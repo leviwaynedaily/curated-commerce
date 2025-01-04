@@ -25,9 +25,10 @@ const formSchema = z.object({
 
 interface StorefrontFormProps {
   businessId: string;
+  onSuccess?: () => void;
 }
 
-export function StorefrontForm({ businessId }: StorefrontFormProps) {
+export function StorefrontForm({ businessId, onSuccess }: StorefrontFormProps) {
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,6 +50,7 @@ export function StorefrontForm({ businessId }: StorefrontFormProps) {
 
       toast.success("Store created successfully!");
       queryClient.invalidateQueries({ queryKey: ["storefront"] });
+      onSuccess?.();
     } catch (error) {
       console.error("Error creating store:", error);
       toast.error("Failed to create store. Please try again.");
