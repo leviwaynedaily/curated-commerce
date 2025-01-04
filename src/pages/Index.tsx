@@ -33,15 +33,41 @@ const Index = () => {
     queryFn: async () => {
       if (!business?.id) return null
 
-      const { data, error } = await supabase
+      // First try to get the last accessed storefront from localStorage
+      const lastStorefrontId = localStorage.getItem('lastStorefrontId')
+      
+      let query = supabase
         .from("storefronts")
         .select("*")
         .eq("business_id", business.id)
+
+      if (lastStorefrontId) {
+        // If we have a last accessed storefront, try to get that one
+        const { data: specificStorefront } = await query
+          .eq('id', lastStorefrontId)
+          .maybeSingle()
+        
+        if (specificStorefront) {
+          console.log("Using last accessed storefront:", specificStorefront.id)
+          return specificStorefront
+        }
+      }
+
+      // If no last storefront or it wasn't found, get the first one
+      const { data, error } = await query
+        .order('created_at', { ascending: false })
+        .limit(1)
         .maybeSingle()
 
       if (error) {
         console.error("Storefront query error:", error)
         return null
+      }
+
+      // Store the storefront ID for next time
+      if (data) {
+        localStorage.setItem('lastStorefrontId', data.id)
+        console.log("Setting new current storefront:", data.id)
       }
       
       return data
