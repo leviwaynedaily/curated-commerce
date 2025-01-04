@@ -1,6 +1,6 @@
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { DashboardLayout } from "@/components/layout/DashboardLayout"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import {
   BarChart3,
   Package,
@@ -9,12 +9,13 @@ import {
   ArrowRight,
   Palette,
   Globe,
-  Store,
-} from "lucide-react";
-import { BusinessForm } from "@/components/forms/BusinessForm";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { StorefrontForm } from "@/components/forms/StorefrontForm";
+} from "lucide-react"
+import { BusinessForm } from "@/components/forms/BusinessForm"
+import { useQuery } from "@tanstack/react-query"
+import { supabase } from "@/integrations/supabase/client"
+import { StorefrontForm } from "@/components/forms/StorefrontForm"
+import { ProductForm } from "@/components/forms/ProductForm"
+import { ProductList } from "@/components/products/ProductList"
 
 const stats = [
   {
@@ -47,7 +48,7 @@ const stats = [
   },
 ];
 
-const Dashboard = () => (
+const Dashboard = ({ storefront }: { storefront: any }) => (
   <div className="space-y-8 fade-in">
     <div>
       <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -81,8 +82,18 @@ const Dashboard = () => (
       ))}
     </div>
 
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      <Card className="hover-card col-span-2">
+    <Card className="hover-card">
+      <CardHeader>
+        <CardTitle>Products</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        <ProductForm storefrontId={storefront.id} />
+        <ProductList storefrontId={storefront.id} />
+      </CardContent>
+    </Card>
+
+    <div className="grid gap-4 md:grid-cols-2">
+      <Card className="hover-card">
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
@@ -102,10 +113,6 @@ const Dashboard = () => (
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button className="w-full justify-start">
-            <Package className="mr-2 h-4 w-4" />
-            Add New Product
-          </Button>
           <Button variant="outline" className="w-full justify-start">
             <Palette className="mr-2 h-4 w-4" />
             Customize Store
@@ -118,50 +125,50 @@ const Dashboard = () => (
       </Card>
     </div>
   </div>
-);
+)
 
 const Index = () => {
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return null
 
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .maybeSingle()
 
       if (error) {
-        console.error("Business query error:", error);
-        return null;
+        console.error("Business query error:", error)
+        return null
       }
       
-      return data;
+      return data
     },
-  });
+  })
 
   const { data: storefront, isLoading: isLoadingStorefront } = useQuery({
     queryKey: ["storefront", business?.id],
     queryFn: async () => {
-      if (!business?.id) return null;
+      if (!business?.id) return null
 
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
         .eq("business_id", business.id)
-        .maybeSingle();
+        .maybeSingle()
 
       if (error) {
-        console.error("Storefront query error:", error);
-        return null;
+        console.error("Storefront query error:", error)
+        return null
       }
       
-      return data;
+      return data
     },
     enabled: !!business?.id,
-  });
+  })
 
   if (isLoadingBusiness || isLoadingStorefront) {
     return (
@@ -170,7 +177,7 @@ const Index = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </DashboardLayout>
-    );
+    )
   }
 
   return (
@@ -201,10 +208,10 @@ const Index = () => {
           </Card>
         </div>
       ) : (
-        <Dashboard />
+        <Dashboard storefront={storefront} />
       )}
     </DashboardLayout>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
