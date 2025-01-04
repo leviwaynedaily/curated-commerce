@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Plus, Store } from "lucide-react"
+import { Plus } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -60,7 +60,6 @@ export function StorefrontSwitcher() {
         throw error
       }
 
-      console.log("Fetched storefronts:", data)
       return data
     },
     enabled: !!business?.id,
@@ -117,23 +116,19 @@ export function StorefrontSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Store className="h-4 w-4 text-muted-foreground" />
+    <div>
       <Select
         defaultValue={currentStorefront?.id}
         onValueChange={(value) => {
           if (value === "new") {
             setShowCreateStore(true)
           } else {
-            // Here you would typically update the current storefront in your app state
             console.log("Switching to storefront:", value)
           }
         }}
       >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Select store">
-            {currentStorefront?.name || "Select store"}
-          </SelectValue>
+        <SelectTrigger className="w-[180px] bg-background">
+          <SelectValue placeholder="Select store" />
         </SelectTrigger>
         <SelectContent>
           {storefronts.map((store) => (
