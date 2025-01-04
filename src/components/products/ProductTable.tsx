@@ -161,11 +161,12 @@ export function ProductTable({
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHeader className="w-12 h-12 px-4">
+              <TableHeader className="w-12 h-12">
                 <Checkbox
                   checked={products.length > 0 && selectedProducts.length === products.length}
                   onCheckedChange={toggleAllProducts}
-                  className="mt-1"
+                  aria-label="Select all"
+                  className="translate-y-[2px]"
                 />
               </TableHeader>
               <ProductTableHeader
