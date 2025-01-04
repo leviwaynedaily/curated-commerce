@@ -29,12 +29,14 @@ const formSchema = z.object({
   show_verification_options: z.boolean().default(false),
 });
 
-const DEFAULT_VALUES = {
+type FormValues = z.infer<typeof formSchema>;
+
+const DEFAULT_VALUES: FormValues = {
   name: "",
   logo_url: null,
   description: "",
   show_description: false,
-  verification_type: "none",
+  verification_type: "none" as const,
   verification_logo_url: null,
   verification_age: 21,
   verification_age_text: "I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy.",
@@ -78,7 +80,7 @@ const StorefrontInformation = () => {
     enabled: !!currentStorefrontId,
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: DEFAULT_VALUES,
   });
@@ -92,7 +94,7 @@ const StorefrontInformation = () => {
         logo_url: storefront.logo_url || DEFAULT_VALUES.logo_url,
         description: storefront.description || DEFAULT_VALUES.description,
         show_description: storefront.show_description || DEFAULT_VALUES.show_description,
-        verification_type: storefront.verification_type || DEFAULT_VALUES.verification_type,
+        verification_type: (storefront.verification_type as FormValues['verification_type']) || DEFAULT_VALUES.verification_type,
         verification_logo_url: storefront.verification_logo_url || DEFAULT_VALUES.verification_logo_url,
         verification_age: storefront.verification_age || DEFAULT_VALUES.verification_age,
         verification_age_text: storefront.verification_age_text || DEFAULT_VALUES.verification_age_text,
@@ -105,7 +107,7 @@ const StorefrontInformation = () => {
     }
   }, [storefront, form]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       console.log("Attempting to save storefront with values:", values);
       
@@ -158,7 +160,7 @@ const StorefrontInformation = () => {
   // Add auto-save functionality with debounce
   const debouncedSave = useMemo(
     () =>
-      debounce(async (values: z.infer<typeof formSchema>) => {
+      debounce(async (values: FormValues) => {
         await onSubmit(values);
       }, 1000),
     []
@@ -169,7 +171,7 @@ const StorefrontInformation = () => {
     const subscription = form.watch((values) => {
       if (storefront) { // Only auto-save if we have initial data
         console.log("Form values changed:", values);
-        debouncedSave(values as z.infer<typeof formSchema>);
+        debouncedSave(values as FormValues);
       }
     });
     return () => subscription.unsubscribe();
