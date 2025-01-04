@@ -7,6 +7,7 @@ interface StatsProps {
 
 export function Stats({ products }: StatsProps) {
   console.log("Products in Stats:", products)
+  // Filter products by their exact status values
   const activeProducts = products?.filter(p => p.status === "active")?.length || 0
   const inactiveProducts = products?.filter(p => p.status === "inactive")?.length || 0
   const totalProducts = products?.length || 0
