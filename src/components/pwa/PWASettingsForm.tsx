@@ -49,7 +49,7 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .select("*")
         .eq("storefront_id", currentStorefrontId)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
         console.error("Error fetching PWA settings:", error);
