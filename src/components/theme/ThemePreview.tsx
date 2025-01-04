@@ -7,8 +7,27 @@ interface ThemePreviewProps {
   };
 }
 
+// Default theme configuration to use as fallback
+const defaultTheme: ThemeConfig = {
+  colors: {
+    background: {
+      primary: "#ffffff",
+      secondary: "#f5f5f5",
+      accent: "#000000",
+    },
+    font: {
+      primary: "#000000",
+      secondary: "#666666",
+      highlight: "#333333",
+    },
+  },
+};
+
 export function ThemePreview({ theme }: ThemePreviewProps) {
-  const { colors } = theme.layout_config;
+  // Use nullish coalescing to fall back to default theme if layout_config is invalid
+  const colors = theme?.layout_config?.colors ?? defaultTheme.colors;
+
+  console.log("Theme Preview Colors:", colors); // Debug log
 
   return (
     <div className="aspect-video rounded-lg overflow-hidden">
