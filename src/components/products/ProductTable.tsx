@@ -20,19 +20,44 @@ import {
 } from "@/components/ui/dialog"
 import { ProductForm } from "../forms/ProductForm"
 
-export function ProductTable({ storefrontId }: { storefrontId: string }) {
+interface ProductTableProps {
+  storefrontId: string
+  statusFilter: string
+  searchQuery: string
+  selectedProducts: string[]
+  onSelectedProductsChange: (products: string[]) => void
+}
+
+export function ProductTable({
+  storefrontId,
+  statusFilter,
+  searchQuery,
+  selectedProducts,
+  onSelectedProductsChange,
+}: ProductTableProps) {
   const [editingProduct, setEditingProduct] = useState<any>(null)
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products", storefrontId],
+    queryKey: ["products", storefrontId, statusFilter, searchQuery],
     queryFn: async () => {
       console.log("Fetching products for storefront:", storefrontId)
-      const { data, error } = await supabase
+      let query = supabase
         .from("products")
         .select("*")
         .eq("storefront_id", storefrontId)
         .order("created_at", { ascending: false })
+
+      // Apply status filter
+      if (statusFilter !== "all") {
+        query = query.eq("status", statusFilter)
+      }
+
+      // Apply search filter
+      if (searchQuery) {
+        query = query.ilike("name", `%${searchQuery}%`)
+      }
+
+      const { data, error } = await query
 
       if (error) {
         console.error("Error fetching products:", error)
@@ -45,16 +70,16 @@ export function ProductTable({ storefrontId }: { storefrontId: string }) {
   })
 
   const toggleProductSelection = (productId: string) => {
-    setSelectedProducts(prev =>
-      prev.includes(productId)
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
+    onSelectedProductsChange(
+      selectedProducts.includes(productId)
+        ? selectedProducts.filter(id => id !== productId)
+        : [...selectedProducts, productId]
     )
   }
 
   const toggleAllProducts = () => {
     if (products) {
-      setSelectedProducts(
+      onSelectedProductsChange(
         selectedProducts.length === products.length
           ? []
           : products.map(product => product.id)

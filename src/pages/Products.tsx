@@ -1,10 +1,17 @@
+import { useState } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Button } from "@/components/ui/button"
 import { ProductTable } from "@/components/products/ProductTable"
+import { ProductFilters } from "@/components/products/ProductFilters"
+import { ProductBulkActions } from "@/components/products/ProductBulkActions"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 
 const Products = () => {
+  const [selectedStatus, setSelectedStatus] = useState("all")
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+
   const { data: storefront, isLoading } = useQuery({
     queryKey: ["storefront"],
     queryFn: async () => {
@@ -64,9 +71,32 @@ const Products = () => {
               Manage your store's products here.
             </p>
           </div>
-          <Button variant="default">Add product</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline">Export</Button>
+            <Button variant="outline">Import</Button>
+            <Button variant="default">Add product</Button>
+          </div>
         </div>
-        <ProductTable storefrontId={storefront.id} />
+
+        <ProductFilters
+          selectedStatus={selectedStatus}
+          onStatusChange={setSelectedStatus}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
+
+        <ProductBulkActions
+          selectedProducts={selectedProducts}
+          onClearSelection={() => setSelectedProducts([])}
+        />
+
+        <ProductTable
+          storefrontId={storefront.id}
+          statusFilter={selectedStatus}
+          searchQuery={searchQuery}
+          selectedProducts={selectedProducts}
+          onSelectedProductsChange={setSelectedProducts}
+        />
       </div>
     </DashboardLayout>
   )
