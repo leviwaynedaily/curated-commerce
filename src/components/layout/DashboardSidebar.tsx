@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
 
 interface DashboardSidebarProps {
   open?: boolean;
@@ -46,6 +47,9 @@ const DashboardSidebarContent = () => (
       <span className="text-xl font-semibold text-primary">Curately</span>
     </SidebarHeader>
     <SidebarContent>
+      <div className="px-4 py-2">
+        <StorefrontSwitcher />
+      </div>
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>
