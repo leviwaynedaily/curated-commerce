@@ -6,6 +6,7 @@ import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 interface StorefrontBasicInfoProps {
   form: UseFormReturn<any>;
@@ -38,6 +39,14 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
     },
     enabled: !!currentStorefrontId
   });
+
+  // Set the default value for the name field when storefront data is loaded
+  useEffect(() => {
+    if (storefront?.name && !form.getValues("name")) {
+      console.log("Setting default name to:", storefront.name);
+      form.setValue("name", storefront.name);
+    }
+  }, [storefront, form]);
 
   return (
     <div className="space-y-6">
