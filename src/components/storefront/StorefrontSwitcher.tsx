@@ -65,26 +65,8 @@ export function StorefrontSwitcher() {
     enabled: !!business?.id,
   })
 
-  const { data: currentStorefront } = useQuery({
-    queryKey: ["storefront"],
-    queryFn: async () => {
-      if (!business?.id) return null
-
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("business_id", business.id)
-        .maybeSingle()
-
-      if (error) {
-        console.error("Storefront query error:", error)
-        return null
-      }
-      
-      return data
-    },
-    enabled: !!business?.id,
-  })
+  // Get the current storefront ID from localStorage
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   if (!storefronts?.length) {
     return (
@@ -118,17 +100,22 @@ export function StorefrontSwitcher() {
   return (
     <div>
       <Select
-        defaultValue={currentStorefront?.id}
+        value={currentStorefrontId || undefined}
         onValueChange={(value) => {
           if (value === "new") {
             setShowCreateStore(true)
           } else {
             console.log("Switching to storefront:", value)
+            localStorage.setItem('lastStorefrontId', value)
+            // Force a refresh to update the dashboard with the new store
+            window.location.reload()
           }
         }}
       >
         <SelectTrigger className="w-[180px] bg-background">
-          <SelectValue placeholder="Select store" />
+          <SelectValue placeholder="Select store">
+            {storefronts?.find(store => store.id === currentStorefrontId)?.name || "Select store"}
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {storefronts.map((store) => (
