@@ -1,14 +1,14 @@
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { extractColorsFromLogo } from "@/utils/colorExtractor";
 import { useToast } from "@/components/ui/use-toast";
+import { ColorInput } from "./appearance/ColorInput";
+import { ColorPreview } from "./appearance/ColorPreview";
+import { BrowserAssets } from "./appearance/BrowserAssets";
 
 interface StorefrontAppearanceProps {
   form: UseFormReturn<any>;
@@ -20,7 +20,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
   const { toast } = useToast();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  // Fetch current storefront data to get the logo URL
   const { data: storefront } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
@@ -37,7 +36,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
     enabled: !!currentStorefrontId
   });
 
-  // Update preview colors when form values change
   useEffect(() => {
     const subscription = form.watch((value) => {
       if (value.theme_config?.colors) {
@@ -60,8 +58,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
     try {
       setIsExtracting(true);
       const colors = await extractColorsFromLogo(storefront.logo_url);
-      
-      // Update form values with extracted colors
       form.setValue("theme_config.colors", colors);
       
       toast({
@@ -79,31 +75,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
       setIsExtracting(false);
     }
   };
-
-  const ColorInput = ({ label, path }: { label: string; path: string }) => (
-    <FormField
-      control={form.control}
-      name={`theme_config.colors.${path}`}
-      render={({ field }) => (
-        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-          <div className="space-y-0.5">
-            <FormLabel>{label}</FormLabel>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div
-              className="h-6 w-6 rounded-md border"
-              style={{ backgroundColor: field.value }}
-            />
-            <Input
-              type="color"
-              {...field}
-              className="w-12 cursor-pointer border-0 bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:border-0"
-            />
-          </div>
-        </FormItem>
-      )}
-    />
-  );
 
   return (
     <div className="space-y-6">
@@ -139,12 +110,16 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
             {isExtracting ? "Extracting Colors..." : "Suggest Colors from Logo"}
           </Button>
 
+          <BrowserAssets form={form} storefrontId={currentStorefrontId} />
+
+          <Separator />
+
           <div>
             <h3 className="mb-4 text-sm font-medium">Background Colors</h3>
             <div className="space-y-4">
-              <ColorInput label="Primary Background" path="background.primary" />
-              <ColorInput label="Secondary Background" path="background.secondary" />
-              <ColorInput label="Accent Background" path="background.accent" />
+              <ColorInput label="Primary Background" path="background.primary" form={form} />
+              <ColorInput label="Secondary Background" path="background.secondary" form={form} />
+              <ColorInput label="Accent Background" path="background.accent" form={form} />
             </div>
           </div>
 
@@ -153,54 +128,16 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
           <div>
             <h3 className="mb-4 text-sm font-medium">Font Colors</h3>
             <div className="space-y-4">
-              <ColorInput label="Primary Font" path="font.primary" />
-              <ColorInput label="Secondary Font" path="font.secondary" />
-              <ColorInput label="Highlight Font" path="font.highlight" />
+              <ColorInput label="Primary Font" path="font.primary" form={form} />
+              <ColorInput label="Secondary Font" path="font.secondary" form={form} />
+              <ColorInput label="Highlight Font" path="font.highlight" form={form} />
             </div>
           </div>
         </div>
 
         <div>
           <h3 className="mb-4 text-sm font-medium">Live Preview</h3>
-          <Card className="overflow-hidden">
-            <div
-              style={{ backgroundColor: previewColors?.background?.primary }}
-              className="p-6"
-            >
-              <div
-                style={{ backgroundColor: previewColors?.background?.secondary }}
-                className="rounded-lg p-4"
-              >
-                <h4
-                  style={{ color: previewColors?.font?.primary }}
-                  className="mb-2 text-lg font-semibold"
-                >
-                  Preview Heading
-                </h4>
-                <p
-                  style={{ color: previewColors?.font?.secondary }}
-                  className="mb-4 text-sm"
-                >
-                  This is how your content will look with the selected colors.
-                </p>
-                <button
-                  style={{
-                    backgroundColor: previewColors?.background?.accent,
-                    color: previewColors?.font?.primary,
-                  }}
-                  className="rounded px-4 py-2 text-sm font-medium"
-                >
-                  Sample Button
-                </button>
-                <p
-                  style={{ color: previewColors?.font?.highlight }}
-                  className="mt-4 text-sm font-medium"
-                >
-                  Highlighted text example
-                </p>
-              </div>
-            </div>
-          </Card>
+          <ColorPreview colors={previewColors} />
         </div>
       </div>
     </div>
