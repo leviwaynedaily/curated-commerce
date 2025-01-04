@@ -15,7 +15,6 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { Link } from "react-router-dom"
-import { ProductTable } from "@/components/products/ProductTable"
 
 const stats = [
   {
@@ -81,16 +80,6 @@ const Dashboard = ({ storefront }: { storefront: any }) => (
         </Card>
       ))}
     </div>
-
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Products</CardTitle>
-        <Button variant="default">Add product</Button>
-      </CardHeader>
-      <CardContent>
-        <ProductTable storefrontId={storefront.id} />
-      </CardContent>
-    </Card>
 
     <div className="grid gap-4 md:grid-cols-2">
       <Card className="hover-card">

@@ -1,7 +1,7 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ProductForm } from "@/components/forms/ProductForm"
-import { ProductList } from "@/components/products/ProductList"
+import { Button } from "@/components/ui/button"
+import { ProductTable } from "@/components/products/ProductTable"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 
@@ -66,20 +66,12 @@ const Products = () => {
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Add New Product</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Products</CardTitle>
+            <Button variant="default">Add product</Button>
           </CardHeader>
           <CardContent>
-            <ProductForm storefrontId={storefront.id} />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Your Products</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProductList storefrontId={storefront.id} />
+            <ProductTable storefrontId={storefront.id} />
           </CardContent>
         </Card>
       </div>
