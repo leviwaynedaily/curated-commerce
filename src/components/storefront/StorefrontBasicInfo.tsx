@@ -45,13 +45,6 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
         <h2 className="text-lg font-semibold">Basic Information</h2>
       </div>
 
-      <div className="space-y-2">
-        <FormLabel>Current Store Name</FormLabel>
-        <div className="text-sm text-muted-foreground mb-4">
-          {storefront?.name || "Loading..."}
-        </div>
-      </div>
-
       <FormField
         control={form.control}
         name="name"
