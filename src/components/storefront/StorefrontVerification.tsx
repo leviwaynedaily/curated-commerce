@@ -29,7 +29,7 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
                 <Switch
                   checked={field.value !== "none"}
                   onCheckedChange={(checked) => {
-                    field.onChange(checked ? "age" : "none");
+                    field.onChange(checked ? "none" : "none");
                   }}
                 />
               </FormControl>
@@ -77,9 +77,17 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
                         onCheckedChange={(checked) => {
                           const currentType = form.getValues("verification_type");
                           if (checked) {
-                            form.setValue("verification_type", hasPasswordProtection ? "both" : "age");
+                            if (hasPasswordProtection) {
+                              form.setValue("verification_type", "both");
+                            } else {
+                              form.setValue("verification_type", "age");
+                            }
                           } else {
-                            form.setValue("verification_type", hasPasswordProtection ? "password" : "none");
+                            if (hasPasswordProtection) {
+                              form.setValue("verification_type", "password");
+                            } else {
+                              form.setValue("verification_type", "none");
+                            }
                           }
                         }}
                       />
