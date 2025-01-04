@@ -91,7 +91,7 @@ export type Database = {
           name: string
           shipping_price: number | null
           sort_order: number | null
-          status: string | null
+          status: Database["public"]["Enums"]["product_status"] | null
           storefront_id: string | null
           updated_at: string | null
         }
@@ -105,7 +105,7 @@ export type Database = {
           name: string
           shipping_price?: number | null
           sort_order?: number | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["product_status"] | null
           storefront_id?: string | null
           updated_at?: string | null
         }
@@ -119,7 +119,7 @@ export type Database = {
           name?: string
           shipping_price?: number | null
           sort_order?: number | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["product_status"] | null
           storefront_id?: string | null
           updated_at?: string | null
         }
@@ -209,6 +209,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      product_status: "active" | "inactive"
       verification_type: "none" | "age" | "password" | "both"
     }
     CompositeTypes: {
