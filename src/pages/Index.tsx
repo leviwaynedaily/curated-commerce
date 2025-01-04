@@ -14,8 +14,7 @@ import { BusinessForm } from "@/components/forms/BusinessForm"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
-import { ProductForm } from "@/components/forms/ProductForm"
-import { ProductList } from "@/components/products/ProductList"
+import { Link } from "react-router-dom"
 
 const stats = [
   {
@@ -46,7 +45,7 @@ const stats = [
     change: "+15",
     changeType: "positive",
   },
-];
+]
 
 const Dashboard = ({ storefront }: { storefront: any }) => (
   <div className="space-y-8 fade-in">
@@ -82,17 +81,29 @@ const Dashboard = ({ storefront }: { storefront: any }) => (
       ))}
     </div>
 
-    <Card className="hover-card">
-      <CardHeader>
-        <CardTitle>Products</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-8">
-        <ProductForm storefrontId={storefront.id} />
-        <ProductList storefrontId={storefront.id} />
-      </CardContent>
-    </Card>
-
     <div className="grid gap-4 md:grid-cols-2">
+      <Card className="hover-card">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button variant="outline" className="w-full justify-start" asChild>
+            <Link to="/products">
+              <Package className="mr-2 h-4 w-4" />
+              Manage Products
+            </Link>
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <Palette className="mr-2 h-4 w-4" />
+            Customize Store
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <Globe className="mr-2 h-4 w-4" />
+            View Store
+          </Button>
+        </CardContent>
+      </Card>
+
       <Card className="hover-card">
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
@@ -104,22 +115,6 @@ const Dashboard = ({ storefront }: { storefront: any }) => (
           <Button variant="link" className="mt-4 p-0 h-auto font-normal">
             View all orders
             <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className="hover-card">
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="outline" className="w-full justify-start">
-            <Palette className="mr-2 h-4 w-4" />
-            Customize Store
-          </Button>
-          <Button variant="outline" className="w-full justify-start">
-            <Globe className="mr-2 h-4 w-4" />
-            View Store
           </Button>
         </CardContent>
       </Card>
