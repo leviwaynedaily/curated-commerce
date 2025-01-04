@@ -1,5 +1,6 @@
 import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { UseFormReturn } from "react-hook-form";
 
 interface StorefrontInstructionsProps {
@@ -7,6 +8,8 @@ interface StorefrontInstructionsProps {
 }
 
 export function StorefrontInstructions({ form }: StorefrontInstructionsProps) {
+  const showInstructions = form.watch("enable_instructions");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -27,6 +30,25 @@ export function StorefrontInstructions({ form }: StorefrontInstructionsProps) {
           )}
         />
       </div>
+
+      {showInstructions && (
+        <FormField
+          control={form.control}
+          name="instructions_text"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instructions Text</FormLabel>
+              <FormControl>
+                <Textarea 
+                  placeholder="Enter instructions for your customers..."
+                  className="min-h-[200px]"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      )}
     </div>
   );
 }
