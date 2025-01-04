@@ -9,9 +9,10 @@ interface ImageUploadProps {
   onChange: (url: string | null) => void;
   bucket: string;
   path: string;
+  storefrontId?: string;
 }
 
-export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, bucket, path, storefrontId }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
 
@@ -21,9 +22,15 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
 
     try {
       setIsUploading(true);
+      console.log("Starting file upload for storefront:", storefrontId);
 
       const fileExt = file.name.split('.').pop();
-      const filePath = `${path}/${Math.random()}.${fileExt}`;
+      // Include storefrontId in the path if available
+      const filePath = storefrontId 
+        ? `${storefrontId}/${path}/${Math.random()}.${fileExt}`
+        : `${path}/${Math.random()}.${fileExt}`;
+
+      console.log("Uploading file to path:", filePath);
 
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
@@ -35,6 +42,7 @@ export function ImageUpload({ value, onChange, bucket, path }: ImageUploadProps)
         .from(bucket)
         .getPublicUrl(filePath);
 
+      console.log("File uploaded successfully, public URL:", publicUrl);
       onChange(publicUrl);
 
       toast({

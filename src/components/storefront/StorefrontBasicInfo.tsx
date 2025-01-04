@@ -19,7 +19,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
   const { data: storefront } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
-      console.log("Fetching storefront name for:", currentStorefrontId);
+      console.log("Fetching storefront data for:", currentStorefrontId);
       if (!currentStorefrontId) return null;
 
       const { data, error } = await supabase
@@ -70,6 +70,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
                 onChange={field.onChange}
                 bucket="storefront-assets"
                 path="logos"
+                storefrontId={currentStorefrontId || undefined}
               />
             </FormControl>
           </FormItem>
