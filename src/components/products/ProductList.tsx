@@ -68,7 +68,12 @@ export function ProductList({ storefrontId }: { storefrontId: string }) {
             )}
             <CardHeader>
               <CardTitle>{product.name}</CardTitle>
-              <CardDescription>${product.price}</CardDescription>
+              <CardDescription>
+                <div className="space-y-1">
+                  <p>In-Town: ${product.in_town_price}</p>
+                  <p>Shipping: ${product.shipping_price}</p>
+                </div>
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">

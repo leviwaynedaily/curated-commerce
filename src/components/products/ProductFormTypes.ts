@@ -5,8 +5,11 @@ export const productFormSchema = z.object({
     message: "Product name must be at least 2 characters.",
   }),
   description: z.string().optional(),
-  price: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Price must be a valid number",
+  in_town_price: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "In-town price must be a valid number",
+  }),
+  shipping_price: z.string().refine((val) => !isNaN(Number(val)), {
+    message: "Shipping price must be a valid number",
   }),
   category: z.string().optional(),
   images: z.array(z.string()).optional(),

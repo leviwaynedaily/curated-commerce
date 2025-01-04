@@ -112,7 +112,8 @@ export function ProductTable({
               </TableHead>
               <TableHead className="min-w-[300px]">Product</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Price</TableHead>
+              <TableHead>In-Town Price</TableHead>
+              <TableHead>Shipping Price</TableHead>
               <TableHead>Category</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -145,7 +146,8 @@ export function ProductTable({
                     {product.status}
                   </Badge>
                 </TableCell>
-                <TableCell>${product.price}</TableCell>
+                <TableCell>${product.in_town_price}</TableCell>
+                <TableCell>${product.shipping_price}</TableCell>
                 <TableCell>{product.category || "—"}</TableCell>
                 <TableCell className="text-right">
                   <ProductActions

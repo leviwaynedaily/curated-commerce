@@ -87,8 +87,9 @@ export type Database = {
           description: string | null
           id: string
           images: Json | null
+          in_town_price: number | null
           name: string
-          price: number | null
+          shipping_price: number | null
           sort_order: number | null
           status: string | null
           storefront_id: string | null
@@ -100,8 +101,9 @@ export type Database = {
           description?: string | null
           id?: string
           images?: Json | null
+          in_town_price?: number | null
           name: string
-          price?: number | null
+          shipping_price?: number | null
           sort_order?: number | null
           status?: string | null
           storefront_id?: string | null
@@ -113,8 +115,9 @@ export type Database = {
           description?: string | null
           id?: string
           images?: Json | null
+          in_town_price?: number | null
           name?: string
-          price?: number | null
+          shipping_price?: number | null
           sort_order?: number | null
           status?: string | null
           storefront_id?: string | null
