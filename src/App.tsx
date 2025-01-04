@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Products from "./pages/Products";
+import StorefrontInformation from "./pages/StorefrontInformation";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/storefront-information"
+            element={
+              <ProtectedRoute>
+                <StorefrontInformation />
               </ProtectedRoute>
             }
           />

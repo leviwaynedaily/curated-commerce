@@ -144,6 +144,8 @@ export type Database = {
           is_published: boolean | null
           logo_url: string | null
           name: string
+          page_title: string | null
+          show_description: boolean | null
           slug: string
           theme_config: Json | null
           updated_at: string | null
@@ -163,6 +165,8 @@ export type Database = {
           is_published?: boolean | null
           logo_url?: string | null
           name: string
+          page_title?: string | null
+          show_description?: boolean | null
           slug: string
           theme_config?: Json | null
           updated_at?: string | null
@@ -182,6 +186,8 @@ export type Database = {
           is_published?: boolean | null
           logo_url?: string | null
           name?: string
+          page_title?: string | null
+          show_description?: boolean | null
           slug?: string
           theme_config?: Json | null
           updated_at?: string | null
