@@ -45,6 +45,18 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+// Helper function to validate ThemeConfig structure
+const isValidThemeConfig = (config: any): config is ThemeConfig => {
+  return (
+    config &&
+    typeof config === 'object' &&
+    'colors' in config &&
+    typeof config.colors === 'object' &&
+    'background' in config.colors &&
+    'font' in config.colors
+  );
+};
+
 const Appearance = () => {
   const { toast } = useToast();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -75,8 +87,11 @@ const Appearance = () => {
 
       console.log("Fetched storefront:", data);
       
-      // Ensure theme_config has the correct structure or use default
-      const themeConfig = data.theme_config as ThemeConfig || defaultThemeConfig;
+      // Validate theme_config structure and use default if invalid
+      const themeConfig = isValidThemeConfig(data.theme_config) 
+        ? data.theme_config 
+        : defaultThemeConfig;
+
       return {
         ...data,
         theme_config: themeConfig,
