@@ -30,29 +30,36 @@ type FormValues = z.infer<typeof formSchema>;
 
 const StorefrontInformation = () => {
   const { toast } = useToast();
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   const { data: storefront, isLoading } = useQuery({
-    queryKey: ["storefront"],
+    queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session");
+      console.log("Fetching storefront with ID:", currentStorefrontId);
+      
+      if (!currentStorefrontId) {
+        throw new Error("No storefront selected");
+      }
 
-      const { data: business } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!business) throw new Error("No business found");
-
-      const { data: storefront } = await supabase
+      const { data, error } = await supabase
         .from("storefronts")
         .select("*")
-        .eq("business_id", business.id)
-        .single();
+        .eq("id", currentStorefrontId)
+        .maybeSingle();
 
-      return storefront;
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        throw error;
+      }
+
+      if (!data) {
+        throw new Error("Storefront not found");
+      }
+
+      console.log("Fetched storefront:", data);
+      return data;
     },
+    enabled: !!currentStorefrontId,
   });
 
   const form = useForm<FormValues>({
@@ -74,16 +81,9 @@ const StorefrontInformation = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("No session");
-
-      const { data: business } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!business) throw new Error("No business found");
+      if (!currentStorefrontId) {
+        throw new Error("No storefront selected");
+      }
 
       const { error } = await supabase
         .from("storefronts")
@@ -96,7 +96,7 @@ const StorefrontInformation = () => {
           verification_age: values.verification_age,
           verification_password: values.verification_password,
         })
-        .eq("business_id", business.id);
+        .eq("id", currentStorefrontId);
 
       if (error) throw error;
 
@@ -118,6 +118,14 @@ const StorefrontInformation = () => {
     return (
       <DashboardLayout>
         <div>Loading...</div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!currentStorefrontId) {
+    return (
+      <DashboardLayout>
+        <div>Please select a storefront first</div>
       </DashboardLayout>
     );
   }
