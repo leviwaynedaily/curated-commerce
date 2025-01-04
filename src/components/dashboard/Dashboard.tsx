@@ -26,10 +26,10 @@ export function Dashboard({ storefront }: { storefront: any }) {
   })
 
   return (
-    <div className="space-y-8 fade-in">
+    <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-2">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-sm md:text-base text-muted-foreground mt-2">
           Welcome back! Here's an overview of your store.
         </p>
       </div>

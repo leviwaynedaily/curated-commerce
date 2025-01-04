@@ -17,7 +17,7 @@ export function Stats({ products }: StatsProps) {
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
         <Card key={stat.title} className="hover-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -27,7 +27,7 @@ export function Stats({ products }: StatsProps) {
             <stat.icon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className="text-xl md:text-2xl font-bold">{stat.value}</div>
             <p
               className={`text-xs ${
                 stat.changeType === "positive"
