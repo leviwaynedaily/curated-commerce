@@ -38,6 +38,8 @@ export function ProductBulkActions({
 
   const handleBulkDuplicate = async () => {
     try {
+      console.log("Starting bulk duplication for products:", selectedProducts)
+      
       // First, get the products to duplicate
       const { data: productsToDuplicate, error: fetchError } = await supabase
         .from("products")
@@ -45,17 +47,25 @@ export function ProductBulkActions({
         .in("id", selectedProducts)
 
       if (fetchError) throw fetchError
+      if (!productsToDuplicate) {
+        throw new Error("No products found to duplicate")
+      }
 
-      if (!productsToDuplicate) return
+      console.log("Products to duplicate:", productsToDuplicate)
 
-      // Prepare the products for insertion (removing ids and updating names)
+      // Prepare the products for insertion by removing id and timestamps
       const duplicatedProducts = productsToDuplicate.map(product => ({
-        ...product,
-        id: undefined, // Let Supabase generate new IDs
+        storefront_id: product.storefront_id,
         name: `${product.name} (Copy)`,
-        created_at: undefined,
-        updated_at: undefined,
+        description: product.description,
+        price: product.price,
+        category: product.category,
+        images: product.images,
+        status: product.status,
+        sort_order: product.sort_order,
       }))
+
+      console.log("Prepared duplicated products:", duplicatedProducts)
 
       const { error: insertError } = await supabase
         .from("products")
