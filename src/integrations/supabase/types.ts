@@ -305,6 +305,45 @@ export type Database = {
           },
         ]
       }
+      themes: {
+        Row: {
+          category: Database["public"]["Enums"]["theme_category"]
+          created_at: string | null
+          description: string | null
+          id: string
+          is_default: boolean | null
+          layout_config: Json
+          name: string
+          preview_image: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["theme_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          layout_config?: Json
+          name: string
+          preview_image?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["theme_category"]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_default?: boolean | null
+          layout_config?: Json
+          name?: string
+          preview_image?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -316,6 +355,7 @@ export type Database = {
       product_status: "active" | "inactive"
       pwa_display_mode: "standalone" | "fullscreen" | "minimal-ui" | "browser"
       pwa_orientation: "portrait" | "landscape" | "any"
+      theme_category: "grid" | "list" | "masonry" | "carousel"
       verification_type: "none" | "age" | "password" | "both"
     }
     CompositeTypes: {
