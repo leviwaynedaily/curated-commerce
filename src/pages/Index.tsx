@@ -9,10 +9,12 @@ import {
   ArrowRight,
   Palette,
   Globe,
+  Store,
 } from "lucide-react";
 import { BusinessForm } from "@/components/forms/BusinessForm";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { StorefrontForm } from "@/components/forms/StorefrontForm";
 
 const stats = [
   {
@@ -119,7 +121,7 @@ const Dashboard = () => (
 );
 
 const Index = () => {
-  const { data: business, isLoading } = useQuery({
+  const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -136,7 +138,24 @@ const Index = () => {
     },
   });
 
-  if (isLoading) {
+  const { data: storefront, isLoading: isLoadingStorefront } = useQuery({
+    queryKey: ["storefront", business?.id],
+    queryFn: async () => {
+      if (!business?.id) return null;
+
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("business_id", business.id)
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data;
+    },
+    enabled: !!business?.id,
+  });
+
+  if (isLoadingBusiness || isLoadingStorefront) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
@@ -156,6 +175,20 @@ const Index = () => {
             </CardHeader>
             <CardContent>
               <BusinessForm />
+            </CardContent>
+          </Card>
+        </div>
+      ) : !storefront ? (
+        <div className="max-w-md mx-auto mt-8">
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl">Create Your Store</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Set up your online storefront to start selling your products
+              </p>
+            </CardHeader>
+            <CardContent>
+              <StorefrontForm businessId={business.id} />
             </CardContent>
           </Card>
         </div>
