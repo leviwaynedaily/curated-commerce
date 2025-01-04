@@ -8,8 +8,8 @@ interface ThemePreviewProps {
   };
 }
 
-const defaultTheme: ThemeConfig = {
-  colors: {
+export function ThemePreview({ theme }: ThemePreviewProps) {
+  const colors = theme?.layout_config?.colors ?? {
     background: {
       primary: "#ffffff",
       secondary: "#f5f5f5",
@@ -20,13 +20,7 @@ const defaultTheme: ThemeConfig = {
       secondary: "#666666",
       highlight: "#333333",
     },
-  },
-};
-
-export function ThemePreview({ theme }: ThemePreviewProps) {
-  const colors = theme?.layout_config?.colors ?? defaultTheme.colors;
-  const layout = theme?.layout_config?.layout ?? {};
-  const components = theme?.layout_config?.components ?? {};
+  };
 
   console.log("Theme Preview Colors:", colors);
 
@@ -56,7 +50,7 @@ export function ThemePreview({ theme }: ThemePreviewProps) {
                 WebkitTextFillColor: colors.font.highlight.includes('gradient') ? 'transparent' : colors.font.primary,
               }}
             >
-              Logo
+              {theme.name}
             </div>
           </div>
 
@@ -93,10 +87,10 @@ export function ThemePreview({ theme }: ThemePreviewProps) {
               key={item}
               className="rounded-lg overflow-hidden"
               style={{ 
-                backgroundColor: components?.card?.background || colors.background.secondary,
-                boxShadow: components?.card?.shadow,
-                border: components?.card?.border,
-                borderRadius: components?.card?.borderRadius
+                backgroundColor: colors.background.secondary,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+                border: `1px solid ${colors.background.secondary}`,
+                borderRadius: '0.5rem'
               }}
             >
               <div 
@@ -110,7 +104,7 @@ export function ThemePreview({ theme }: ThemePreviewProps) {
                 />
                 <div 
                   className="w-20 h-3 rounded"
-                  style={{ backgroundColor: colors.background.secondary }}
+                  style={{ backgroundColor: `${colors.font.secondary}22` }}
                 />
               </div>
             </div>
