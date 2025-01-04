@@ -1,18 +1,33 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package } from "lucide-react"
+import { Package, PackageCheck, PackageX } from "lucide-react"
 
 interface StatsProps {
   products: any[]
 }
 
 export function Stats({ products }: StatsProps) {
+  const activeProducts = products?.filter(p => p.status === "active")?.length || 0
+  const inactiveProducts = products?.filter(p => p.status === "inactive")?.length || 0
+  const totalProducts = products?.length || 0
+
   const stats = [
     {
-      title: "Products",
-      value: products?.length || 0,
-      icon: Package,
-      change: "+3",
+      title: "Active Products",
+      value: activeProducts,
+      icon: PackageCheck,
+      change: "+2",
       changeType: "positive",
+      percentage: totalProducts ? Math.round((activeProducts / totalProducts) * 100) : 0,
+      color: "bg-green-500"
+    },
+    {
+      title: "Inactive Products",
+      value: inactiveProducts,
+      icon: PackageX,
+      change: "-1",
+      changeType: "negative",
+      percentage: totalProducts ? Math.round((inactiveProducts / totalProducts) * 100) : 0,
+      color: "bg-red-500"
     },
   ]
 
@@ -27,7 +42,16 @@ export function Stats({ products }: StatsProps) {
             <stat.icon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-xl md:text-2xl font-bold">{stat.value}</div>
+            <div className="text-2xl font-bold">{stat.value}</div>
+            <div className="mt-4 h-2 w-full rounded-full bg-muted">
+              <div
+                className={`h-2 rounded-full ${stat.color} transition-all duration-500`}
+                style={{ width: `${stat.percentage}%` }}
+              />
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground">
+              {stat.percentage}% of total products
+            </p>
             <p
               className={`text-xs ${
                 stat.changeType === "positive"
