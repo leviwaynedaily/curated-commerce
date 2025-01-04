@@ -59,7 +59,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           <FormItem>
             <FormLabel>Site Name</FormLabel>
             <FormControl>
-              <Input placeholder="Enter site name" {...field} />
+              <Input placeholder={storefront?.name || "Enter site name"} {...field} />
             </FormControl>
           </FormItem>
         )}
