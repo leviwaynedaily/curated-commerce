@@ -21,10 +21,12 @@ const formSchema = z.object({
   verification_type: z.enum(["none", "age", "password", "both"]).default("none"),
   verification_logo_url: z.string().nullable(),
   verification_age: z.number().default(21),
-  verification_age_text: z.string().default("I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy."),
+  verification_age_text: z.string(),
   verification_password: z.string().nullable(),
-  verification_legal_text: z.string().default("This website contains age-restricted content. By entering, you accept our terms and confirm your legal age to view such content."),
+  verification_legal_text: z.string(),
   enable_instructions: z.boolean().default(false),
+  instructions_text: z.string().nullable(),
+  show_verification_options: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -71,12 +73,14 @@ const StorefrontInformation = () => {
       description: storefront?.description || "",
       show_description: storefront?.show_description || false,
       verification_type: storefront?.verification_type || "none",
-      verification_logo_url: null,
+      verification_logo_url: storefront?.verification_logo_url || null,
       verification_age: storefront?.verification_age || 21,
-      verification_age_text: "I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy.",
+      verification_age_text: storefront?.verification_age_text || "I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy.",
       verification_password: storefront?.verification_password || null,
-      verification_legal_text: "This website contains age-restricted content. By entering, you accept our terms and confirm your legal age to view such content.",
-      enable_instructions: false,
+      verification_legal_text: storefront?.verification_legal_text || "This website contains age-restricted content. By entering, you accept our terms and confirm your legal age to view such content.",
+      enable_instructions: storefront?.enable_instructions || false,
+      instructions_text: storefront?.instructions_text || null,
+      show_verification_options: false,
     },
   });
 
@@ -110,8 +114,13 @@ const StorefrontInformation = () => {
           description: values.description,
           show_description: values.show_description,
           verification_type: values.verification_type,
+          verification_logo_url: values.verification_logo_url,
           verification_age: values.verification_age,
+          verification_age_text: values.verification_age_text,
           verification_password: values.verification_password,
+          verification_legal_text: values.verification_legal_text,
+          enable_instructions: values.enable_instructions,
+          instructions_text: values.instructions_text,
         })
         .eq("id", currentStorefrontId);
 

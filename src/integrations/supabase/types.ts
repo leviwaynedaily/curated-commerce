@@ -139,8 +139,10 @@ export type Database = {
           created_at: string | null
           custom_domain: string | null
           description: string | null
+          enable_instructions: boolean | null
           favicon_url: string | null
           id: string
+          instructions_text: string | null
           is_published: boolean | null
           logo_url: string | null
           name: string
@@ -150,6 +152,9 @@ export type Database = {
           theme_config: Json | null
           updated_at: string | null
           verification_age: number | null
+          verification_age_text: string | null
+          verification_legal_text: string | null
+          verification_logo_url: string | null
           verification_password: string | null
           verification_type:
             | Database["public"]["Enums"]["verification_type"]
@@ -160,8 +165,10 @@ export type Database = {
           created_at?: string | null
           custom_domain?: string | null
           description?: string | null
+          enable_instructions?: boolean | null
           favicon_url?: string | null
           id?: string
+          instructions_text?: string | null
           is_published?: boolean | null
           logo_url?: string | null
           name: string
@@ -171,6 +178,9 @@ export type Database = {
           theme_config?: Json | null
           updated_at?: string | null
           verification_age?: number | null
+          verification_age_text?: string | null
+          verification_legal_text?: string | null
+          verification_logo_url?: string | null
           verification_password?: string | null
           verification_type?:
             | Database["public"]["Enums"]["verification_type"]
@@ -181,8 +191,10 @@ export type Database = {
           created_at?: string | null
           custom_domain?: string | null
           description?: string | null
+          enable_instructions?: boolean | null
           favicon_url?: string | null
           id?: string
+          instructions_text?: string | null
           is_published?: boolean | null
           logo_url?: string | null
           name?: string
@@ -192,6 +204,9 @@ export type Database = {
           theme_config?: Json | null
           updated_at?: string | null
           verification_age?: number | null
+          verification_age_text?: string | null
+          verification_legal_text?: string | null
+          verification_logo_url?: string | null
           verification_password?: string | null
           verification_type?:
             | Database["public"]["Enums"]["verification_type"]
