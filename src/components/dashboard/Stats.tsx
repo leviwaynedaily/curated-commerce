@@ -1,14 +1,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package, PackageCheck, PackageX } from "lucide-react"
+import { PackageCheck, PackageX } from "lucide-react"
 
 interface StatsProps {
   products: any[]
 }
 
 export function Stats({ products }: StatsProps) {
+  console.log("Products in Stats:", products)
   const activeProducts = products?.filter(p => p.status === "active")?.length || 0
   const inactiveProducts = products?.filter(p => p.status === "inactive")?.length || 0
   const totalProducts = products?.length || 0
+
+  console.log("Active products:", activeProducts)
+  console.log("Inactive products:", inactiveProducts)
+  console.log("Total products:", totalProducts)
 
   const stats = [
     {
