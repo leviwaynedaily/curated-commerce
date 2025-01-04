@@ -29,9 +29,7 @@ const formSchema = z.object({
   show_verification_options: z.boolean().default(false),
 });
 
-type FormValues = z.infer<typeof formSchema>;
-
-const DEFAULT_VALUES: FormValues = {
+const DEFAULT_VALUES = {
   name: "",
   logo_url: null,
   description: "",
@@ -60,9 +58,12 @@ const StorefrontInformation = () => {
         throw new Error("No storefront selected");
       }
 
+      const { data: session } = await supabase.auth.getSession();
+      console.log("Current session:", session?.session?.user?.id);
+
       const { data, error } = await supabase
         .from("storefronts")
-        .select("*")
+        .select("*, businesses!inner(*)")
         .eq("id", currentStorefrontId)
         .maybeSingle();
 
@@ -77,7 +78,7 @@ const StorefrontInformation = () => {
     enabled: !!currentStorefrontId,
   });
 
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: DEFAULT_VALUES,
   });
@@ -104,7 +105,7 @@ const StorefrontInformation = () => {
     }
   }, [storefront, form]);
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log("Attempting to save storefront with values:", values);
       
@@ -112,6 +113,9 @@ const StorefrontInformation = () => {
         console.error("No storefront ID found");
         throw new Error("No storefront selected");
       }
+
+      const { data: session } = await supabase.auth.getSession();
+      console.log("Current session during save:", session?.session?.user?.id);
 
       const { error } = await supabase
         .from("storefronts")
@@ -154,7 +158,7 @@ const StorefrontInformation = () => {
   // Add auto-save functionality with debounce
   const debouncedSave = useMemo(
     () =>
-      debounce(async (values: FormValues) => {
+      debounce(async (values: z.infer<typeof formSchema>) => {
         await onSubmit(values);
       }, 1000),
     []
@@ -165,7 +169,7 @@ const StorefrontInformation = () => {
     const subscription = form.watch((values) => {
       if (storefront) { // Only auto-save if we have initial data
         console.log("Form values changed:", values);
-        debouncedSave(values as FormValues);
+        debouncedSave(values as z.infer<typeof formSchema>);
       }
     });
     return () => subscription.unsubscribe();
