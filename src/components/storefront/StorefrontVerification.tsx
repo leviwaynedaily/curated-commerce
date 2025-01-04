@@ -16,35 +16,26 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Verification Settings</h2>
-        <p className="text-sm text-muted-foreground">
-          Configure age verification and password protection settings.
-        </p>
+        <FormField
+          control={form.control}
+          name="verification_type"
+          render={({ field }) => (
+            <FormItem className="flex items-center space-x-2">
+              <FormLabel className="text-sm text-muted-foreground">Enable verification prompt</FormLabel>
+              <FormControl>
+                <Switch
+                  checked={field.value !== "none"}
+                  onCheckedChange={(checked) => {
+                    field.onChange(checked ? "age" : "none");
+                  }}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
       </div>
-
-      <FormField
-        control={form.control}
-        name="verification_type"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <FormLabel className="text-base">Enable Verification Prompt</FormLabel>
-              <FormDescription>
-                Require visitors to verify their age or enter a password
-              </FormDescription>
-            </div>
-            <FormControl>
-              <Switch
-                checked={field.value !== "none"}
-                onCheckedChange={(checked) => {
-                  field.onChange(checked ? "age" : "none");
-                }}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
 
       {showVerificationOptions && (
         <div className="space-y-6">

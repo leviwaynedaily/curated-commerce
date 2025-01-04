@@ -12,11 +12,8 @@ interface StorefrontBasicInfoProps {
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Basic Information</h2>
-        <p className="text-sm text-muted-foreground">
-          Configure your storefront's basic information.
-        </p>
       </div>
 
       <FormField
@@ -26,7 +23,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           <FormItem>
             <FormLabel>Site Name</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input placeholder="Enter site name" {...field} />
             </FormControl>
           </FormItem>
         )}
@@ -50,39 +47,37 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="description"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Storefront Description</FormLabel>
-            <FormControl>
-              <Textarea {...field} />
-            </FormControl>
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name="show_description"
-        render={({ field }) => (
-          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <FormLabel className="text-base">Show Description on Storefront</FormLabel>
-              <FormDescription>
-                Display your storefront description to customers
-              </FormDescription>
-            </div>
-            <FormControl>
-              <Switch
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <FormLabel>Storefront Description</FormLabel>
+          <FormField
+            control={form.control}
+            name="show_description"
+            render={({ field }) => (
+              <FormItem className="flex items-center space-x-2">
+                <FormLabel className="text-sm text-muted-foreground">Display on storefront</FormLabel>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <Textarea {...field} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 }

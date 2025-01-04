@@ -11,6 +11,8 @@ import { StorefrontInstructions } from "@/components/storefront/StorefrontInstru
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useMemo } from "react";
+import debounce from "lodash.debounce";
 
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
@@ -79,6 +81,22 @@ const StorefrontInformation = () => {
     },
   });
 
+  // Add auto-save functionality
+  const debouncedSave = useMemo(
+    () =>
+      debounce((values: FormValues) => {
+        onSubmit(values);
+      }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      debouncedSave(values as FormValues);
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch, debouncedSave]);
+
   const onSubmit = async (values: FormValues) => {
     try {
       if (!currentStorefrontId) {
@@ -102,13 +120,13 @@ const StorefrontInformation = () => {
 
       toast({
         title: "Success",
-        description: "Storefront information updated successfully",
+        description: "Changes saved automatically",
       });
     } catch (error) {
       console.error("Error updating storefront:", error);
       toast({
         title: "Error",
-        description: "Failed to update storefront information",
+        description: "Failed to save changes",
         variant: "destructive",
       });
     }
@@ -136,12 +154,12 @@ const StorefrontInformation = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Storefront Information</h1>
           <p className="text-muted-foreground mt-2">
-            Customize how your storefront appears to customers.
+            Customize how your storefront appears to customers. Changes are saved automatically.
           </p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <form className="space-y-8">
             <StorefrontBasicInfo form={form} />
             
             <Separator className="my-8" />
@@ -151,10 +169,6 @@ const StorefrontInformation = () => {
             <Separator className="my-8" />
             
             <StorefrontInstructions form={form} />
-
-            <Button type="submit" className="ml-auto">
-              Save Changes
-            </Button>
           </form>
         </Form>
       </div>
