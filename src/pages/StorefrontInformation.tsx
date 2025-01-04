@@ -21,15 +21,31 @@ const formSchema = z.object({
   verification_type: z.enum(["none", "age", "password", "both"]).default("none"),
   verification_logo_url: z.string().nullable(),
   verification_age: z.number().default(21),
-  verification_age_text: z.string(),
+  verification_age_text: z.string().nullable(),
   verification_password: z.string().nullable(),
-  verification_legal_text: z.string(),
+  verification_legal_text: z.string().nullable(),
   enable_instructions: z.boolean().default(false),
   instructions_text: z.string().nullable(),
   show_verification_options: z.boolean().default(false),
 });
 
 type FormValues = z.infer<typeof formSchema>;
+
+const DEFAULT_VALUES: FormValues = {
+  name: "",
+  logo_url: null,
+  description: "",
+  show_description: false,
+  verification_type: "none",
+  verification_logo_url: null,
+  verification_age: 21,
+  verification_age_text: "I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy.",
+  verification_password: null,
+  verification_legal_text: "This website contains age-restricted content. By entering, you accept our terms and confirm your legal age to view such content.",
+  enable_instructions: false,
+  instructions_text: null,
+  show_verification_options: false,
+};
 
 const StorefrontInformation = () => {
   const { toast } = useToast();
@@ -55,11 +71,6 @@ const StorefrontInformation = () => {
         throw error;
       }
 
-      if (!data) {
-        console.log("No storefront data found");
-        throw new Error("Storefront not found");
-      }
-
       console.log("Fetched storefront data:", data);
       return data;
     },
@@ -68,21 +79,7 @@ const StorefrontInformation = () => {
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: storefront?.name || "",
-      logo_url: storefront?.logo_url || null,
-      description: storefront?.description || "",
-      show_description: storefront?.show_description || false,
-      verification_type: storefront?.verification_type || "none",
-      verification_logo_url: storefront?.verification_logo_url || null,
-      verification_age: storefront?.verification_age || 21,
-      verification_age_text: storefront?.verification_age_text || "I confirm that I am 21 years of age or older and agree to the Terms of Service and Privacy Policy.",
-      verification_password: storefront?.verification_password || null,
-      verification_legal_text: storefront?.verification_legal_text || "This website contains age-restricted content. By entering, you accept our terms and confirm your legal age to view such content.",
-      enable_instructions: storefront?.enable_instructions || false,
-      instructions_text: storefront?.instructions_text || null,
-      show_verification_options: false,
-    },
+    defaultValues: DEFAULT_VALUES,
   });
 
   // Update form values when storefront data is loaded
@@ -90,39 +87,22 @@ const StorefrontInformation = () => {
     if (storefront) {
       console.log("Setting form values from storefront data:", storefront);
       form.reset({
-        name: storefront.name,
-        logo_url: storefront.logo_url,
-        description: storefront.description || "",
-        show_description: storefront.show_description || false,
-        verification_type: storefront.verification_type || "none",
-        verification_logo_url: storefront.verification_logo_url,
-        verification_age: storefront.verification_age || 21,
-        verification_age_text: storefront.verification_age_text,
-        verification_password: storefront.verification_password,
-        verification_legal_text: storefront.verification_legal_text,
-        enable_instructions: storefront.enable_instructions || false,
-        instructions_text: storefront.instructions_text,
+        name: storefront.name || DEFAULT_VALUES.name,
+        logo_url: storefront.logo_url || DEFAULT_VALUES.logo_url,
+        description: storefront.description || DEFAULT_VALUES.description,
+        show_description: storefront.show_description || DEFAULT_VALUES.show_description,
+        verification_type: storefront.verification_type || DEFAULT_VALUES.verification_type,
+        verification_logo_url: storefront.verification_logo_url || DEFAULT_VALUES.verification_logo_url,
+        verification_age: storefront.verification_age || DEFAULT_VALUES.verification_age,
+        verification_age_text: storefront.verification_age_text || DEFAULT_VALUES.verification_age_text,
+        verification_password: storefront.verification_password || DEFAULT_VALUES.verification_password,
+        verification_legal_text: storefront.verification_legal_text || DEFAULT_VALUES.verification_legal_text,
+        enable_instructions: storefront.enable_instructions || DEFAULT_VALUES.enable_instructions,
+        instructions_text: storefront.instructions_text || DEFAULT_VALUES.instructions_text,
         show_verification_options: false,
       });
     }
   }, [storefront, form]);
-
-  // Add auto-save functionality
-  const debouncedSave = useMemo(
-    () =>
-      debounce(async (values: FormValues) => {
-        await onSubmit(values);
-      }, 1000),
-    []
-  );
-
-  useEffect(() => {
-    const subscription = form.watch((values) => {
-      console.log("Form values changed:", values);
-      debouncedSave(values as FormValues);
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch, debouncedSave]);
 
   const onSubmit = async (values: FormValues) => {
     try {
@@ -133,7 +113,7 @@ const StorefrontInformation = () => {
         throw new Error("No storefront selected");
       }
 
-      const { error, data } = await supabase
+      const { error } = await supabase
         .from("storefronts")
         .update({
           name: values.name,
@@ -149,17 +129,14 @@ const StorefrontInformation = () => {
           enable_instructions: values.enable_instructions,
           instructions_text: values.instructions_text,
         })
-        .eq("id", currentStorefrontId)
-        .select()
-        .single();
+        .eq("id", currentStorefrontId);
 
       if (error) {
         console.error("Error updating storefront:", error);
         throw error;
       }
 
-      console.log("Storefront updated successfully:", data);
-
+      console.log("Storefront updated successfully");
       toast({
         title: "Success",
         description: "Changes saved automatically",
@@ -173,6 +150,26 @@ const StorefrontInformation = () => {
       });
     }
   };
+
+  // Add auto-save functionality with debounce
+  const debouncedSave = useMemo(
+    () =>
+      debounce(async (values: FormValues) => {
+        await onSubmit(values);
+      }, 1000),
+    []
+  );
+
+  // Watch for form changes and trigger auto-save
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (storefront) { // Only auto-save if we have initial data
+        console.log("Form values changed:", values);
+        debouncedSave(values as FormValues);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch, debouncedSave, storefront]);
 
   if (isLoading) {
     return (
