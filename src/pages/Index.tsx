@@ -10,6 +10,9 @@ import {
   Palette,
   Globe,
 } from "lucide-react";
+import { BusinessForm } from "@/components/forms/BusinessForm";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const stats = [
   {
@@ -42,84 +45,125 @@ const stats = [
   },
 ];
 
+const Dashboard = () => (
+  <div className="space-y-8 fade-in">
+    <div>
+      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+      <p className="text-muted-foreground mt-2">
+        Welcome back! Here's an overview of your store.
+      </p>
+    </div>
+
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {stats.map((stat) => (
+        <Card key={stat.title} className="hover-card">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              {stat.title}
+            </CardTitle>
+            <stat.icon className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stat.value}</div>
+            <p
+              className={`text-xs ${
+                stat.changeType === "positive"
+                  ? "text-green-500"
+                  : "text-red-500"
+              }`}
+            >
+              {stat.change} from last month
+            </p>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Card className="hover-card col-span-2">
+        <CardHeader>
+          <CardTitle>Recent Orders</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            No orders yet. They'll appear here when customers start purchasing.
+          </p>
+          <Button variant="link" className="mt-4 p-0 h-auto font-normal">
+            View all orders
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card className="hover-card">
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button className="w-full justify-start">
+            <Package className="mr-2 h-4 w-4" />
+            Add New Product
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <Palette className="mr-2 h-4 w-4" />
+            Customize Store
+          </Button>
+          <Button variant="outline" className="w-full justify-start">
+            <Globe className="mr-2 h-4 w-4" />
+            View Store
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  </div>
+);
+
 const Index = () => {
+  const { data: business, isLoading } = useQuery({
+    queryKey: ["business"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout>
-      <div className="space-y-8 fade-in">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
-            Welcome back! Here's an overview of your store.
-          </p>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <Card key={stat.title} className="hover-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {stat.title}
-                </CardTitle>
-                <stat.icon className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p
-                  className={`text-xs ${
-                    stat.changeType === "positive"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {stat.change} from last month
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          <Card className="hover-card col-span-2">
+      {!business ? (
+        <div className="max-w-md mx-auto mt-8">
+          <Card>
             <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
+              <CardTitle>Create Your Business</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                No orders yet. They'll appear here when customers start purchasing.
-              </p>
-              <Button
-                variant="link"
-                className="mt-4 p-0 h-auto font-normal"
-              >
-                View all orders
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover-card">
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button className="w-full justify-start">
-                <Package className="mr-2 h-4 w-4" />
-                Add New Product
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Palette className="mr-2 h-4 w-4" />
-                Customize Store
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Globe className="mr-2 h-4 w-4" />
-                View Store
-              </Button>
+              <BusinessForm />
             </CardContent>
           </Card>
         </div>
-      </div>
+      ) : (
+        <Dashboard />
+      )}
     </DashboardLayout>
   );
-}
+};
 
 export default Index;
