@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -31,13 +31,38 @@ export function UserButton() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [session, setSession] = useState(null);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (!session) {
+        navigate('/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const { data: user, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) {
+        console.error("Error fetching user:", error);
+        throw error;
+      }
       return user;
     },
+    enabled: !!session,
+    retry: 1,
   });
 
   const { data: business } = useQuery({
@@ -138,6 +163,10 @@ export function UserButton() {
       });
     }
   };
+
+  if (!session) {
+    return null;
+  }
 
   return (
     <>
