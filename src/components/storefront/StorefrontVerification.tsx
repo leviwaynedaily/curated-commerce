@@ -2,7 +2,6 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Checkbox } from "@/components/ui/checkbox";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
 
@@ -13,6 +12,8 @@ interface StorefrontVerificationProps {
 export function StorefrontVerification({ form }: StorefrontVerificationProps) {
   const verificationType = form.watch("verification_type");
   const showVerificationOptions = verificationType !== "none";
+  const hasAgeVerification = verificationType === "age" || verificationType === "both";
+  const hasPasswordProtection = verificationType === "password" || verificationType === "both";
 
   return (
     <div className="space-y-6">
@@ -57,73 +58,93 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="verification_age"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                <FormControl>
-                  <Checkbox
-                    checked={verificationType === "age" || verificationType === "both"}
-                    onCheckedChange={(checked) => {
-                      const currentType = form.getValues("verification_type");
-                      if (checked) {
-                        form.setValue("verification_type", currentType === "password" ? "both" : "age");
-                      } else {
-                        form.setValue("verification_type", currentType === "both" ? "password" : "none");
-                      }
-                    }}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Age Verification</FormLabel>
-                  <FormDescription>
-                    Require visitors to confirm they are of legal age
-                  </FormDescription>
-                </div>
-              </FormItem>
-            )}
-          />
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="verification_age"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between space-x-4">
+                  <div>
+                    <FormLabel>Age Verification</FormLabel>
+                    <FormDescription>
+                      Require visitors to confirm they are of legal age
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={hasAgeVerification}
+                      onCheckedChange={(checked) => {
+                        const currentType = form.getValues("verification_type");
+                        if (checked) {
+                          form.setValue("verification_type", hasPasswordProtection ? "both" : "age");
+                        } else {
+                          form.setValue("verification_type", hasPasswordProtection ? "password" : "none");
+                        }
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="verification_age_text"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Age Verification Text</FormLabel>
-                <FormControl>
-                  <Textarea {...field} />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="verification_password"
+              render={({ field }) => (
+                <FormItem className="flex items-center justify-between space-x-4">
+                  <div>
+                    <FormLabel>Password Protection</FormLabel>
+                    <FormDescription>
+                      Protect your storefront with a password
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={hasPasswordProtection}
+                      onCheckedChange={(checked) => {
+                        const currentType = form.getValues("verification_type");
+                        if (checked) {
+                          form.setValue("verification_type", hasAgeVerification ? "both" : "password");
+                        } else {
+                          form.setValue("verification_type", hasAgeVerification ? "age" : "none");
+                        }
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="verification_password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password Protection</FormLabel>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Enter password"
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      const hasPassword = e.target.value.length > 0;
-                      const currentType = form.getValues("verification_type");
-                      if (hasPassword) {
-                        form.setValue("verification_type", currentType === "age" ? "both" : "password");
-                      } else {
-                        form.setValue("verification_type", currentType === "both" ? "age" : "none");
-                      }
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          {hasAgeVerification && (
+            <FormField
+              control={form.control}
+              name="verification_age_text"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Age Verification Text</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
+
+          {hasPasswordProtection && (
+            <FormField
+              control={form.control}
+              name="verification_password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="Enter password" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          )}
 
           <FormField
             control={form.control}
