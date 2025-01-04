@@ -20,11 +20,22 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Check file type
+    const fileType = file.type.toLowerCase();
+    if (!fileType.match(/^image\/(png|jpeg|jpg|svg\+xml)$/)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PNG, JPEG, or SVG file",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setIsUploading(true);
       console.log("Starting file upload for storefront:", storefrontId);
 
-      const fileExt = file.name.split('.').pop();
+      const fileExt = fileType === 'image/svg+xml' ? 'svg' : file.name.split('.').pop();
       // Include storefrontId in the path if available
       const filePath = storefrontId 
         ? `${storefrontId}/${path}/${Math.random()}.${fileExt}`
@@ -34,7 +45,9 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
 
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          contentType: fileType // Explicitly set content type for proper handling of SVGs
+        });
 
       if (uploadError) throw uploadError;
 
@@ -70,7 +83,7 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       <div className="flex items-center gap-4">
         <input
           type="file"
-          accept="image/*"
+          accept="image/png,image/jpeg,image/jpg,image/svg+xml"
           onChange={handleUpload}
           disabled={isUploading}
           className="hidden"
