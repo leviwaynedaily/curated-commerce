@@ -131,7 +131,7 @@ const Index = () => {
         .from("businesses")
         .select("*")
         .eq("user_id", user.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Business query error:", error);
@@ -151,7 +151,7 @@ const Index = () => {
         .from("storefronts")
         .select("*")
         .eq("business_id", business.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Storefront query error:", error);
