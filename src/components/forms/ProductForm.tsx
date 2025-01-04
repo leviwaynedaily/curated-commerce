@@ -1,12 +1,8 @@
-"use client"
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { toast } from "sonner"
 import { useState } from "react"
 import { useQueryClient } from "@tanstack/react-query"
-import { ImagePlus, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,34 +16,37 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { supabase } from "@/integrations/supabase/client"
+import { ProductImageUpload } from "../products/ProductImageUpload"
+import { productFormSchema, type ProductFormValues } from "../products/ProductFormTypes"
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 
-const formSchema = z.object({
-  name: z.string().min(2, {
-    message: "Product name must be at least 2 characters.",
-  }),
-  description: z.string().optional(),
-  price: z.string().refine((val) => !isNaN(Number(val)), {
-    message: "Price must be a valid number",
-  }),
-  category: z.string().optional(),
-  images: z.array(z.string()).optional(),
-})
+interface ProductFormProps {
+  storefrontId: string
+  product?: {
+    id: string
+    name: string
+    description?: string
+    price: number
+    category?: string
+    images?: string[]
+  }
+  onSuccess?: () => void
+}
 
-export function ProductForm({ storefrontId }: { storefrontId: string }) {
+export function ProductForm({ storefrontId, product, onSuccess }: ProductFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const queryClient = useQueryClient()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      price: "",
-      category: "",
-      images: [],
+      name: product?.name ?? "",
+      description: product?.description ?? "",
+      price: product?.price?.toString() ?? "",
+      category: product?.category ?? "",
+      images: product?.images ?? [],
     },
   })
 
@@ -98,33 +97,41 @@ export function ProductForm({ storefrontId }: { storefrontId: string }) {
     }
   }
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: ProductFormValues) {
     try {
       setIsLoading(true)
       console.log("Submitting product form with values:", values)
 
-      const { data, error } = await supabase
-        .from("products")
-        .insert({
-          name: values.name,
-          description: values.description || null,
-          price: Number(values.price),
-          category: values.category || null,
-          storefront_id: storefrontId,
-          images: values.images || [],
-        })
-        .select()
-        .single()
+      const productData = {
+        name: values.name,
+        description: values.description || null,
+        price: Number(values.price),
+        category: values.category || null,
+        storefront_id: storefrontId,
+        images: values.images || [],
+      }
+
+      const { error } = product
+        ? await supabase
+            .from("products")
+            .update(productData)
+            .eq("id", product.id)
+        : await supabase
+            .from("products")
+            .insert(productData)
+            .select()
+            .single()
 
       if (error) throw error
 
-      console.log("Product created successfully:", data)
-      toast.success("Product created successfully!")
+      console.log(`Product ${product ? 'updated' : 'created'} successfully`)
+      toast.success(`Product ${product ? 'updated' : 'created'} successfully!`)
       form.reset()
       queryClient.invalidateQueries({ queryKey: ["products"] })
+      onSuccess?.()
     } catch (error) {
-      console.error("Error creating product:", error)
-      toast.error("Failed to create product. Please try again.")
+      console.error(`Error ${product ? 'updating' : 'creating'} product:`, error)
+      toast.error(`Failed to ${product ? 'update' : 'create'} product. Please try again.`)
     } finally {
       setIsLoading(false)
     }
@@ -189,54 +196,13 @@ export function ProductForm({ storefrontId }: { storefrontId: string }) {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="images"
-          render={() => (
-            <FormItem>
-              <FormLabel>Images</FormLabel>
-              <FormControl>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleImageUpload}
-                    disabled={isUploading}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById("image-upload")?.click()}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? (
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    ) : (
-                      <ImagePlus className="h-4 w-4 mr-2" />
-                    )}
-                    Upload Images
-                  </Button>
-                </div>
-              </FormControl>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-                {form.watch("images")?.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Product image ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-md"
-                  />
-                ))}
-              </div>
-              <FormMessage />
-            </FormItem>
-          )}
+        <ProductImageUpload
+          form={form}
+          isUploading={isUploading}
+          onUpload={handleImageUpload}
         />
         <Button type="submit" disabled={isLoading || isUploading}>
-          {isLoading ? "Creating..." : "Create Product"}
+          {isLoading ? `${product ? 'Updating' : 'Creating'}...` : product ? 'Update Product' : 'Create Product'}
         </Button>
       </form>
     </Form>
