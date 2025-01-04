@@ -21,6 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ProductForm } from "../forms/ProductForm"
+import { format } from "date-fns"
 
 interface ProductTableProps {
   storefrontId: string
@@ -95,7 +96,7 @@ export function ProductTable({
   }
 
   const handleCellClick = (productId: string, field: string) => {
-    if (field === "status" || field === "images") return // Don't make these fields inline editable
+    if (field === "status" || field === "images" || field === "created_at") return // Don't make these fields inline editable
     setEditingCell({ productId, field })
   }
 
@@ -181,6 +182,8 @@ export function ProductTable({
             {product[field] || "—"}
           </span>
         )
+      case "created_at":
+        return format(new Date(product.created_at), 'MMM d, yyyy')
       default:
         return product[field]
     }
@@ -204,6 +207,7 @@ export function ProductTable({
               <TableHead>In-Town Price</TableHead>
               <TableHead>Shipping Price</TableHead>
               <TableHead>Category</TableHead>
+              <TableHead>Created</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -235,6 +239,9 @@ export function ProductTable({
                 </TableCell>
                 <TableCell onClick={() => handleCellClick(product.id, "category")}>
                   {renderCell(product, "category")}
+                </TableCell>
+                <TableCell>
+                  {renderCell(product, "created_at")}
                 </TableCell>
                 <TableCell className="text-right">
                   <ProductActions
