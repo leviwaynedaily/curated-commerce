@@ -1,20 +1,59 @@
-import { getColorFromURL } from 'color-thief-node';
-
 export async function extractColorsFromLogo(logoUrl: string) {
   try {
     console.log('Extracting colors from logo:', logoUrl);
     
-    // Get the dominant color and palette
-    const dominantColor = await getColorFromURL(logoUrl);
-    console.log('Extracted dominant color:', dominantColor);
+    // Create an image element
+    const img = new Image();
+    img.crossOrigin = "Anonymous";  // Enable CORS
+    
+    // Create a canvas
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+      throw new Error('Could not get canvas context');
+    }
 
+    // Wait for image to load
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = logoUrl;
+    });
+
+    // Set canvas size to match image
+    canvas.width = img.width;
+    canvas.height = img.height;
+    
+    // Draw image to canvas
+    ctx.drawImage(img, 0, 0);
+    
+    // Get image data from center of image
+    const imageData = ctx.getImageData(
+      Math.floor(canvas.width / 4),
+      Math.floor(canvas.height / 4),
+      Math.floor(canvas.width / 2),
+      Math.floor(canvas.height / 2)
+    );
+    
+    // Calculate average color
+    let r = 0, g = 0, b = 0;
+    const data = imageData.data;
+    const pixelCount = data.length / 4;
+    
+    for (let i = 0; i < data.length; i += 4) {
+      r += data[i];
+      g += data[i + 1];
+      b += data[i + 2];
+    }
+    
+    r = Math.floor(r / pixelCount);
+    g = Math.floor(g / pixelCount);
+    b = Math.floor(b / pixelCount);
+    
     // Convert RGB to hex
-    const primaryBackground = rgbToHex(dominantColor[0], dominantColor[1], dominantColor[2]);
-    
-    // Create a complementary color for secondary background
+    const primaryBackground = rgbToHex(r, g, b);
     const secondaryBackground = adjustBrightness(primaryBackground, 40);
-    
-    // Create an accent color
     const accentColor = createComplementaryColor(primaryBackground);
     
     // Determine font colors based on background brightness
