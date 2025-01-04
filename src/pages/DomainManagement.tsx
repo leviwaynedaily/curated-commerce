@@ -97,7 +97,7 @@ const DomainManagement = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-muted rounded-lg">
-                  <p className="text-sm font-mono break-all">
+                  <p className="text-sm font-mono text-[#1A1F2C] break-all">
                     https://curately.shop/{storefront.slug}
                   </p>
                 </div>
