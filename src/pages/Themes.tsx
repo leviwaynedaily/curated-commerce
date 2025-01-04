@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ThemePreview } from "@/components/theme/ThemePreview";
 import { z } from "zod";
+import { ThemeConfig } from "@/types/theme";
 
 // Schema for theme validation
 const themeConfigSchema = z.object({
@@ -122,7 +123,12 @@ const Themes = () => {
               }`}
               onClick={() => setSelectedTheme(theme.id)}
             >
-              <ThemePreview theme={theme} />
+              <ThemePreview 
+                theme={{
+                  name: theme.name,
+                  layout_config: theme.layout_config as ThemeConfig
+                }} 
+              />
               <div className="mt-4">
                 <h3 className="font-semibold">{theme.name}</h3>
                 {theme.description && (
