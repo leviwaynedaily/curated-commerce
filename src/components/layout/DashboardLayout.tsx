@@ -12,6 +12,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { StorefrontSwitcher } from "../storefront/StorefrontSwitcher";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -38,7 +39,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         />
         <div className="flex-1 flex flex-col min-h-screen">
           <header className="h-16 flex items-center px-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            {/* Mobile menu button - only shown on mobile */}
             <Button
               variant="ghost"
               size="icon"
@@ -47,7 +47,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             >
               <Menu className="h-6 w-6" />
             </Button>
-            {/* Desktop sidebar toggle - only shown on desktop when sidebar is collapsed */}
             <Button
               variant="ghost"
               size="icon"
@@ -56,6 +55,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             >
               <Menu className="h-6 w-6" />
             </Button>
+            <div className="ml-4">
+              <StorefrontSwitcher />
+            </div>
             <div className="flex-1" />
             <ThemeToggle />
             <DropdownMenu>

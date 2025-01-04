@@ -19,6 +19,7 @@ import {
   Package,
   Palette,
   Globe,
+  Store,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -33,6 +34,7 @@ interface DashboardSidebarProps {
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
   { title: "Products", icon: Package, url: "/products" },
+  { title: "Stores", icon: Store, url: "/stores" },
   { title: "Appearance", icon: Palette, url: "/appearance" },
   { title: "Settings", icon: Settings, url: "/settings" },
   { title: "View Store", icon: Globe, url: "/preview" },
