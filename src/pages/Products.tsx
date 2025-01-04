@@ -1,5 +1,4 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ProductTable } from "@/components/products/ProductTable"
 import { useQuery } from "@tanstack/react-query"
@@ -58,22 +57,16 @@ const Products = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Products</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your store's products here.
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Products</h1>
+            <p className="text-muted-foreground mt-2">
+              Manage your store's products here.
+            </p>
+          </div>
+          <Button variant="default">Add product</Button>
         </div>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Products</CardTitle>
-            <Button variant="default">Add product</Button>
-          </CardHeader>
-          <CardContent>
-            <ProductTable storefrontId={storefront.id} />
-          </CardContent>
-        </Card>
+        <ProductTable storefrontId={storefront.id} />
       </div>
     </DashboardLayout>
   )
