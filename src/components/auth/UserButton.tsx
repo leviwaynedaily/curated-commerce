@@ -19,6 +19,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function UserButton() {
   const navigate = useNavigate();
@@ -33,6 +40,38 @@ export function UserButton() {
     },
   });
 
+  const { data: business } = useQuery({
+    queryKey: ["business"],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  const { data: storefronts } = useQuery({
+    queryKey: ["storefronts", business?.id],
+    queryFn: async () => {
+      if (!business?.id) return [];
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("business_id", business.id)
+        .order("name");
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!business?.id,
+  });
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/login");
@@ -42,13 +81,24 @@ export function UserButton() {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const fullName = formData.get("fullName") as string;
+    const defaultStoreId = formData.get("defaultStore") as string;
     
     try {
       const { error } = await supabase.auth.updateUser({
-        data: { full_name: fullName }
+        data: { 
+          full_name: fullName,
+          default_storefront_id: defaultStoreId 
+        }
       });
 
       if (error) throw error;
+
+      // Update localStorage if the default store changed
+      if (defaultStoreId) {
+        localStorage.setItem('lastStorefrontId', defaultStoreId);
+        // Refresh the page to load the new default store
+        window.location.reload();
+      }
 
       await refetch();
       toast({
@@ -133,6 +183,26 @@ export function UserButton() {
                 placeholder="Enter your full name"
               />
             </div>
+            {storefronts && storefronts.length > 1 && (
+              <div className="space-y-2">
+                <Label htmlFor="defaultStore">Default Store</Label>
+                <Select
+                  name="defaultStore"
+                  defaultValue={user?.user_metadata?.default_storefront_id || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select default store" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {storefronts.map((store) => (
+                      <SelectItem key={store.id} value={store.id}>
+                        {store.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="space-y-2">
               <Button
                 type="button"
