@@ -56,10 +56,11 @@ const StorefrontInformation = () => {
       }
 
       if (!data) {
+        console.log("No storefront data found");
         throw new Error("Storefront not found");
       }
 
-      console.log("Fetched storefront:", data);
+      console.log("Fetched storefront data:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
@@ -84,17 +85,40 @@ const StorefrontInformation = () => {
     },
   });
 
+  // Update form values when storefront data is loaded
+  useEffect(() => {
+    if (storefront) {
+      console.log("Setting form values from storefront data:", storefront);
+      form.reset({
+        name: storefront.name,
+        logo_url: storefront.logo_url,
+        description: storefront.description || "",
+        show_description: storefront.show_description || false,
+        verification_type: storefront.verification_type || "none",
+        verification_logo_url: storefront.verification_logo_url,
+        verification_age: storefront.verification_age || 21,
+        verification_age_text: storefront.verification_age_text,
+        verification_password: storefront.verification_password,
+        verification_legal_text: storefront.verification_legal_text,
+        enable_instructions: storefront.enable_instructions || false,
+        instructions_text: storefront.instructions_text,
+        show_verification_options: false,
+      });
+    }
+  }, [storefront, form]);
+
   // Add auto-save functionality
   const debouncedSave = useMemo(
     () =>
-      debounce((values: FormValues) => {
-        onSubmit(values);
+      debounce(async (values: FormValues) => {
+        await onSubmit(values);
       }, 1000),
     []
   );
 
   useEffect(() => {
     const subscription = form.watch((values) => {
+      console.log("Form values changed:", values);
       debouncedSave(values as FormValues);
     });
     return () => subscription.unsubscribe();
@@ -102,11 +126,14 @@ const StorefrontInformation = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
+      console.log("Attempting to save storefront with values:", values);
+      
       if (!currentStorefrontId) {
+        console.error("No storefront ID found");
         throw new Error("No storefront selected");
       }
 
-      const { error } = await supabase
+      const { error, data } = await supabase
         .from("storefronts")
         .update({
           name: values.name,
@@ -122,9 +149,16 @@ const StorefrontInformation = () => {
           enable_instructions: values.enable_instructions,
           instructions_text: values.instructions_text,
         })
-        .eq("id", currentStorefrontId);
+        .eq("id", currentStorefrontId)
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating storefront:", error);
+        throw error;
+      }
+
+      console.log("Storefront updated successfully:", data);
 
       toast({
         title: "Success",
