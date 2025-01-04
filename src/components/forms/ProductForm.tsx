@@ -22,6 +22,7 @@ interface ProductFormProps {
     shipping_price: number
     category?: string
     images?: string[]
+    status?: string
   }
   onSuccess?: () => void
 }
@@ -40,6 +41,7 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
       shipping_price: product?.shipping_price?.toString() ?? "",
       category: product?.category ?? "",
       images: product?.images ?? [],
+      status: (product?.status as "active" | "inactive") ?? "active",
     },
   })
 
@@ -103,6 +105,7 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
         category: values.category || null,
         storefront_id: storefrontId,
         images: values.images || [],
+        status: values.status,
       }
 
       const { error } = product
