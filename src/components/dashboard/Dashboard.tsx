@@ -12,14 +12,14 @@ export function Dashboard({ storefront }: { storefront: any }) {
         .from("products")
         .select("*")
         .eq("storefront_id", storefront.id)
-        .eq("status", "active")
+        // Removed the .eq("status", "active") filter to get all products
 
       if (error) {
         console.error("Error fetching products:", error)
         throw error
       }
 
-      console.log("Active products fetched:", data)
+      console.log("All products fetched:", data)
       return data
     },
     enabled: !!storefront?.id,
