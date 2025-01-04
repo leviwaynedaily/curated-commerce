@@ -37,6 +37,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         />
         <div className="flex-1 flex flex-col min-h-screen">
           <header className="h-16 flex items-center px-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            {/* Mobile menu button - only shown on mobile */}
             <Button
               variant="ghost"
               size="icon"
@@ -45,11 +46,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             >
               <Menu className="h-6 w-6" />
             </Button>
+            {/* Desktop sidebar toggle - only shown on desktop when sidebar is collapsed */}
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="hidden md:flex"
+              className="hidden md:flex md:opacity-0 md:pointer-events-none md:group-[[data-state=collapsed]]/sidebar-wrapper:opacity-100 md:group-[[data-state=collapsed]]/sidebar-wrapper:pointer-events-auto"
             >
               <Menu className="h-6 w-6" />
             </Button>
