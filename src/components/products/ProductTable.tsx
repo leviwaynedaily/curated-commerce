@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import {
   Table,
@@ -12,6 +12,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { ProductActions } from "./ProductActions"
+import { Input } from "@/components/ui/input"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -28,6 +30,11 @@ interface ProductTableProps {
   onSelectedProductsChange: (products: string[]) => void
 }
 
+interface EditableCell {
+  productId: string
+  field: string
+}
+
 export function ProductTable({
   storefrontId,
   statusFilter,
@@ -36,6 +43,8 @@ export function ProductTable({
   onSelectedProductsChange,
 }: ProductTableProps) {
   const [editingProduct, setEditingProduct] = useState<any>(null)
+  const [editingCell, setEditingCell] = useState<EditableCell | null>(null)
+  const queryClient = useQueryClient()
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["products", storefrontId, statusFilter, searchQuery],
@@ -47,12 +56,10 @@ export function ProductTable({
         .eq("storefront_id", storefrontId)
         .order("created_at", { ascending: false })
 
-      // Apply status filter
       if (statusFilter !== "all") {
         query = query.eq("status", statusFilter)
       }
 
-      // Apply search filter
       if (searchQuery) {
         query = query.ilike("name", `%${searchQuery}%`)
       }
@@ -87,12 +94,96 @@ export function ProductTable({
     }
   }
 
+  const handleCellClick = (productId: string, field: string) => {
+    if (field === "status" || field === "images") return // Don't make these fields inline editable
+    setEditingCell({ productId, field })
+  }
+
+  const handleCellUpdate = async (productId: string, field: string, value: string) => {
+    try {
+      const numericFields = ["in_town_price", "shipping_price"]
+      const updateValue = numericFields.includes(field) ? Number(value) : value
+
+      const { error } = await supabase
+        .from("products")
+        .update({ [field]: updateValue })
+        .eq("id", productId)
+
+      if (error) throw error
+
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+      toast.success("Product updated successfully!")
+    } catch (error) {
+      console.error("Error updating product:", error)
+      toast.error("Failed to update product")
+    } finally {
+      setEditingCell(null)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, productId: string, field: string, value: string) => {
+    if (e.key === "Enter") {
+      handleCellUpdate(productId, field, value)
+    } else if (e.key === "Escape") {
+      setEditingCell(null)
+    }
+  }
+
   if (isLoading) {
     return <div>Loading products...</div>
   }
 
   if (!products?.length) {
     return <div>No products found. Create your first product above!</div>
+  }
+
+  const renderCell = (product: any, field: string) => {
+    const isEditing = editingCell?.productId === product.id && editingCell?.field === field
+
+    if (isEditing) {
+      return (
+        <Input
+          autoFocus
+          defaultValue={product[field]}
+          onBlur={(e) => handleCellUpdate(product.id, field, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(e, product.id, field, e.currentTarget.value)}
+          className="w-full"
+        />
+      )
+    }
+
+    switch (field) {
+      case "name":
+        return (
+          <div className="flex items-center gap-3">
+            {product.images?.[0] && (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="h-10 w-10 rounded-md object-cover"
+              />
+            )}
+            <span className="cursor-pointer hover:text-primary">{product[field]}</span>
+          </div>
+        )
+      case "description":
+        return (
+          <span className="line-clamp-2 text-sm text-muted-foreground cursor-pointer hover:text-primary">
+            {product[field] || "—"}
+          </span>
+        )
+      case "in_town_price":
+      case "shipping_price":
+        return <span className="cursor-pointer hover:text-primary">${product[field]}</span>
+      case "category":
+        return (
+          <span className="cursor-pointer hover:text-primary">
+            {product[field] || "—"}
+          </span>
+        )
+      default:
+        return product[field]
+    }
   }
 
   return (
@@ -103,10 +194,7 @@ export function ProductTable({
             <TableRow>
               <TableHead className="w-12">
                 <Checkbox
-                  checked={
-                    products.length > 0 &&
-                    selectedProducts.length === products.length
-                  }
+                  checked={products.length > 0 && selectedProducts.length === products.length}
                   onCheckedChange={toggleAllProducts}
                 />
               </TableHead>
@@ -128,33 +216,26 @@ export function ProductTable({
                     onCheckedChange={() => toggleProductSelection(product.id)}
                   />
                 </TableCell>
-                <TableCell className="font-medium">
-                  <div className="flex items-center gap-3">
-                    {product.images?.[0] && (
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="h-10 w-10 rounded-md object-cover"
-                      />
-                    )}
-                    <span>{product.name}</span>
-                  </div>
+                <TableCell onClick={() => handleCellClick(product.id, "name")}>
+                  {renderCell(product, "name")}
                 </TableCell>
-                <TableCell className="max-w-[200px]">
-                  <span className="line-clamp-2 text-sm text-muted-foreground">
-                    {product.description || "—"}
-                  </span>
+                <TableCell onClick={() => handleCellClick(product.id, "description")}>
+                  {renderCell(product, "description")}
                 </TableCell>
                 <TableCell>
-                  <Badge
-                    variant={product.status === "active" ? "default" : "secondary"}
-                  >
+                  <Badge variant={product.status === "active" ? "default" : "secondary"}>
                     {product.status}
                   </Badge>
                 </TableCell>
-                <TableCell>${product.in_town_price}</TableCell>
-                <TableCell>${product.shipping_price}</TableCell>
-                <TableCell>{product.category || "—"}</TableCell>
+                <TableCell onClick={() => handleCellClick(product.id, "in_town_price")}>
+                  {renderCell(product, "in_town_price")}
+                </TableCell>
+                <TableCell onClick={() => handleCellClick(product.id, "shipping_price")}>
+                  {renderCell(product, "shipping_price")}
+                </TableCell>
+                <TableCell onClick={() => handleCellClick(product.id, "category")}>
+                  {renderCell(product, "category")}
+                </TableCell>
                 <TableCell className="text-right">
                   <ProductActions
                     productId={product.id}
