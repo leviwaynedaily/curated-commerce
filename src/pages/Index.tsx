@@ -133,7 +133,10 @@ const Index = () => {
         .eq("user_id", user.id)
         .single();
 
-      if (error && error.code !== "PGRST116") throw error;
+      if (error) {
+        if (error.code === "PGRST116") return null;
+        throw error;
+      }
       return data;
     },
   });
@@ -149,7 +152,10 @@ const Index = () => {
         .eq("business_id", business.id)
         .single();
 
-      if (error && error.code !== "PGRST116") throw error;
+      if (error) {
+        if (error.code === "PGRST116") return null;
+        throw error;
+      }
       return data;
     },
     enabled: !!business?.id,
