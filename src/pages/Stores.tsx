@@ -65,6 +65,12 @@ const Stores = () => {
     enabled: !!business?.id,
   })
 
+  const getStoreUrl = (slug: string) => {
+    // Get the current origin (protocol + hostname + port if present)
+    const origin = window.location.origin
+    return `${origin}/${slug}`
+  }
+
   if (isLoading) {
     return (
       <DashboardLayout>
@@ -113,7 +119,7 @@ const Stores = () => {
                   </Button>
                   <Button variant="outline" size="sm" asChild>
                     <a
-                      href={`https://curately.co/${store.slug}`}
+                      href={getStoreUrl(store.slug)}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
