@@ -4,18 +4,52 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StorefrontBasicInfoProps {
   form: UseFormReturn<any>;
 }
 
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
-  const currentName = form.getValues("name");
+  // Get the current storefront ID from localStorage
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
+
+  // Fetch current storefront data
+  const { data: storefront } = useQuery({
+    queryKey: ["storefront", currentStorefrontId],
+    queryFn: async () => {
+      console.log("Fetching storefront name for:", currentStorefrontId);
+      if (!currentStorefrontId) return null;
+
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("name")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        throw error;
+      }
+
+      console.log("Fetched storefront data:", data);
+      return data;
+    },
+    enabled: !!currentStorefrontId
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Basic Information</h2>
+      </div>
+
+      <div className="space-y-2">
+        <FormLabel>Current Store Name</FormLabel>
+        <div className="text-sm text-muted-foreground mb-4">
+          {storefront?.name || "Loading..."}
+        </div>
       </div>
 
       <FormField
@@ -25,7 +59,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           <FormItem>
             <FormLabel>Site Name</FormLabel>
             <FormControl>
-              <Input placeholder={currentName || "Enter site name"} {...field} />
+              <Input placeholder="Enter site name" {...field} />
             </FormControl>
           </FormItem>
         )}
