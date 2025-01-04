@@ -11,32 +11,31 @@ interface StorefrontVerificationProps {
 
 export function StorefrontVerification({ form }: StorefrontVerificationProps) {
   const verificationType = form.watch("verification_type");
-  const showVerificationOptions = form.watch("show_verification_options");
   const hasAgeVerification = verificationType === "age" || verificationType === "both";
   const hasPasswordProtection = verificationType === "password" || verificationType === "both";
+  const isVerificationEnabled = verificationType !== "none";
+
+  const handleVerificationToggle = (enabled: boolean) => {
+    // If enabling, set to "age" as default, if disabling set to "none"
+    form.setValue("verification_type", enabled ? "age" : "none");
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Verification Settings</h2>
-        <FormField
-          control={form.control}
-          name="show_verification_options"
-          render={({ field }) => (
-            <FormItem className="flex items-center space-x-2">
-              <FormLabel className="text-sm text-muted-foreground">Enable verification prompt</FormLabel>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+        <FormItem className="flex items-center space-x-2">
+          <FormLabel className="text-sm text-muted-foreground">Enable verification prompt</FormLabel>
+          <FormControl>
+            <Switch
+              checked={isVerificationEnabled}
+              onCheckedChange={handleVerificationToggle}
+            />
+          </FormControl>
+        </FormItem>
       </div>
 
-      {showVerificationOptions && (
+      {isVerificationEnabled && (
         <div className="space-y-6">
           <FormField
             control={form.control}
