@@ -63,26 +63,42 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
               control={form.control}
               name="verification_age"
               render={({ field }) => (
-                <FormItem className="flex items-center justify-between space-x-4">
-                  <div>
-                    <FormLabel>Age Verification</FormLabel>
-                    <FormDescription>
-                      Require visitors to confirm they are of legal age
-                    </FormDescription>
+                <FormItem className="flex flex-col space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <FormLabel>Age Verification</FormLabel>
+                      <FormDescription>
+                        Require visitors to confirm they are of legal age
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={hasAgeVerification}
+                        onCheckedChange={(checked) => {
+                          const currentType = form.getValues("verification_type");
+                          if (checked) {
+                            form.setValue("verification_type", hasPasswordProtection ? "both" : "age");
+                          } else {
+                            form.setValue("verification_type", hasPasswordProtection ? "password" : "none");
+                          }
+                        }}
+                      />
+                    </FormControl>
                   </div>
-                  <FormControl>
-                    <Switch
-                      checked={hasAgeVerification}
-                      onCheckedChange={(checked) => {
-                        const currentType = form.getValues("verification_type");
-                        if (checked) {
-                          form.setValue("verification_type", hasPasswordProtection ? "both" : "age");
-                        } else {
-                          form.setValue("verification_type", hasPasswordProtection ? "password" : "none");
-                        }
-                      }}
+                  {hasAgeVerification && (
+                    <FormField
+                      control={form.control}
+                      name="verification_age_text"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Age Verification Text</FormLabel>
+                          <FormControl>
+                            <Textarea {...field} />
+                          </FormControl>
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
+                  )}
                 </FormItem>
               )}
             />
@@ -115,21 +131,6 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
               )}
             />
           </div>
-
-          {hasAgeVerification && (
-            <FormField
-              control={form.control}
-              name="verification_age_text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Age Verification Text</FormLabel>
-                  <FormControl>
-                    <Textarea {...field} />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          )}
 
           {hasPasswordProtection && (
             <FormField
