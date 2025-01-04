@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ThemePreview } from "@/components/theme/ThemePreview";
 import { z } from "zod";
 import { ThemeConfig } from "@/types/theme";
+import { Tables } from "@/integrations/supabase/types";
 
 // Schema for theme validation
 const themeConfigSchema = z.object({
@@ -30,7 +31,7 @@ const Themes = () => {
   const { toast } = useToast();
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
 
-  // Fetch themes
+  // Fetch themes with proper typing
   const { data: themes, refetch: refetchThemes } = useQuery({
     queryKey: ["themes"],
     queryFn: async () => {
@@ -40,7 +41,7 @@ const Themes = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data as Tables<"themes">[];
     },
   });
 
@@ -113,32 +114,37 @@ const Themes = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {themes?.map((theme) => (
-            <div
-              key={theme.id}
-              className={`border rounded-lg p-4 cursor-pointer transition-all ${
-                selectedTheme === theme.id
-                  ? "ring-2 ring-primary"
-                  : "hover:border-primary"
-              }`}
-              onClick={() => setSelectedTheme(theme.id)}
-            >
-              <ThemePreview 
-                theme={{
-                  name: theme.name,
-                  layout_config: theme.layout_config as ThemeConfig
-                }} 
-              />
-              <div className="mt-4">
-                <h3 className="font-semibold">{theme.name}</h3>
-                {theme.description && (
-                  <p className="text-sm text-muted-foreground">
-                    {theme.description}
-                  </p>
-                )}
+          {themes?.map((theme) => {
+            // Ensure layout_config is of type ThemeConfig
+            const layoutConfig = theme.layout_config as ThemeConfig;
+            
+            return (
+              <div
+                key={theme.id}
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  selectedTheme === theme.id
+                    ? "ring-2 ring-primary"
+                    : "hover:border-primary"
+                }`}
+                onClick={() => setSelectedTheme(theme.id)}
+              >
+                <ThemePreview 
+                  theme={{
+                    name: theme.name,
+                    layout_config: layoutConfig
+                  }} 
+                />
+                <div className="mt-4">
+                  <h3 className="font-semibold">{theme.name}</h3>
+                  {theme.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {theme.description}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </DashboardLayout>
