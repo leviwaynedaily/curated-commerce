@@ -14,9 +14,6 @@ import {
   Settings,
   Package,
   Palette,
-  Users,
-  MessageSquare,
-  ShoppingBag,
   Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -29,9 +26,6 @@ interface DashboardSidebarProps {
 const menuItems = [
   { title: "Dashboard", icon: Home, url: "/" },
   { title: "Products", icon: Package, url: "/products" },
-  { title: "Orders", icon: ShoppingBag, url: "/orders" },
-  { title: "Customers", icon: Users, url: "/customers" },
-  { title: "Messages", icon: MessageSquare, url: "/messages" },
   { title: "Appearance", icon: Palette, url: "/appearance" },
   { title: "Settings", icon: Settings, url: "/settings" },
   { title: "View Store", icon: Globe, url: "/preview" },
