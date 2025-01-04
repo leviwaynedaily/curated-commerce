@@ -3,6 +3,13 @@ import { supabase } from "@/integrations/supabase/client"
 import { Stats } from "./Stats"
 import { QuickActions } from "./QuickActions"
 
+const getTimeBasedGreeting = () => {
+  const hour = new Date().getHours()
+  if (hour < 12) return "Good morning"
+  if (hour < 17) return "Good afternoon"
+  return "Good evening"
+}
+
 export function Dashboard({ storefront }: { storefront: any }) {
   const { data: products } = useQuery({
     queryKey: ["products", storefront.id],
@@ -12,7 +19,6 @@ export function Dashboard({ storefront }: { storefront: any }) {
         .from("products")
         .select("*")
         .eq("storefront_id", storefront.id)
-        // Removed the .eq("status", "active") filter to get all products
 
       if (error) {
         console.error("Error fetching products:", error)
@@ -25,6 +31,17 @@ export function Dashboard({ storefront }: { storefront: any }) {
     enabled: !!storefront?.id,
   })
 
+  const { data: user } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      return user
+    },
+  })
+
+  const greeting = getTimeBasedGreeting()
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there'
+
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
       <div>
@@ -32,7 +49,7 @@ export function Dashboard({ storefront }: { storefront: any }) {
           Dashboard for {storefront.name}
         </h1>
         <p className="text-sm md:text-base text-muted-foreground mt-2">
-          Welcome back! Here's an overview of your store.
+          {greeting}, {userName}. Here's an overview of {storefront.name}.
         </p>
       </div>
 
