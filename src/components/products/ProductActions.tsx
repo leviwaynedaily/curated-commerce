@@ -24,15 +24,18 @@ export function ProductActions({ productId, onEdit }: ProductActionsProps) {
       if (fetchError) throw fetchError
 
       // Delete images from storage if they exist
-      if (product?.images?.length) {
-        console.log("Deleting images from storage:", product.images)
+      const images = product?.images as string[] | null
+      if (images && Array.isArray(images) && images.length > 0) {
+        console.log("Deleting images from storage:", images)
+        const imagePaths = images.map((url: string) => {
+          // Extract the path from the full URL
+          const path = url.split("/storefront-assets/")[1]
+          return path
+        })
+
         const { error: storageError } = await supabase.storage
           .from("storefront-assets")
-          .remove(product.images.map((url: string) => {
-            // Extract the path from the full URL
-            const path = url.split("/storefront-assets/")[1]
-            return path
-          }))
+          .remove(imagePaths)
 
         if (storageError) {
           console.error("Error deleting images from storage:", storageError)

@@ -29,15 +29,17 @@ export function ProductBulkActions({
       if (fetchError) throw fetchError
 
       // Delete images from storage for all selected products
-      const allImages = products?.flatMap(product => 
-        (product.images || []).map((url: string) => {
+      const allImages = products?.flatMap(product => {
+        const images = product.images as string[] | null
+        if (!images || !Array.isArray(images)) return []
+        return images.map((url: string) => {
           // Extract the path from the full URL
           const path = url.split("/storefront-assets/")[1]
           return path
         })
-      )
+      })
 
-      if (allImages?.length) {
+      if (allImages && allImages.length > 0) {
         console.log("Deleting images from storage:", allImages)
         const { error: storageError } = await supabase.storage
           .from("storefront-assets")
