@@ -120,7 +120,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
             type="button"
             variant="outline"
             onClick={handleExtractColors}
-            disabled={isExtracting || !storefront?.logo_url}
+            disabled={isExtracting}
             className="w-full mb-4"
           >
             {isExtracting ? "Extracting Colors..." : "Suggest Colors from Logo"}
