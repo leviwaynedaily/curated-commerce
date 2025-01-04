@@ -111,6 +111,7 @@ export function ProductTable({
                 />
               </TableHead>
               <TableHead className="min-w-[300px]">Product</TableHead>
+              <TableHead className="min-w-[200px]">Description</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>In-Town Price</TableHead>
               <TableHead>Shipping Price</TableHead>
@@ -138,6 +139,11 @@ export function ProductTable({
                     )}
                     <span>{product.name}</span>
                   </div>
+                </TableCell>
+                <TableCell className="max-w-[200px]">
+                  <span className="line-clamp-2 text-sm text-muted-foreground">
+                    {product.description || "—"}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Badge
