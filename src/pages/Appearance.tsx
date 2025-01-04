@@ -11,6 +11,21 @@ import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
 import { ThemeConfig } from "@/types/theme";
 
+const defaultThemeConfig: ThemeConfig = {
+  colors: {
+    background: {
+      primary: "#000000",
+      secondary: "#f5f5f5",
+      accent: "#56b533",
+    },
+    font: {
+      primary: "#ffffff",
+      secondary: "#cccccc",
+      highlight: "#ee459a",
+    },
+  },
+};
+
 const formSchema = z.object({
   theme_config: z.object({
     colors: z.object({
@@ -25,20 +40,7 @@ const formSchema = z.object({
         highlight: z.string(),
       }),
     }),
-  }).default({
-    colors: {
-      background: {
-        primary: "#000000",
-        secondary: "#f5f5f5",
-        accent: "#56b533",
-      },
-      font: {
-        primary: "#ffffff",
-        secondary: "#cccccc",
-        highlight: "#ee459a",
-      },
-    },
-  }),
+  }).default(defaultThemeConfig),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -72,7 +74,13 @@ const Appearance = () => {
       }
 
       console.log("Fetched storefront:", data);
-      return data;
+      
+      // Ensure theme_config has the correct structure or use default
+      const themeConfig = data.theme_config as ThemeConfig || defaultThemeConfig;
+      return {
+        ...data,
+        theme_config: themeConfig,
+      };
     },
     enabled: !!currentStorefrontId,
   });
@@ -80,20 +88,7 @@ const Appearance = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      theme_config: (storefront?.theme_config as ThemeConfig) || {
-        colors: {
-          background: {
-            primary: "#000000",
-            secondary: "#f5f5f5",
-            accent: "#56b533",
-          },
-          font: {
-            primary: "#ffffff",
-            secondary: "#cccccc",
-            highlight: "#ee459a",
-          },
-        },
-      },
+      theme_config: storefront?.theme_config || defaultThemeConfig,
     },
   });
 
