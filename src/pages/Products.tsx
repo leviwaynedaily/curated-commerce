@@ -6,11 +6,19 @@ import { ProductFilters } from "@/components/products/ProductFilters"
 import { ProductBulkActions } from "@/components/products/ProductBulkActions"
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { ProductForm } from "@/components/forms/ProductForm"
 
 const Products = () => {
   const [selectedStatus, setSelectedStatus] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
+  const [showCreateProduct, setShowCreateProduct] = useState(false)
 
   // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
@@ -78,7 +86,12 @@ const Products = () => {
           <div className="flex items-center gap-2">
             <Button variant="outline">Export</Button>
             <Button variant="outline">Import</Button>
-            <Button variant="default">Add product</Button>
+            <Button 
+              variant="default"
+              onClick={() => setShowCreateProduct(true)}
+            >
+              Add product
+            </Button>
           </div>
         </div>
 
@@ -101,6 +114,18 @@ const Products = () => {
           selectedProducts={selectedProducts}
           onSelectedProductsChange={setSelectedProducts}
         />
+
+        <Dialog open={showCreateProduct} onOpenChange={setShowCreateProduct}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Product</DialogTitle>
+            </DialogHeader>
+            <ProductForm
+              storefrontId={storefront.id}
+              onSuccess={() => setShowCreateProduct(false)}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   )
