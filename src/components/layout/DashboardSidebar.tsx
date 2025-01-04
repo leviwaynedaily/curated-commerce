@@ -38,7 +38,7 @@ const menuItems = [
   { title: "View Store", icon: Globe, url: "/preview" },
 ];
 
-const SidebarContent = () => (
+const DashboardSidebarContent = () => (
   <>
     <SidebarHeader className="h-16 flex items-center px-6 border-b">
       <span className="text-xl font-semibold text-primary">Curately</span>
@@ -78,7 +78,7 @@ export function DashboardSidebar({
       {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
         <SheetContent side="left" className="p-0 w-[280px]">
-          <SidebarContent />
+          <DashboardSidebarContent />
         </SheetContent>
       </Sheet>
 
@@ -90,7 +90,7 @@ export function DashboardSidebar({
           !open && "-translate-x-full"
         )}
       >
-        <SidebarContent />
+        <DashboardSidebarContent />
       </div>
     </>
   );
