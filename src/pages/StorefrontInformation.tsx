@@ -7,13 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { StorefrontBasicInfo } from "@/components/storefront/StorefrontBasicInfo";
 import { StorefrontVerification } from "@/components/storefront/StorefrontVerification";
 import { StorefrontInstructions } from "@/components/storefront/StorefrontInstructions";
-import { StorefrontAppearance } from "@/components/storefront/StorefrontAppearance";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
-import { ThemeConfig } from "@/types/theme";
 
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
@@ -29,33 +27,6 @@ const formSchema = z.object({
   enable_instructions: z.boolean().default(false),
   instructions_text: z.string().nullable(),
   show_verification_options: z.boolean().default(false),
-  theme_config: z.object({
-    colors: z.object({
-      background: z.object({
-        primary: z.string(),
-        secondary: z.string(),
-        accent: z.string(),
-      }),
-      font: z.object({
-        primary: z.string(),
-        secondary: z.string(),
-        highlight: z.string(),
-      }),
-    }),
-  }).default({
-    colors: {
-      background: {
-        primary: "#000000",
-        secondary: "#f5f5f5",
-        accent: "#56b533",
-      },
-      font: {
-        primary: "#ffffff",
-        secondary: "#cccccc",
-        highlight: "#ee459a",
-      },
-    },
-  }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -110,20 +81,6 @@ const StorefrontInformation = () => {
       enable_instructions: storefront?.enable_instructions || false,
       instructions_text: storefront?.instructions_text || null,
       show_verification_options: false,
-      theme_config: (storefront?.theme_config as ThemeConfig) || {
-        colors: {
-          background: {
-            primary: "#000000",
-            secondary: "#f5f5f5",
-            accent: "#56b533",
-          },
-          font: {
-            primary: "#ffffff",
-            secondary: "#cccccc",
-            highlight: "#ee459a",
-          },
-        },
-      },
     },
   });
 
@@ -164,7 +121,6 @@ const StorefrontInformation = () => {
           verification_legal_text: values.verification_legal_text,
           enable_instructions: values.enable_instructions,
           instructions_text: values.instructions_text,
-          theme_config: values.theme_config,
         })
         .eq("id", currentStorefrontId);
 
@@ -213,10 +169,6 @@ const StorefrontInformation = () => {
         <Form {...form}>
           <form className="space-y-8">
             <StorefrontBasicInfo form={form} />
-            
-            <Separator className="my-8" />
-            
-            <StorefrontAppearance form={form} />
             
             <Separator className="my-8" />
             
