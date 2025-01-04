@@ -2,10 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
-  BarChart3,
   Package,
-  ShoppingCart,
-  Users,
   ArrowRight,
   Palette,
   Globe,
@@ -18,31 +15,10 @@ import { Link } from "react-router-dom"
 
 const stats = [
   {
-    title: "Total Sales",
-    value: "$12,345",
-    icon: BarChart3,
-    change: "+12%",
-    changeType: "positive",
-  },
-  {
     title: "Products",
     value: "123",
     icon: Package,
     change: "+3",
-    changeType: "positive",
-  },
-  {
-    title: "Orders",
-    value: "45",
-    icon: ShoppingCart,
-    change: "-2",
-    changeType: "negative",
-  },
-  {
-    title: "Customers",
-    value: "678",
-    icon: Users,
-    change: "+15",
     changeType: "positive",
   },
 ]
