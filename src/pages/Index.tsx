@@ -131,9 +131,9 @@ const Index = () => {
         .from("businesses")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
+      if (error && error.code !== "PGRST116") throw error;
       return data;
     },
   });
@@ -147,9 +147,9 @@ const Index = () => {
         .from("storefronts")
         .select("*")
         .eq("business_id", business.id)
-        .maybeSingle();
+        .single();
 
-      if (error) throw error;
+      if (error && error.code !== "PGRST116") throw error;
       return data;
     },
     enabled: !!business?.id,
