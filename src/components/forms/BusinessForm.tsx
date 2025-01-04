@@ -14,6 +14,10 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type { TablesInsert } from "@/integrations/supabase/types";
+
+// Use the correct types from Supabase
+type BusinessInsert = TablesInsert<"businesses">;
 
 const businessSchema = z.object({
   name: z.string().min(2, "Business name must be at least 2 characters"),
@@ -41,10 +45,15 @@ export function BusinessForm() {
         return;
       }
 
-      const { error } = await supabase.from("businesses").insert({
-        ...values,
+      // Create the business insert object with the correct types
+      const businessData: BusinessInsert = {
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
         user_id: user.id,
-      });
+      };
+
+      const { error } = await supabase.from("businesses").insert(businessData);
 
       if (error) throw error;
 
