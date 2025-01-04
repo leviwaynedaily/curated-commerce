@@ -41,6 +41,15 @@ export function ProductList({ storefrontId }: { storefrontId: string }) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {products.map((product) => (
         <Card key={product.id} className="hover:shadow-lg transition-shadow">
+          {product.images?.[0] && (
+            <div className="relative aspect-video">
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+              />
+            </div>
+          )}
           <CardHeader>
             <CardTitle>{product.name}</CardTitle>
             <CardDescription>${product.price}</CardDescription>
