@@ -20,12 +20,42 @@ export function ProductBulkActions({
 
   const handleBulkDelete = async () => {
     try {
-      const { error } = await supabase
+      // First, get all selected products to access their images
+      const { data: products, error: fetchError } = await supabase
+        .from("products")
+        .select("images")
+        .in("id", selectedProducts)
+
+      if (fetchError) throw fetchError
+
+      // Delete images from storage for all selected products
+      const allImages = products?.flatMap(product => 
+        (product.images || []).map((url: string) => {
+          // Extract the path from the full URL
+          const path = url.split("/storefront-assets/")[1]
+          return path
+        })
+      )
+
+      if (allImages?.length) {
+        console.log("Deleting images from storage:", allImages)
+        const { error: storageError } = await supabase.storage
+          .from("storefront-assets")
+          .remove(allImages)
+
+        if (storageError) {
+          console.error("Error deleting images from storage:", storageError)
+          // Continue with product deletion even if image deletion fails
+        }
+      }
+
+      // Delete the products
+      const { error: deleteError } = await supabase
         .from("products")
         .delete()
         .in("id", selectedProducts)
 
-      if (error) throw error
+      if (deleteError) throw deleteError
 
       toast.success("Products deleted successfully!")
       queryClient.invalidateQueries({ queryKey: ["products"] })

@@ -14,12 +14,39 @@ export function ProductActions({ productId, onEdit }: ProductActionsProps) {
 
   const handleDelete = async () => {
     try {
-      const { error } = await supabase
+      // First, get the product to access its images
+      const { data: product, error: fetchError } = await supabase
+        .from("products")
+        .select("images")
+        .eq("id", productId)
+        .single()
+
+      if (fetchError) throw fetchError
+
+      // Delete images from storage if they exist
+      if (product?.images?.length) {
+        console.log("Deleting images from storage:", product.images)
+        const { error: storageError } = await supabase.storage
+          .from("storefront-assets")
+          .remove(product.images.map((url: string) => {
+            // Extract the path from the full URL
+            const path = url.split("/storefront-assets/")[1]
+            return path
+          }))
+
+        if (storageError) {
+          console.error("Error deleting images from storage:", storageError)
+          // Continue with product deletion even if image deletion fails
+        }
+      }
+
+      // Delete the product
+      const { error: deleteError } = await supabase
         .from("products")
         .delete()
         .eq("id", productId)
 
-      if (error) throw error
+      if (deleteError) throw deleteError
 
       toast.success("Product deleted successfully!")
       queryClient.invalidateQueries({ queryKey: ["products"] })
