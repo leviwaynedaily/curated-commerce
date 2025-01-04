@@ -10,6 +10,8 @@ interface StorefrontBasicInfoProps {
 }
 
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
+  const currentName = form.getValues("name");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -23,7 +25,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           <FormItem>
             <FormLabel>Site Name</FormLabel>
             <FormControl>
-              <Input placeholder="Enter site name" {...field} />
+              <Input placeholder={currentName || "Enter site name"} {...field} />
             </FormControl>
           </FormItem>
         )}
