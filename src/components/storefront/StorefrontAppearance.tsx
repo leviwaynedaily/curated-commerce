@@ -3,7 +3,12 @@ import { FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { extractColorsFromLogo } from "@/utils/colorExtractor";
+import { useToast } from "@/components/ui/use-toast";
 
 interface StorefrontAppearanceProps {
   form: UseFormReturn<any>;
@@ -11,6 +16,26 @@ interface StorefrontAppearanceProps {
 
 export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
   const [previewColors, setPreviewColors] = useState(form.getValues("theme_config.colors"));
+  const [isExtracting, setIsExtracting] = useState(false);
+  const { toast } = useToast();
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
+
+  // Fetch current storefront data to get the logo URL
+  const { data: storefront } = useQuery({
+    queryKey: ["storefront", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("logo_url")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentStorefrontId
+  });
 
   // Update preview colors when form values change
   useEffect(() => {
@@ -21,6 +46,39 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
     });
     return () => subscription.unsubscribe();
   }, [form]);
+
+  const handleExtractColors = async () => {
+    if (!storefront?.logo_url) {
+      toast({
+        title: "No logo found",
+        description: "Please upload a logo in the Basic Information section first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsExtracting(true);
+      const colors = await extractColorsFromLogo(storefront.logo_url);
+      
+      // Update form values with extracted colors
+      form.setValue("theme_config.colors", colors);
+      
+      toast({
+        title: "Colors extracted",
+        description: "Color palette has been updated based on your logo.",
+      });
+    } catch (error) {
+      console.error('Error extracting colors:', error);
+      toast({
+        title: "Error",
+        description: "Failed to extract colors from logo. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsExtracting(false);
+    }
+  };
 
   const ColorInput = ({ label, path }: { label: string; path: string }) => (
     <FormField
@@ -58,6 +116,16 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleExtractColors}
+            disabled={isExtracting || !storefront?.logo_url}
+            className="w-full mb-4"
+          >
+            {isExtracting ? "Extracting Colors..." : "Suggest Colors from Logo"}
+          </Button>
+
           <div>
             <h3 className="mb-4 text-sm font-medium">Background Colors</h3>
             <div className="space-y-4">
