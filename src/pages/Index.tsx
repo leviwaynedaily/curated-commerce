@@ -134,9 +134,10 @@ const Index = () => {
         .single();
 
       if (error) {
-        if (error.code === "PGRST116") return null;
-        throw error;
+        console.error("Business query error:", error);
+        return null;
       }
+      
       return data;
     },
   });
@@ -153,9 +154,10 @@ const Index = () => {
         .single();
 
       if (error) {
-        if (error.code === "PGRST116") return null;
-        throw error;
+        console.error("Storefront query error:", error);
+        return null;
       }
+      
       return data;
     },
     enabled: !!business?.id,
