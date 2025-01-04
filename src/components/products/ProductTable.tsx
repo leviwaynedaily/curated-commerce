@@ -49,38 +49,64 @@ export function ProductTable({
   const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'created_at', direction: 'desc' })
   const queryClient = useQueryClient()
 
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, error } = useQuery({
     queryKey: ["products", storefrontId, statusFilter, searchQuery, sortConfig],
     queryFn: async () => {
-      console.log("Fetching products for storefront:", storefrontId)
-      let query = supabase
-        .from("products")
-        .select("*")
-        .eq("storefront_id", storefrontId)
+      try {
+        console.log("Fetching products for storefront:", storefrontId)
+        
+        // First check if we have an authenticated session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+        if (sessionError) {
+          console.error("Session error:", sessionError)
+          throw sessionError
+        }
+        
+        if (!session) {
+          console.error("No active session")
+          throw new Error("Authentication required")
+        }
 
-      if (statusFilter !== "all") {
-        query = query.eq("status", statusFilter)
-      }
+        let query = supabase
+          .from("products")
+          .select("*")
+          .eq("storefront_id", storefrontId)
 
-      if (searchQuery) {
-        query = query.ilike("name", `%${searchQuery}%`)
-      }
+        if (statusFilter !== "all") {
+          query = query.eq("status", statusFilter)
+        }
 
-      if (sortConfig.direction) {
-        query = query.order(sortConfig.field, { ascending: sortConfig.direction === 'asc' })
-      }
+        if (searchQuery) {
+          query = query.ilike("name", `%${searchQuery}%`)
+        }
 
-      const { data, error } = await query
+        if (sortConfig.direction) {
+          query = query.order(sortConfig.field, { ascending: sortConfig.direction === 'asc' })
+        }
 
-      if (error) {
-        console.error("Error fetching products:", error)
+        const { data, error: queryError } = await query
+
+        if (queryError) {
+          console.error("Error fetching products:", queryError)
+          throw queryError
+        }
+
+        console.log("Products fetched successfully:", data)
+        return data || []
+      } catch (error) {
+        console.error("Error in products query:", error)
         throw error
       }
-
-      console.log("Products fetched:", data)
-      return data
     },
+    retry: 1,
+    enabled: !!storefrontId,
   })
+
+  if (error) {
+    console.error("Product table error:", error)
+    toast.error("Failed to load products. Please try again.")
+    return <div>Error loading products. Please refresh the page.</div>
+  }
 
   const toggleProductSelection = (productId: string) => {
     onSelectedProductsChange(
@@ -110,14 +136,17 @@ export function ProductTable({
       const numericFields = ["in_town_price", "shipping_price"]
       const updateValue = numericFields.includes(field) ? Number(value) : value
 
-      const { error } = await supabase
+      const { error: updateError } = await supabase
         .from("products")
         .update({ [field]: updateValue })
         .eq("id", productId)
 
-      if (error) throw error
+      if (updateError) {
+        console.error("Error updating product:", updateError)
+        throw updateError
+      }
 
-      queryClient.invalidateQueries({ queryKey: ["products"] })
+      await queryClient.invalidateQueries({ queryKey: ["products"] })
       toast.success("Product updated successfully!")
     } catch (error) {
       console.error("Error updating product:", error)
