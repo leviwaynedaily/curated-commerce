@@ -37,6 +37,7 @@ const menuItems = [
   { title: "Products", icon: Package, url: "/products" },
   { title: "Storefront Information", icon: Store, url: "/storefront-information" },
   { title: "Appearance", icon: Palette, url: "/appearance" },
+  { title: "Themes", icon: Palette, url: "/themes" },
   { title: "PWA", icon: Smartphone, url: "/pwa" },
   { title: "Domain Management", icon: Globe, url: "/domain" },
   { title: "View Store", icon: Globe, url: "/preview" },

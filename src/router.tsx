@@ -8,6 +8,7 @@ import StorefrontInformation from "./pages/StorefrontInformation";
 import Appearance from "./pages/Appearance";
 import PWASettings from "./pages/PWASettings";
 import DomainManagement from "./pages/DomainManagement";
+import Themes from "./pages/Themes";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
@@ -96,6 +97,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Appearance />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/themes",
+    element: (
+      <ProtectedRoute>
+        <Themes />
       </ProtectedRoute>
     ),
   },
