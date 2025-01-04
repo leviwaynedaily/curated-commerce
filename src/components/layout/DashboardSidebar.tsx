@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/sidebar";
 import { 
   Home,
-  Settings,
   Package,
   Store,
   Palette,
@@ -40,7 +39,6 @@ const menuItems = [
   { title: "Appearance", icon: Palette, url: "/appearance" },
   { title: "PWA", icon: Smartphone, url: "/pwa" },
   { title: "Domain Management", icon: Globe, url: "/domain" },
-  { title: "Settings", icon: Settings, url: "/settings" },
   { title: "View Store", icon: Globe, url: "/preview" },
 ];
 
