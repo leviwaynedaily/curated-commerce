@@ -30,20 +30,20 @@ export function ProductActions({ productId, onEdit }: ProductActionsProps) {
   }
 
   return (
-    <div className="absolute top-2 right-2 flex gap-2">
+    <div className="flex gap-2 justify-end">
       <Button
-        variant="secondary"
+        variant="ghost"
         size="icon"
         onClick={onEdit}
-        className="h-8 w-8"
+        className="h-8 w-8 text-muted-foreground hover:text-foreground"
       >
         <Pencil className="h-4 w-4" />
       </Button>
       <Button
-        variant="destructive"
+        variant="ghost"
         size="icon"
         onClick={handleDelete}
-        className="h-8 w-8"
+        className="h-8 w-8 text-muted-foreground hover:text-destructive"
       >
         <Trash2 className="h-4 w-4" />
       </Button>
