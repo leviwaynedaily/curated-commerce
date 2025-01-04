@@ -7,6 +7,8 @@ import {
   ShoppingCart,
   Users,
   ArrowRight,
+  Palette,
+  Globe,
 } from "lucide-react";
 
 const stats = [

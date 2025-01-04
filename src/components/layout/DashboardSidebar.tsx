@@ -39,9 +39,7 @@ const menuItems = [
 
 export function DashboardSidebar({ open, onOpenChange }: DashboardSidebarProps) {
   return (
-    <Sidebar
-      open={open}
-      onOpenChange={onOpenChange}
+    <div
       className={cn(
         "fixed left-0 top-0 z-20 h-full w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
         "transition-transform duration-300 ease-in-out lg:relative lg:transform-none",
@@ -72,6 +70,6 @@ export function DashboardSidebar({ open, onOpenChange }: DashboardSidebarProps) 
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-    </Sidebar>
+    </div>
   );
 }
