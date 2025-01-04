@@ -13,90 +13,113 @@ import { supabase } from "@/integrations/supabase/client"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { Link } from "react-router-dom"
 
-const stats = [
-  {
-    title: "Products",
-    value: "123",
-    icon: Package,
-    change: "+3",
-    changeType: "positive",
-  },
-]
+const Dashboard = ({ storefront }: { storefront: any }) => {
+  const { data: products } = useQuery({
+    queryKey: ["products", storefront.id],
+    queryFn: async () => {
+      console.log("Fetching products for storefront:", storefront.id)
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("storefront_id", storefront.id)
+        .eq("status", "active")
 
-const Dashboard = ({ storefront }: { storefront: any }) => (
-  <div className="space-y-8 fade-in">
-    <div>
-      <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-      <p className="text-muted-foreground mt-2">
-        Welcome back! Here's an overview of your store.
-      </p>
-    </div>
+      if (error) {
+        console.error("Error fetching products:", error)
+        throw error
+      }
 
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat) => (
-        <Card key={stat.title} className="hover-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {stat.title}
-            </CardTitle>
-            <stat.icon className="h-4 w-4 text-muted-foreground" />
+      console.log("Active products fetched:", data)
+      return data
+    },
+    enabled: !!storefront?.id,
+  })
+
+  const stats = [
+    {
+      title: "Products",
+      value: products?.length || 0,
+      icon: Package,
+      change: "+3",
+      changeType: "positive",
+    },
+  ]
+
+  return (
+    <div className="space-y-8 fade-in">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="text-muted-foreground mt-2">
+          Welcome back! Here's an overview of your store.
+        </p>
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat) => (
+          <Card key={stat.title} className="hover-card">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                {stat.title}
+              </CardTitle>
+              <stat.icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stat.value}</div>
+              <p
+                className={`text-xs ${
+                  stat.changeType === "positive"
+                    ? "text-green-500"
+                    : "text-red-500"
+                }`}
+              >
+                {stat.change} from last month
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="hover-card">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stat.value}</div>
-            <p
-              className={`text-xs ${
-                stat.changeType === "positive"
-                  ? "text-green-500"
-                  : "text-red-500"
-              }`}
-            >
-              {stat.change} from last month
-            </p>
+          <CardContent className="space-y-4">
+            <Button variant="outline" className="w-full justify-start" asChild>
+              <Link to="/products">
+                <Package className="mr-2 h-4 w-4" />
+                Manage Products
+              </Link>
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Palette className="mr-2 h-4 w-4" />
+              Customize Store
+            </Button>
+            <Button variant="outline" className="w-full justify-start">
+              <Globe className="mr-2 h-4 w-4" />
+              View Store
+            </Button>
           </CardContent>
         </Card>
-      ))}
-    </div>
 
-    <div className="grid gap-4 md:grid-cols-2">
-      <Card className="hover-card">
-        <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Button variant="outline" className="w-full justify-start" asChild>
-            <Link to="/products">
-              <Package className="mr-2 h-4 w-4" />
-              Manage Products
-            </Link>
-          </Button>
-          <Button variant="outline" className="w-full justify-start">
-            <Palette className="mr-2 h-4 w-4" />
-            Customize Store
-          </Button>
-          <Button variant="outline" className="w-full justify-start">
-            <Globe className="mr-2 h-4 w-4" />
-            View Store
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card className="hover-card">
-        <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            No orders yet. They'll appear here when customers start purchasing.
-          </p>
-          <Button variant="link" className="mt-4 p-0 h-auto font-normal">
-            View all orders
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
+        <Card className="hover-card">
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground">
+              No orders yet. They'll appear here when customers start purchasing.
+            </p>
+            <Button variant="link" className="mt-4 p-0 h-auto font-normal">
+              View all orders
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 const Index = () => {
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
