@@ -13,6 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
+import { ThemeConfig } from "@/types/theme";
 
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
@@ -109,7 +110,7 @@ const StorefrontInformation = () => {
       enable_instructions: storefront?.enable_instructions || false,
       instructions_text: storefront?.instructions_text || null,
       show_verification_options: false,
-      theme_config: storefront?.theme_config || {
+      theme_config: (storefront?.theme_config as ThemeConfig) || {
         colors: {
           background: {
             primary: "#000000",
