@@ -4,9 +4,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
 
 interface StorefrontBasicInfoProps {
   form: UseFormReturn<any>;
@@ -14,41 +11,6 @@ interface StorefrontBasicInfoProps {
 
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
-  const hasSetInitialName = useRef(false);
-
-  // Fetch current storefront data
-  const { data: storefront } = useQuery({
-    queryKey: ["storefront", currentStorefrontId],
-    queryFn: async () => {
-      console.log("Fetching storefront data for:", currentStorefrontId);
-      if (!currentStorefrontId) return null;
-
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("name")
-        .eq("id", currentStorefrontId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        throw error;
-      }
-
-      console.log("Fetched storefront data:", data);
-      return data;
-    },
-    enabled: !!currentStorefrontId
-  });
-
-  // Set the default value for the name field only once when storefront data is loaded
-  // and only if the field is empty
-  useEffect(() => {
-    if (storefront?.name && !hasSetInitialName.current && !form.getValues("name")) {
-      console.log("Setting initial name to:", storefront.name);
-      form.setValue("name", storefront.name);
-      hasSetInitialName.current = true;
-    }
-  }, [storefront, form]);
 
   return (
     <div className="space-y-6">
@@ -63,7 +25,7 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           <FormItem>
             <FormLabel>Site Name</FormLabel>
             <FormControl>
-              <Input placeholder={storefront?.name || "Enter site name"} {...field} />
+              <Input placeholder="Enter site name" {...field} />
             </FormControl>
           </FormItem>
         )}
