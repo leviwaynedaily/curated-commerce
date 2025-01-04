@@ -116,6 +116,19 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
+          {storefront?.logo_url && (
+            <div className="mb-4">
+              <p className="text-sm font-medium mb-2">Current Logo</p>
+              <div className="w-32 h-32 border rounded-lg overflow-hidden bg-white p-2">
+                <img
+                  src={storefront.logo_url}
+                  alt="Storefront Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+          )}
+
           <Button
             type="button"
             variant="outline"
