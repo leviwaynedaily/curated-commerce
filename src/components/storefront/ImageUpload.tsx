@@ -92,11 +92,11 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       </div>
 
       {value && (
-        <div className="relative w-40 h-40">
+        <div className="relative w-full max-w-md aspect-square">
           <img
             src={value}
             alt="Uploaded image"
-            className="w-full h-full object-cover rounded-md"
+            className="w-full h-full object-contain rounded-md"
           />
           <Button
             type="button"
