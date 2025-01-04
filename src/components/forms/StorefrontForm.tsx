@@ -49,7 +49,8 @@ export function StorefrontForm({ businessId, onSuccess }: StorefrontFormProps) {
       if (error) throw error;
 
       toast.success("Store created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["storefront"] });
+      // Update the correct query key to match the one in Stores.tsx
+      queryClient.invalidateQueries({ queryKey: ["storefronts"] });
       onSuccess?.();
     } catch (error) {
       console.error("Error creating store:", error);
@@ -97,7 +98,7 @@ export function StorefrontForm({ businessId, onSuccess }: StorefrontFormProps) {
               <FormLabel>Store URL</FormLabel>
               <FormControl>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">curately.co/</span>
+                  <span className="text-sm text-muted-foreground">{window.location.origin}/</span>
                   <Input placeholder="my-store" {...field} />
                 </div>
               </FormControl>
