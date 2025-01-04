@@ -115,8 +115,8 @@ const Themes = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {themes?.map((theme) => {
-            // Ensure layout_config is of type ThemeConfig
-            const layoutConfig = theme.layout_config as ThemeConfig;
+            // First cast to unknown, then to ThemeConfig to satisfy TypeScript
+            const layoutConfig = (theme.layout_config as unknown) as ThemeConfig;
             
             return (
               <div
