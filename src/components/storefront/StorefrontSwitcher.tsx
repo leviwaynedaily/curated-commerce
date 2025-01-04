@@ -33,7 +33,7 @@ export function StorefrontSwitcher() {
         .from("businesses")
         .select("*")
         .eq("user_id", user.id)
-        .maybeSingle() // Changed from .single() to .maybeSingle()
+        .maybeSingle()
 
       if (error) {
         console.error("Error fetching business:", error)
@@ -118,10 +118,10 @@ export function StorefrontSwitcher() {
             {storefronts?.find(store => store.id === currentStorefrontId)?.name || "Select store"}
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-background border z-[100]">
           {storefronts?.map((store) => (
             <SelectItem key={store.id} value={store.id}>
-              {store.name}
+              {store.name || store.slug}
             </SelectItem>
           ))}
           <SelectItem value="new" className="text-primary">
