@@ -1,4 +1,8 @@
 import {
+  Sheet,
+  SheetContent,
+} from "@/components/ui/sheet";
+import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
@@ -17,10 +21,13 @@ import {
   Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Link } from "react-router-dom";
 
 interface DashboardSidebarProps {
   open?: boolean;
+  mobileOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
 const menuItems = [
@@ -31,39 +38,60 @@ const menuItems = [
   { title: "View Store", icon: Globe, url: "/preview" },
 ];
 
-export function DashboardSidebar({ open, onOpenChange }: DashboardSidebarProps) {
+const SidebarContent = () => (
+  <>
+    <SidebarHeader className="h-16 flex items-center px-6 border-b">
+      <span className="text-xl font-semibold text-primary">Curately</span>
+    </SidebarHeader>
+    <SidebarContent>
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            {menuItems.map((item) => (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild>
+                  <Link
+                    to={item.url}
+                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors"
+                  >
+                    <item.icon className="h-5 w-5" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+  </>
+);
+
+export function DashboardSidebar({ 
+  open, 
+  mobileOpen = false,
+  onOpenChange,
+  onMobileOpenChange 
+}: DashboardSidebarProps) {
   return (
-    <div
-      className={cn(
-        "fixed left-0 top-0 z-20 h-full w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-        "transition-transform duration-300 ease-in-out lg:relative lg:transform-none",
-        !open && "-translate-x-full"
-      )}
-    >
-      <SidebarHeader className="h-16 flex items-center px-6 border-b">
-        <span className="text-xl font-semibold text-primary">Curately</span>
-      </SidebarHeader>
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a
-                      href={item.url}
-                      className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors"
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </div>
+    <>
+      {/* Mobile Sidebar */}
+      <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
+        <SheetContent side="left" className="p-0 w-[280px]">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop Sidebar */}
+      <div
+        className={cn(
+          "hidden md:block fixed left-0 top-0 z-20 h-full w-64 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "transition-transform duration-300 ease-in-out lg:relative lg:transform-none",
+          !open && "-translate-x-full"
+        )}
+      >
+        <SidebarContent />
+      </div>
+    </>
   );
 }

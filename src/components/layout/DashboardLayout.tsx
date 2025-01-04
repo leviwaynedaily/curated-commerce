@@ -18,6 +18,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -28,14 +29,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <DashboardSidebar open={sidebarOpen} onOpenChange={setSidebarOpen} />
+        <DashboardSidebar 
+          open={sidebarOpen} 
+          mobileOpen={mobileOpen}
+          onOpenChange={setSidebarOpen}
+          onMobileOpenChange={setMobileOpen}
+        />
         <div className="flex-1 flex flex-col min-h-screen">
           <header className="h-16 flex items-center px-6 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <Button
               variant="ghost"
               size="icon"
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden"
+            >
+              <Menu className="h-6 w-6" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden"
+              className="hidden md:flex"
             >
               <Menu className="h-6 w-6" />
             </Button>
