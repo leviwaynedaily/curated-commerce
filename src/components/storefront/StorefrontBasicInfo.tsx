@@ -6,15 +6,15 @@ import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 interface StorefrontBasicInfoProps {
   form: UseFormReturn<any>;
 }
 
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
-  // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
+  const hasSetInitialName = useRef(false);
 
   // Fetch current storefront data
   const { data: storefront } = useQuery({
@@ -40,11 +40,13 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
     enabled: !!currentStorefrontId
   });
 
-  // Set the default value for the name field when storefront data is loaded
+  // Set the default value for the name field only once when storefront data is loaded
+  // and only if the field is empty
   useEffect(() => {
-    if (storefront?.name && !form.getValues("name")) {
-      console.log("Setting default name to:", storefront.name);
+    if (storefront?.name && !hasSetInitialName.current && !form.getValues("name")) {
+      console.log("Setting initial name to:", storefront.name);
       form.setValue("name", storefront.name);
+      hasSetInitialName.current = true;
     }
   }, [storefront, form]);
 
