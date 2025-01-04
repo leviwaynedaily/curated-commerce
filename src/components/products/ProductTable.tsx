@@ -4,15 +4,10 @@ import { supabase } from "@/integrations/supabase/client"
 import {
   Table,
   TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { ProductActions } from "./ProductActions"
-import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import {
   Dialog,
@@ -21,7 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { ProductForm } from "../forms/ProductForm"
-import { format } from "date-fns"
+import { ProductTableHeader } from "./ProductTableHeader"
+import { ProductTableRow } from "./ProductTableRow"
 
 interface ProductTableProps {
   storefrontId: string
@@ -36,6 +32,11 @@ interface EditableCell {
   field: string
 }
 
+interface SortConfig {
+  field: string
+  direction: 'asc' | 'desc' | null
+}
+
 export function ProductTable({
   storefrontId,
   statusFilter,
@@ -45,17 +46,17 @@ export function ProductTable({
 }: ProductTableProps) {
   const [editingProduct, setEditingProduct] = useState<any>(null)
   const [editingCell, setEditingCell] = useState<EditableCell | null>(null)
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ field: 'created_at', direction: 'desc' })
   const queryClient = useQueryClient()
 
   const { data: products, isLoading } = useQuery({
-    queryKey: ["products", storefrontId, statusFilter, searchQuery],
+    queryKey: ["products", storefrontId, statusFilter, searchQuery, sortConfig],
     queryFn: async () => {
       console.log("Fetching products for storefront:", storefrontId)
       let query = supabase
         .from("products")
         .select("*")
         .eq("storefront_id", storefrontId)
-        .order("created_at", { ascending: false })
 
       if (statusFilter !== "all") {
         query = query.eq("status", statusFilter)
@@ -63,6 +64,10 @@ export function ProductTable({
 
       if (searchQuery) {
         query = query.ilike("name", `%${searchQuery}%`)
+      }
+
+      if (sortConfig.direction) {
+        query = query.order(sortConfig.field, { ascending: sortConfig.direction === 'asc' })
       }
 
       const { data, error } = await query
@@ -96,7 +101,7 @@ export function ProductTable({
   }
 
   const handleCellClick = (productId: string, field: string) => {
-    if (field === "status" || field === "images" || field === "created_at") return // Don't make these fields inline editable
+    if (field === "status" || field === "images" || field === "created_at") return
     setEditingCell({ productId, field })
   }
 
@@ -130,6 +135,18 @@ export function ProductTable({
     }
   }
 
+  const handleSort = (field: string) => {
+    setSortConfig(current => ({
+      field,
+      direction:
+        current.field === field
+          ? current.direction === 'asc'
+            ? 'desc'
+            : 'asc'
+          : 'desc'
+    }))
+  }
+
   if (isLoading) {
     return <div>Loading products...</div>
   }
@@ -138,118 +155,85 @@ export function ProductTable({
     return <div>No products found. Create your first product above!</div>
   }
 
-  const renderCell = (product: any, field: string) => {
-    const isEditing = editingCell?.productId === product.id && editingCell?.field === field
-
-    if (isEditing) {
-      return (
-        <Input
-          autoFocus
-          defaultValue={product[field]}
-          onBlur={(e) => handleCellUpdate(product.id, field, e.target.value)}
-          onKeyDown={(e) => handleKeyDown(e, product.id, field, e.currentTarget.value)}
-          className="w-full"
-        />
-      )
-    }
-
-    switch (field) {
-      case "name":
-        return (
-          <div className="flex items-center gap-3">
-            {product.images?.[0] && (
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="h-10 w-10 rounded-md object-cover"
-              />
-            )}
-            <span className="cursor-pointer hover:text-primary">{product[field]}</span>
-          </div>
-        )
-      case "description":
-        return (
-          <span className="line-clamp-2 text-sm text-muted-foreground cursor-pointer hover:text-primary">
-            {product[field] || "—"}
-          </span>
-        )
-      case "in_town_price":
-      case "shipping_price":
-        return <span className="cursor-pointer hover:text-primary">${product[field]}</span>
-      case "category":
-        return (
-          <span className="cursor-pointer hover:text-primary">
-            {product[field] || "—"}
-          </span>
-        )
-      case "created_at":
-        return format(new Date(product.created_at), 'MMM d, yyyy')
-      default:
-        return product[field]
-    }
-  }
-
   return (
     <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">
+              <TableHeader className="w-12">
                 <Checkbox
                   checked={products.length > 0 && selectedProducts.length === products.length}
                   onCheckedChange={toggleAllProducts}
                 />
-              </TableHead>
-              <TableHead className="min-w-[300px]">Product</TableHead>
-              <TableHead className="min-w-[200px]">Description</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>In-Town Price</TableHead>
-              <TableHead>Shipping Price</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              </TableHeader>
+              <ProductTableHeader
+                field="name"
+                label="Product"
+                className="min-w-[300px]"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="description"
+                label="Description"
+                className="min-w-[200px]"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="status"
+                label="Status"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="in_town_price"
+                label="In-Town Price"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="shipping_price"
+                label="Shipping Price"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="category"
+                label="Category"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="created_at"
+                label="Created"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
+                field="actions"
+                label="Actions"
+                sortable={false}
+                className="text-right"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
             </TableRow>
           </TableHeader>
           <TableBody>
             {products.map(product => (
-              <TableRow key={product.id}>
-                <TableCell>
-                  <Checkbox
-                    checked={selectedProducts.includes(product.id)}
-                    onCheckedChange={() => toggleProductSelection(product.id)}
-                  />
-                </TableCell>
-                <TableCell onClick={() => handleCellClick(product.id, "name")}>
-                  {renderCell(product, "name")}
-                </TableCell>
-                <TableCell onClick={() => handleCellClick(product.id, "description")}>
-                  {renderCell(product, "description")}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={product.status === "active" ? "default" : "secondary"}>
-                    {product.status}
-                  </Badge>
-                </TableCell>
-                <TableCell onClick={() => handleCellClick(product.id, "in_town_price")}>
-                  {renderCell(product, "in_town_price")}
-                </TableCell>
-                <TableCell onClick={() => handleCellClick(product.id, "shipping_price")}>
-                  {renderCell(product, "shipping_price")}
-                </TableCell>
-                <TableCell onClick={() => handleCellClick(product.id, "category")}>
-                  {renderCell(product, "category")}
-                </TableCell>
-                <TableCell>
-                  {renderCell(product, "created_at")}
-                </TableCell>
-                <TableCell className="text-right">
-                  <ProductActions
-                    productId={product.id}
-                    onEdit={() => setEditingProduct(product)}
-                  />
-                </TableCell>
-              </TableRow>
+              <ProductTableRow
+                key={product.id}
+                product={product}
+                isSelected={selectedProducts.includes(product.id)}
+                onToggleSelect={toggleProductSelection}
+                editingCell={editingCell}
+                onCellClick={handleCellClick}
+                onCellUpdate={handleCellUpdate}
+                onKeyDown={handleKeyDown}
+                onEdit={setEditingProduct}
+              />
             ))}
           </TableBody>
         </Table>

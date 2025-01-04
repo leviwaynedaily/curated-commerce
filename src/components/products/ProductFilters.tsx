@@ -50,7 +50,6 @@ export function ProductFilters({
             <DropdownMenuItem>By price range</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <Button variant="outline">Sort</Button>
       </div>
     </div>
   )
