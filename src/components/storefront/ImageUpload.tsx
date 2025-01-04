@@ -106,16 +106,18 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
 
       {value && (
         <div className="relative w-32 h-32">
-          <img
-            src={value}
-            alt="Uploaded image"
-            className="w-full h-full object-contain rounded-md"
-          />
+          <div className="absolute inset-0 w-full h-full bg-white dark:bg-white rounded-md p-2">
+            <img
+              src={value}
+              alt="Uploaded image"
+              className="w-full h-full object-contain"
+            />
+          </div>
           <Button
             type="button"
             variant="destructive"
             size="icon"
-            className="absolute top-2 right-2"
+            className="absolute -top-2 -right-2 z-10"
             onClick={handleRemove}
           >
             <X className="h-4 w-4" />
