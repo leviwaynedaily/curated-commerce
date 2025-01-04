@@ -77,7 +77,7 @@ export function DashboardSidebar({
     <>
       {/* Mobile Sidebar */}
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetContent side="left" className="p-0 w-[240px]">
+        <SheetContent side="left" className="p-0 w-[200px]">
           <DashboardSidebarContent />
         </SheetContent>
       </Sheet>
@@ -85,7 +85,7 @@ export function DashboardSidebar({
       {/* Desktop Sidebar */}
       <div
         className={cn(
-          "hidden md:block fixed left-0 top-0 z-20 h-full w-52 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "hidden md:block fixed left-0 top-0 z-20 h-full w-48 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
           "transition-transform duration-300 ease-in-out lg:relative lg:transform-none",
           !open && "-translate-x-full"
         )}
