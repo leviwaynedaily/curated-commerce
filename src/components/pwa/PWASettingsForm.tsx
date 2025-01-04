@@ -88,10 +88,32 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
+      const dataToUpsert = {
+        ...values,
+        storefront_id: currentStorefrontId,
+      };
+
       const { error } = await supabase
         .from("pwa_settings")
         .upsert({
-          ...values,
+          name: dataToUpsert.name,
+          short_name: dataToUpsert.short_name,
+          description: dataToUpsert.description,
+          start_url: dataToUpsert.start_url,
+          display: dataToUpsert.display,
+          orientation: dataToUpsert.orientation,
+          theme_color: dataToUpsert.theme_color,
+          background_color: dataToUpsert.background_color,
+          icon_72x72: dataToUpsert.icon_72x72,
+          icon_96x96: dataToUpsert.icon_96x96,
+          icon_128x128: dataToUpsert.icon_128x128,
+          icon_144x144: dataToUpsert.icon_144x144,
+          icon_152x152: dataToUpsert.icon_152x152,
+          icon_192x192: dataToUpsert.icon_192x192,
+          icon_384x384: dataToUpsert.icon_384x384,
+          icon_512x512: dataToUpsert.icon_512x512,
+          screenshot_mobile: dataToUpsert.screenshot_mobile,
+          screenshot_desktop: dataToUpsert.screenshot_desktop,
           storefront_id: currentStorefrontId,
         });
 

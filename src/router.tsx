@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/appearance/pwa",
+    path: "/pwa",
     element: (
       <ProtectedRoute>
         <PWASettings />

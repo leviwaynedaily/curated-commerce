@@ -20,6 +20,7 @@ import {
   Store,
   Palette,
   Globe,
+  Smartphone,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
@@ -37,6 +38,7 @@ const menuItems = [
   { title: "Products", icon: Package, url: "/products" },
   { title: "Storefront Information", icon: Store, url: "/storefront-information" },
   { title: "Appearance", icon: Palette, url: "/appearance" },
+  { title: "PWA", icon: Smartphone, url: "/pwa" },
   { title: "Settings", icon: Settings, url: "/settings" },
   { title: "View Store", icon: Globe, url: "/preview" },
 ];
