@@ -18,8 +18,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
-    // Lock scrolling when verification prompt is shown
-    if (!isVerified) {
+    // Lock scrolling when verification or instructions prompt is shown
+    if (!showContent) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
@@ -29,7 +29,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isVerified]);
+  }, [showContent]);
 
   useEffect(() => {
     const fetchStorefrontData = async () => {
@@ -47,6 +47,16 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
       console.log("Fetched storefront data:", data);
       setPreviewData(data);
+
+      // If no verification is required, show instructions or content directly
+      if (data.verification_type === 'none') {
+        setIsVerified(true);
+        if (data.enable_instructions) {
+          setShowInstructions(true);
+        } else {
+          setShowContent(true);
+        }
+      }
     };
 
     fetchStorefrontData();
@@ -76,6 +86,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }, [storefrontId]);
 
   const handleVerification = (password?: string) => {
+    console.log("Handling verification...");
     if (previewData.verification_type === 'password' || previewData.verification_type === 'both') {
       if (password !== previewData.verification_password) {
         return;
@@ -83,18 +94,22 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     }
     setIsVerified(true);
     if (previewData.enable_instructions) {
+      console.log("Showing instructions after verification");
       setShowInstructions(true);
     } else {
+      console.log("Showing content directly after verification");
       setShowContent(true);
     }
   };
 
   const handleContinue = () => {
+    console.log("Continuing to content from instructions");
     setShowInstructions(false);
     setShowContent(true);
   };
 
   const handleReset = () => {
+    console.log("Resetting preview state");
     setIsVerified(false);
     setShowContent(false);
     setShowInstructions(false);
