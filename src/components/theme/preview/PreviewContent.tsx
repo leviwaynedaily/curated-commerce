@@ -115,9 +115,9 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   return (
     <div className="preview-container h-screen overflow-y-auto bg-background">
       {/* Static Logo Section */}
-      <div className="w-full bg-background py-6">
+      <div className="w-full bg-background py-4">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="flex flex-col items-center justify-center space-y-3">
             {previewData.logo_url && (
               <img 
                 src={previewData.logo_url} 
@@ -136,7 +136,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         </div>
       </div>
 
-      {/* Header Section - Initially not sticky */}
+      {/* Header Section - Initially positioned below description */}
       <div 
         className={`sticky-header bg-background transition-all duration-300 ${
           isScrolled ? 'sticky top-0 z-50 shadow-md' : ''
@@ -159,8 +159,8 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         />
       </div>
 
-      {/* Main Content - Reduced top padding */}
-      <div className="container mx-auto px-4 pt-2 pb-8">
+      {/* Main Content */}
+      <div className="container mx-auto px-4 pt-1 pb-8">
         <ProductGrid
           products={filteredAndSortedProducts}
           gridSize={gridSize}
