@@ -4,6 +4,7 @@ import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Database } from "@/integrations/supabase/types";
+import { Button } from "@/components/ui/button";
 
 interface LivePreviewProps {
   storefrontId: string;
@@ -133,13 +134,26 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       )}
       {isVerified && showInstructions && previewData.enable_instructions && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-          <div className="w-[280px] rounded-lg shadow-xl bg-card p-4 space-y-4">
+          <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
+            {previewData.logo_url && (
+              <img 
+                src={previewData.logo_url} 
+                alt={previewData.name} 
+                className="h-16 mx-auto object-contain"
+              />
+            )}
+            
+            <h2 className="text-xl font-semibold text-center">
+              Welcome to {previewData.name}
+            </h2>
+            
             <div 
-              className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
+              className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
               dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
             />
-            <button
-              className="w-full h-7 text-xs rounded"
+
+            <Button
+              className="w-full"
               onClick={handleContinue}
               style={{ 
                 backgroundColor: previewData.verification_button_color,
@@ -147,8 +161,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
                 border: 'none'
               }}
             >
-              Continue to Site
-            </button>
+              Enter Site
+            </Button>
           </div>
         </div>
       )}
