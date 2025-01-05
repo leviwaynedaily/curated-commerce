@@ -12,7 +12,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
   const { data: products } = useQuery({
     queryKey: ["preview-products", previewData.id],
     queryFn: async () => {
-      console.log("Fetching products for preview")
+      console.log("Fetching products for preview", previewData.id)
       const { data, error } = await supabase
         .from("products")
         .select("*")
@@ -33,28 +33,30 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {previewData.logo_url && (
-        <img 
-          src={previewData.logo_url} 
-          alt={previewData.name} 
-          className="h-16 object-contain mb-8"
-        />
-      )}
-      
-      {previewData.show_description && previewData.description && (
-        <p 
-          className="mb-8 text-lg"
-          style={{ color: colors.font.secondary }}
-        >
-          {previewData.description}
-        </p>
-      )}
+      <div className="flex flex-col items-center">
+        {previewData.logo_url && (
+          <img 
+            src={previewData.logo_url} 
+            alt={previewData.name} 
+            className="h-24 object-contain mb-8"
+          />
+        )}
+        
+        {previewData.show_description && previewData.description && (
+          <p 
+            className="mb-12 text-lg text-center max-w-2xl"
+            style={{ color: colors.font.secondary }}
+          >
+            {previewData.description}
+          </p>
+        )}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {products?.map((product) => (
           <div 
             key={product.id}
-            className="group relative rounded-lg overflow-hidden"
+            className="group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg"
             style={{ backgroundColor: colors.background.secondary }}
           >
             {product.images?.[0] && (
