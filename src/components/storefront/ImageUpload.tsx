@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ImageUploadProps {
   value: string | null;
@@ -15,6 +16,7 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange, bucket, path, storefrontId }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -58,6 +60,11 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       console.log("File uploaded successfully, public URL:", publicUrl);
       onChange(publicUrl);
 
+      // Invalidate the storefront query to refresh the data
+      if (storefrontId) {
+        await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
+      }
+
       toast({
         title: "Success",
         description: "Image uploaded successfully",
@@ -74,8 +81,12 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
     }
   };
 
-  const handleRemove = () => {
+  const handleRemove = async () => {
     onChange(null);
+    // Invalidate the storefront query to refresh the data
+    if (storefrontId) {
+      await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
+    }
   };
 
   return (

@@ -5,10 +5,11 @@ import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { StorefrontAppearance } from "@/components/storefront/StorefrontAppearance";
 import { useToast } from "@/components/ui/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 const formSchema = z.object({
   favicon_url: z.string().nullable(),
@@ -24,25 +25,32 @@ type FormValues = z.infer<typeof formSchema>;
 
 const Appearance = () => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  const { data: storefront, isLoading, refetch } = useQuery({
+  const { data: storefront, isLoading } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) {
         throw new Error("No storefront selected");
       }
 
+      console.log("Fetching storefront data for appearance...");
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
         .eq("id", currentStorefrontId)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        throw error;
+      }
+
+      console.log("Fetched storefront data:", data);
       return data;
     },
-    enabled: !!currentStorefrontId
+    enabled: !!currentStorefrontId,
   });
 
   const form = useForm<FormValues>({
@@ -58,10 +66,28 @@ const Appearance = () => {
     },
   });
 
+  // Update form values when storefront data is loaded
+  useEffect(() => {
+    if (storefront) {
+      console.log("Setting form values from storefront data:", storefront);
+      form.reset({
+        favicon_url: storefront.favicon_url,
+        logo_url: storefront.logo_url,
+        main_color: "#1A1F2C",
+        secondary_color: "#D6BCFA",
+        font_color: "#FFFFFF",
+        verification_color: "#1A1F2C",
+        instructions_color: "#1A1F2C",
+      });
+    }
+  }, [storefront, form]);
+
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div>Loading...</div>
+        <div className="flex items-center justify-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
       </DashboardLayout>
     );
   }
