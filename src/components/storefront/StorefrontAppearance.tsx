@@ -36,14 +36,16 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
   return (
     <div className="space-y-8">
-      <Button 
-        onClick={openPreviewWindow}
-        className="w-full mb-8"
-        variant="outline"
-      >
-        <ExternalLink className="mr-2 h-4 w-4" />
-        Open Preview Window
-      </Button>
+      <div className="flex justify-end">
+        <Button 
+          onClick={openPreviewWindow}
+          variant="outline"
+          className="w-auto"
+        >
+          <ExternalLink className="mr-2 h-4 w-4" />
+          Open Preview Window
+        </Button>
+      </div>
 
       <div className="space-y-8">
         <ColorManagement 
