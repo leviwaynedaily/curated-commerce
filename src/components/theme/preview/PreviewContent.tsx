@@ -4,7 +4,6 @@ import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { PreviewPagination } from "./PreviewPagination";
-import { ProductFilters } from "./ProductFilters";
 import { ViewOptionsDropdown } from "./ViewOptionsDropdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -114,28 +113,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         onTextPlacementChange={setTextPlacement}
       />
       
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <ProductFilters 
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            currentSort={currentSort}
-            onSortChange={setCurrentSort}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categories={Array.from(new Set(products.map(p => p.category).filter(Boolean)))}
-            gridSize="medium"
-            onGridChange={() => {}}
-          />
-          <ViewOptionsDropdown
-            layout={layout}
-            onLayoutChange={setLayout}
-            textPlacement={textPlacement}
-            onTextPlacementChange={setTextPlacement}
-            mainColor={previewData.main_color || "#000000"}
-          />
-        </div>
-
+      <main className="container mx-auto px-4 py-8">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
