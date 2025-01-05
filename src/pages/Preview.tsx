@@ -1,22 +1,17 @@
 import { useSearchParams } from "react-router-dom";
 import { LivePreview } from "@/components/theme/LivePreview";
 
-const Preview = () => {
+export default function Preview() {
   const [searchParams] = useSearchParams();
-  const storefrontId = searchParams.get("storefrontId") || localStorage.getItem('lastStorefrontId');
+  const storefrontId = searchParams.get('storefrontId');
 
   if (!storefrontId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">No Storefront Selected</h1>
-          <p className="text-muted-foreground">Please select a storefront first</p>
-        </div>
-      </div>
-    );
+    return <div className="p-4">No storefront ID provided</div>;
   }
 
-  return <LivePreview storefrontId={storefrontId} />;
-};
-
-export default Preview;
+  return (
+    <div className="w-full h-screen">
+      <LivePreview storefrontId={storefrontId} />
+    </div>
+  );
+}
