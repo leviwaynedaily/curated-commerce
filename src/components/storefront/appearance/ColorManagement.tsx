@@ -106,13 +106,13 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-medium">Colors</h3>
+      <div>
+        <h3 className="text-lg font-medium mb-4">Colors</h3>
         <Button
           type="button"
           variant="outline"
           onClick={handleSuggestColors}
-          className="w-auto"
+          className="w-auto mb-8"
         >
           <Wand2 className="mr-2 h-4 w-4" />
           Suggest from Logo
