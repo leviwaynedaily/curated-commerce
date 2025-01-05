@@ -12,6 +12,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
@@ -51,7 +53,7 @@ const StorefrontInformation = () => {
   const { toast } = useToast();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  const { data: storefront, isLoading } = useQuery({
+  const { data: storefront, isLoading, error } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
       console.log("Fetching storefront with ID:", currentStorefrontId);
@@ -74,10 +76,17 @@ const StorefrontInformation = () => {
         throw error;
       }
 
+      if (!data) {
+        console.error("No storefront found with ID:", currentStorefrontId);
+        throw new Error("Storefront not found");
+      }
+
       console.log("Fetched storefront data:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
+    staleTime: 0, // Disable caching to always fetch fresh data
+    retry: 1, // Only retry once to avoid infinite loops
   });
 
   const form = useForm<FormValues>({
@@ -180,7 +189,21 @@ const StorefrontInformation = () => {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div>Loading...</div>
+        <div className="flex items-center justify-center h-[50vh]">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load storefront information. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
       </DashboardLayout>
     );
   }
@@ -188,7 +211,11 @@ const StorefrontInformation = () => {
   if (!currentStorefrontId) {
     return (
       <DashboardLayout>
-        <div>Please select a storefront first</div>
+        <Alert>
+          <AlertDescription>
+            Please select a storefront first
+          </AlertDescription>
+        </Alert>
       </DashboardLayout>
     );
   }
