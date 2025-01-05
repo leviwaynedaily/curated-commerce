@@ -11,4 +11,9 @@ export interface PreviewData {
   enable_instructions?: boolean;
   instructions_text?: string;
   show_description?: boolean;
+  verification_button_color?: string;
+  verification_button_text_color?: string;
+  verification_text_color?: string;
+  verification_checkbox_color?: string;
+  verification_input_border_color?: string;
 }
