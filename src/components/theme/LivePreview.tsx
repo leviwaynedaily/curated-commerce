@@ -157,7 +157,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
               onClick={handleContinue}
               style={{ 
                 backgroundColor: previewData.verification_button_color,
-                color: previewData.verification_button_text_color,
+                color: '#FFFFFF',
                 border: 'none'
               }}
             >
