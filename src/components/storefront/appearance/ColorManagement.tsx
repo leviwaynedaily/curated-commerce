@@ -134,42 +134,43 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSuggestColors}
+            className="gap-2 w-full"
+          >
+            <Wand2 className="h-4 w-4" />
+            Suggest from Logo
+          </Button>
+          
+          <div className="space-y-2">
             <h4 className="text-sm font-medium">Suggested Colors</h4>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSuggestColors}
-              className="gap-2"
-            >
-              <Wand2 className="h-4 w-4" />
-              Suggest from Logo
-            </Button>
-          </div>
-          <div className="space-y-4">
-            {Object.entries(predefinedColors).map(([category, colors]) => (
-              <div key={category} className="space-y-2">
-                <h5 className="text-xs font-medium capitalize">{category}</h5>
-                <div className="flex flex-wrap gap-2">
-                  {colors.map((color) => (
-                    <button
-                      key={color.value}
-                      type="button"
-                      onClick={() => {
-                        form.setValue("main_color", color.value);
-                      }}
-                      className="group relative h-8 w-8 rounded-full border"
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    >
-                      <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
-                        {color.name}
-                      </span>
-                    </button>
-                  ))}
+            <div className="space-y-4">
+              {Object.entries(predefinedColors).map(([category, colors]) => (
+                <div key={category} className="space-y-2">
+                  <h5 className="text-xs font-medium capitalize">{category}</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {colors.map((color) => (
+                      <button
+                        key={color.value}
+                        type="button"
+                        onClick={() => {
+                          form.setValue("main_color", color.value);
+                        }}
+                        className="group relative h-8 w-8 rounded-full border"
+                        style={{ backgroundColor: color.value }}
+                        title={color.name}
+                      >
+                        <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
+                          {color.name}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>
