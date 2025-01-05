@@ -142,6 +142,20 @@ const Themes = () => {
     applyThemeMutation.mutate(themeId);
   };
 
+  const handleOpenPreview = () => {
+    if (!currentStorefrontId) {
+      toast({
+        title: "Error",
+        description: "Please select a storefront first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const previewUrl = `/preview?storefrontId=${currentStorefrontId}`;
+    window.open(previewUrl, '_blank', 'width=1024,height=768');
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -152,7 +166,14 @@ const Themes = () => {
               Import and manage your storefront themes
             </p>
           </div>
-          <div>
+          <div className="flex gap-4">
+            <Button
+              onClick={handleOpenPreview}
+              variant="outline"
+              className="gap-2"
+            >
+              Live Preview
+            </Button>
             <input
               type="file"
               ref={fileInputRef}
