@@ -115,9 +115,9 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   return (
     <div className="preview-container h-screen overflow-y-auto bg-background">
       {/* Static Logo Section */}
-      <div className="w-full bg-background py-8">
+      <div className="w-full bg-background py-6">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-center space-y-6">
+          <div className="flex flex-col items-center justify-center space-y-4">
             {previewData.logo_url && (
               <img 
                 src={previewData.logo_url} 
@@ -159,8 +159,8 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         />
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      {/* Main Content - Reduced top padding */}
+      <div className="container mx-auto px-4 pt-2 pb-8">
         <ProductGrid
           products={filteredAndSortedProducts}
           gridSize={gridSize}
