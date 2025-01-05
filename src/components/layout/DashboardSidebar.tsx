@@ -14,20 +14,9 @@ import {
   Lock
 } from "lucide-react";
 
-interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {
-  open?: boolean;
-  mobileOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onMobileOpenChange?: (open: boolean) => void;
-}
+interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-export function DashboardSidebar({ 
-  className,
-  open,
-  mobileOpen,
-  onOpenChange,
-  onMobileOpenChange 
-}: DashboardSidebarProps) {
+export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
 
   const routes = [
