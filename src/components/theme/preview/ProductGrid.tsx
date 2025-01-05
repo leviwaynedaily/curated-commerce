@@ -112,7 +112,7 @@ export function ProductGrid({
                   )}
                 </div>
                 <h3 
-                  className="text-sm font-medium mb-1 line-clamp-2"
+                  className="text-sm font-bold mb-1 line-clamp-2"
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
