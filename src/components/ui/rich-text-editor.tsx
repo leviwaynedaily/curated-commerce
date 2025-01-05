@@ -104,21 +104,31 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
         },
       }),
     ],
-    content: value,
+    content: value || '', // Ensure we always pass a string
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[100px]',
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[100px] p-3',
       },
     },
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      const html = editor.getHTML();
+      console.log("Editor content updated:", html);
+      onChange(html);
     },
   })
+
+  // Update editor content when value prop changes
+  React.useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      console.log("Setting editor content to:", value);
+      editor.commands.setContent(value || '', false);
+    }
+  }, [value, editor]);
 
   return (
     <div className="min-h-[200px] rounded-md border">
       <MenuBar editor={editor} />
-      <div className="p-3 [&_.ProseMirror]:min-h-[100px] [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ml-4 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ml-4">
+      <div className="[&_.ProseMirror]:min-h-[100px] [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ml-4 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ml-4">
         <EditorContent editor={editor} />
       </div>
     </div>
