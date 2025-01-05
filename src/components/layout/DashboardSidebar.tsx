@@ -87,9 +87,6 @@ export function DashboardSidebar({
           <div className="mb-2">
             <StorefrontSwitcher />
           </div>
-          <div className="mb-2">
-            <UserButton />
-          </div>
         </div>
         <div className="px-3 py-2">
           <div className="space-y-1">
