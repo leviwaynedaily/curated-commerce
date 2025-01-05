@@ -18,6 +18,7 @@ interface PreviewHeaderProps {
   textPlacement?: string;
   onLayoutChange?: (layout: string) => void;
   onTextPlacementChange?: (placement: string) => void;
+  onShowInstructions?: () => void;
 }
 
 export function PreviewHeader({
@@ -35,6 +36,7 @@ export function PreviewHeader({
   textPlacement = "below",
   onLayoutChange = () => {},
   onTextPlacementChange = () => {},
+  onShowInstructions,
 }: PreviewHeaderProps) {
   return (
     <header 
@@ -57,6 +59,7 @@ export function PreviewHeader({
           textPlacement={textPlacement}
           onTextPlacementChange={onTextPlacementChange}
           onLogoClick={onLogoClick}
+          onShowInstructions={onShowInstructions}
         />
         
         <DesktopHeader 
@@ -71,6 +74,7 @@ export function PreviewHeader({
           layout={layout}
           onLayoutChange={onLayoutChange}
           onLogoClick={onLogoClick}
+          onShowInstructions={onShowInstructions}
         />
       </div>
     </header>

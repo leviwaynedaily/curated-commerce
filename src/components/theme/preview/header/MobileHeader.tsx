@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ interface MobileHeaderProps {
   textPlacement?: string;
   onTextPlacementChange?: (placement: string) => void;
   onLogoClick?: () => void;
+  onShowInstructions?: () => void;
 }
 
 export function MobileHeader({
@@ -35,6 +36,7 @@ export function MobileHeader({
   textPlacement = "below",
   onTextPlacementChange,
   onLogoClick,
+  onShowInstructions,
 }: MobileHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
@@ -49,7 +51,7 @@ export function MobileHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-10 object-contain cursor-pointer" // Increased from h-8 to h-10
+            className="h-10 object-contain cursor-pointer"
             onClick={onLogoClick}
           />
         )}
@@ -57,6 +59,18 @@ export function MobileHeader({
 
       {/* Search and Options */}
       <div className="flex items-center gap-2">
+        {/* Instructions Icon */}
+        {previewData.enable_instructions && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onShowInstructions}
+            className="bg-white/80 hover:bg-white/90 h-9 w-9"
+          >
+            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
+          </Button>
+        )}
+
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (

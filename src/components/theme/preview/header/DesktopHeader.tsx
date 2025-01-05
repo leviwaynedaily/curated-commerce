@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, HelpCircle } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ interface DesktopHeaderProps {
   textPlacement?: string;
   onTextPlacementChange?: (placement: string) => void;
   onLogoClick?: () => void;
+  onShowInstructions?: () => void;
 }
 
 export function DesktopHeader({
@@ -35,6 +36,7 @@ export function DesktopHeader({
   textPlacement = "below",
   onTextPlacementChange,
   onLogoClick,
+  onShowInstructions,
 }: DesktopHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
@@ -49,7 +51,7 @@ export function DesktopHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-16 object-contain cursor-pointer" // Increased from h-12 to h-16
+            className="h-16 object-contain cursor-pointer"
             onClick={onLogoClick}
           />
         )}
@@ -57,6 +59,18 @@ export function DesktopHeader({
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 w-20 justify-end">
+        {/* Instructions Icon */}
+        {previewData.enable_instructions && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onShowInstructions}
+            className="bg-white/80 hover:bg-white/90"
+          >
+            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
+          </Button>
+        )}
+
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (
