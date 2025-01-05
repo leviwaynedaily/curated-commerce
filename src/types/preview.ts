@@ -16,4 +16,5 @@ export interface PreviewData {
   verification_text_color?: string;
   verification_checkbox_color?: string;
   verification_input_border_color?: string;
+  verification_next_text_color?: string;
 }
