@@ -21,18 +21,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!showContent) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [showContent]);
-
-  useEffect(() => {
     const fetchStorefrontData = async () => {
       try {
         console.log("Fetching storefront data for preview. ID:", storefrontId);
@@ -104,59 +92,66 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }
 
   return (
-    <div className="min-h-screen">
-      {/* Always render the content but blur it when verification/instructions are shown */}
-      <div className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}>
+    <div className="relative min-h-screen">
+      {/* Main content area - always scrollable */}
+      <div 
+        className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}
+      >
         <PreviewContent 
           previewData={previewData} 
           onReset={handleReset}
         />
       </div>
 
-      {/* Verification and Instructions overlays */}
+      {/* Verification overlay */}
       {!isVerified && previewData.verification_type !== 'none' && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm overflow-y-auto">
-          <div className="min-h-screen w-full flex items-center justify-center p-4">
-            <VerificationPrompt 
-              previewData={previewData} 
-              onVerify={handleVerification}
-            />
+        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
+          <div className="min-h-full w-full overflow-y-auto">
+            <div className="min-h-full flex items-center justify-center p-4">
+              <VerificationPrompt 
+                previewData={previewData} 
+                onVerify={handleVerification}
+              />
+            </div>
           </div>
         </div>
       )}
 
+      {/* Instructions overlay */}
       {isVerified && showInstructions && previewData.enable_instructions && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm overflow-y-auto">
-          <div className="min-h-screen w-full flex items-center justify-center p-4">
-            <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
-              {previewData.logo_url && (
-                <img 
-                  src={previewData.logo_url} 
-                  alt={previewData.name} 
-                  className="h-16 mx-auto object-contain"
+        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
+          <div className="min-h-full w-full overflow-y-auto">
+            <div className="min-h-full flex items-center justify-center p-4">
+              <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
+                {previewData.logo_url && (
+                  <img 
+                    src={previewData.logo_url} 
+                    alt={previewData.name} 
+                    className="h-16 mx-auto object-contain"
+                  />
+                )}
+                
+                <h2 className="text-xl font-semibold text-center">
+                  Welcome to {previewData.name}
+                </h2>
+                
+                <div 
+                  className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
+                  dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
                 />
-              )}
-              
-              <h2 className="text-xl font-semibold text-center">
-                Welcome to {previewData.name}
-              </h2>
-              
-              <div 
-                className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
-                dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
-              />
 
-              <Button
-                className="w-full"
-                onClick={handleContinue}
-                style={{ 
-                  backgroundColor: previewData.verification_button_color,
-                  color: '#FFFFFF',
-                  border: 'none'
-                }}
-              >
-                Enter Site
-              </Button>
+                <Button
+                  className="w-full"
+                  onClick={handleContinue}
+                  style={{ 
+                    backgroundColor: previewData.verification_button_color,
+                    color: '#FFFFFF',
+                    border: 'none'
+                  }}
+                >
+                  Enter Site
+                </Button>
+              </div>
             </div>
           </div>
         </div>
