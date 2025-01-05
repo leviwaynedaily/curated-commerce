@@ -1,6 +1,6 @@
 export async function extractColorsFromLogo(logoUrl: string) {
   try {
-    console.log('Extracting colors from logo:', logoUrl);
+    console.log('Starting color extraction from logo:', logoUrl);
     
     // Create an image element
     const img = new Image();
@@ -17,7 +17,10 @@ export async function extractColorsFromLogo(logoUrl: string) {
     // Wait for image to load
     await new Promise((resolve, reject) => {
       img.onload = resolve;
-      img.onerror = reject;
+      img.onerror = (e) => {
+        console.error('Error loading image:', e);
+        reject(e);
+      };
       img.src = logoUrl;
     });
 
@@ -28,56 +31,66 @@ export async function extractColorsFromLogo(logoUrl: string) {
     // Draw image to canvas
     ctx.drawImage(img, 0, 0);
     
-    // Get image data from center of image
-    const imageData = ctx.getImageData(
-      Math.floor(canvas.width / 4),
-      Math.floor(canvas.height / 4),
-      Math.floor(canvas.width / 2),
-      Math.floor(canvas.height / 2)
-    );
-    
-    // Calculate average color
-    let r = 0, g = 0, b = 0;
+    // Get image data from the entire image for better color sampling
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
-    const pixelCount = data.length / 4;
     
-    for (let i = 0; i < data.length; i += 4) {
-      r += data[i];
-      g += data[i + 1];
-      b += data[i + 2];
+    // Create color buckets to find dominant colors
+    const colorBuckets: { [key: string]: number } = {};
+    
+    // Sample every 4th pixel for performance
+    for (let i = 0; i < data.length; i += 16) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+      const a = data[i + 3];
+      
+      // Skip transparent pixels
+      if (a < 127) continue;
+      
+      // Convert to hex and count occurrences
+      const hex = rgbToHex(r, g, b);
+      colorBuckets[hex] = (colorBuckets[hex] || 0) + 1;
     }
     
-    r = Math.floor(r / pixelCount);
-    g = Math.floor(g / pixelCount);
-    b = Math.floor(b / pixelCount);
+    // Sort colors by frequency
+    const sortedColors = Object.entries(colorBuckets)
+      .sort(([, a], [, b]) => b - a)
+      .map(([color]) => color);
     
-    // Convert RGB to hex
-    const primaryBackground = rgbToHex(r, g, b);
-    const secondaryBackground = adjustBrightness(primaryBackground, 40);
-    const accentColor = createComplementaryColor(primaryBackground);
+    // Get the most frequent colors
+    const primaryColor = sortedColors[0] || '#1A1F2C';
+    const secondaryColor = sortedColors[1] || adjustBrightness(primaryColor, 20);
+    const accentColor = sortedColors[2] || createComplementaryColor(primaryColor);
     
-    // Determine font colors based on background brightness
-    const primaryFont = isLightColor(primaryBackground) ? '#232323' : '#ffffff';
-    const secondaryFont = isLightColor(secondaryBackground) ? '#333333' : '#cccccc';
-    
-    console.log('Generated color palette:', {
-      background: {
-        primary: primaryBackground,
-        secondary: secondaryBackground,
-        accent: accentColor,
-      },
-      font: {
-        primary: primaryFont,
-        secondary: secondaryFont,
-        highlight: '#ee459a',
-      },
+    console.log('Extracted dominant colors:', {
+      primary: primaryColor,
+      secondary: secondaryColor,
+      accent: accentColor
     });
 
-    return {
-      primary: [primaryBackground, adjustBrightness(primaryBackground, 20), adjustBrightness(primaryBackground, -20)],
-      secondary: [secondaryBackground, adjustBrightness(secondaryBackground, 20), adjustBrightness(secondaryBackground, -20)],
-      accent: [accentColor, adjustBrightness(accentColor, 20), adjustBrightness(accentColor, -20)],
+    // Generate variations for each color
+    const result = {
+      primary: [
+        primaryColor,
+        adjustBrightness(primaryColor, 20),
+        adjustBrightness(primaryColor, -20)
+      ],
+      secondary: [
+        secondaryColor,
+        adjustBrightness(secondaryColor, 20),
+        adjustBrightness(secondaryColor, -20)
+      ],
+      accent: [
+        accentColor,
+        adjustBrightness(accentColor, 20),
+        adjustBrightness(accentColor, -20)
+      ],
     };
+
+    console.log('Generated color palette:', result);
+    return result;
+
   } catch (error) {
     console.error('Error extracting colors:', error);
     return {
@@ -129,15 +142,6 @@ function createComplementaryColor(hex: string): string {
     255 - rgb.g,
     255 - rgb.b
   );
-}
-
-function isLightColor(hex: string): boolean {
-  const rgb = hexToRgb(hex);
-  if (!rgb) return true;
-  
-  // Calculate relative luminance
-  const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-  return luminance > 0.5;
 }
 
 export const extractColors = extractColorsFromLogo;
