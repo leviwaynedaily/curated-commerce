@@ -48,6 +48,17 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       console.log('Generated color palette:', colors);
       setPredefinedColors(colors);
       
+      // Set some suggested colors from the palette
+      if (colors.primary.length > 0) {
+        form.setValue('main_color', colors.primary[0]);
+      }
+      if (colors.secondary.length > 0) {
+        form.setValue('secondary_color', colors.secondary[0]);
+      }
+      if (colors.accent.length > 0) {
+        form.setValue('font_color', colors.accent[0]);
+      }
+      
       toast({
         title: "Colors Generated",
         description: "Color suggestions have been generated from your logo.",
@@ -56,7 +67,8 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   };
 
   const handleColorChange = (field: string, value: string) => {
-    form.setValue(field, value);
+    console.log(`Updating color field: ${field} with value: ${value}`);
+    form.setValue(field, value, { shouldDirty: true });
   };
 
   return (

@@ -22,6 +22,11 @@ const formSchema = z.object({
   verification_text_color: z.string().default("#1A1F2C"),
   verification_checkbox_color: z.string().default("#D946EF"),
   verification_input_border_color: z.string().default("#E5E7EB"),
+  product_card_background_color: z.string().default("#FFFFFF"),
+  product_title_text_color: z.string().default("#1A1F2C"),
+  product_description_text_color: z.string().default("#8E9196"),
+  product_price_color: z.string().default("#D946EF"),
+  storefront_background_color: z.string().default("#F1F0FB"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -69,6 +74,11 @@ const Appearance = () => {
       verification_text_color: "#1A1F2C",
       verification_checkbox_color: "#D946EF",
       verification_input_border_color: "#E5E7EB",
+      product_card_background_color: "#FFFFFF",
+      product_title_text_color: "#1A1F2C",
+      product_description_text_color: "#8E9196",
+      product_price_color: "#D946EF",
+      storefront_background_color: "#F1F0FB",
     },
   });
 
@@ -87,6 +97,11 @@ const Appearance = () => {
         verification_text_color: storefront.verification_text_color || "#1A1F2C",
         verification_checkbox_color: storefront.verification_checkbox_color || "#D946EF",
         verification_input_border_color: storefront.verification_input_border_color || "#E5E7EB",
+        product_card_background_color: storefront.product_card_background_color || "#FFFFFF",
+        product_title_text_color: storefront.product_title_text_color || "#1A1F2C",
+        product_description_text_color: storefront.product_description_text_color || "#8E9196",
+        product_price_color: storefront.product_price_color || "#D946EF",
+        storefront_background_color: storefront.storefront_background_color || "#F1F0FB",
       });
     }
   }, [storefront, form]);
@@ -108,6 +123,11 @@ const Appearance = () => {
             verification_text_color: values.verification_text_color,
             verification_checkbox_color: values.verification_checkbox_color,
             verification_input_border_color: values.verification_input_border_color,
+            product_card_background_color: values.product_card_background_color,
+            product_title_text_color: values.product_title_text_color,
+            product_description_text_color: values.product_description_text_color,
+            product_price_color: values.product_price_color,
+            storefront_background_color: values.storefront_background_color,
           })
           .eq("id", currentStorefrontId);
 
