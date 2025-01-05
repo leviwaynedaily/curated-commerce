@@ -1,19 +1,16 @@
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
 import { ViewOptionsDropdown } from "./ViewOptionsDropdown"
 
 interface PreviewHeaderProps {
   logo_url?: string
   name: string
   mainColor: string
-  onGridChange: (size: 'small' | 'medium' | 'large') => void
   onSearchChange: (query: string) => void
   onSortChange?: (sort: string) => void
   onCategoryChange?: (category: string | null) => void
   searchQuery: string
-  gridSize: 'small' | 'medium' | 'large'
   categories?: string[]
   selectedCategory?: string | null
   currentSort?: string
