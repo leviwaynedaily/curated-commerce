@@ -4,48 +4,12 @@ import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Database } from "@/integrations/supabase/types";
-import { ThemeConfig } from "@/types/theme";
 
 interface LivePreviewProps {
   storefrontId: string;
 }
 
 type StorefrontRow = Database['public']['Tables']['storefronts']['Row'];
-
-// Helper function to validate theme config
-const validateThemeConfig = (config: unknown): ThemeConfig => {
-  if (typeof config !== 'object' || !config) {
-    throw new Error('Invalid theme config');
-  }
-
-  const themeConfig = config as any;
-  
-  if (!themeConfig.colors?.background?.primary ||
-      !themeConfig.colors?.background?.secondary ||
-      !themeConfig.colors?.background?.accent ||
-      !themeConfig.colors?.font?.primary ||
-      !themeConfig.colors?.font?.secondary ||
-      !themeConfig.colors?.font?.highlight) {
-    console.error('Invalid theme config structure:', themeConfig);
-    // Return default theme config
-    return {
-      colors: {
-        background: {
-          primary: "#000000",
-          secondary: "#f5f5f5",
-          accent: "#56b533"
-        },
-        font: {
-          primary: "#ffffff",
-          secondary: "#cccccc",
-          highlight: "#ee459a"
-        }
-      }
-    };
-  }
-
-  return themeConfig as ThemeConfig;
-};
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [previewData, setPreviewData] = useState<PreviewData>({});
@@ -82,23 +46,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       }
 
       console.log("Fetched storefront data:", data);
-      // Convert the raw data to PreviewData type
-      const convertedData: PreviewData = {
-        id: data.id,
-        name: data.name,
-        description: data.description,
-        logo_url: data.logo_url,
-        theme_config: validateThemeConfig(data.theme_config),
-        verification_type: data.verification_type,
-        verification_age_text: data.verification_age_text,
-        verification_legal_text: data.verification_legal_text,
-        verification_logo_url: data.verification_logo_url,
-        verification_password: data.verification_password,
-        enable_instructions: data.enable_instructions,
-        instructions_text: data.instructions_text,
-        show_description: data.show_description,
-      };
-      setPreviewData(convertedData);
+      setPreviewData(data);
     };
 
     fetchStorefrontData();
@@ -117,23 +65,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         (payload) => {
           console.log("Received realtime update:", payload);
           const newData = payload.new as StorefrontRow;
-          // Convert the payload data to PreviewData type
-          const convertedData: PreviewData = {
-            id: newData.id,
-            name: newData.name,
-            description: newData.description,
-            logo_url: newData.logo_url,
-            theme_config: validateThemeConfig(newData.theme_config),
-            verification_type: newData.verification_type,
-            verification_age_text: newData.verification_age_text,
-            verification_legal_text: newData.verification_legal_text,
-            verification_logo_url: newData.verification_logo_url,
-            verification_password: newData.verification_password,
-            enable_instructions: newData.enable_instructions,
-            instructions_text: newData.instructions_text,
-            show_description: newData.show_description,
-          };
-          setPreviewData(convertedData);
+          setPreviewData(newData);
         }
       )
       .subscribe();
@@ -162,7 +94,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     setShowInstructions(false);
   };
 
-  if (!previewData.theme_config) {
+  if (!previewData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -170,18 +102,12 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     );
   }
 
-  const { colors } = previewData.theme_config;
-
   return (
-    <div 
-      className="min-h-screen relative"
-      style={{ backgroundColor: colors.background.primary }}
-    >
+    <div className="min-h-screen relative bg-background">
       {/* Always render the content */}
       <div className={`${!isVerified ? 'filter blur-lg' : ''}`}>
         <PreviewContent 
           previewData={previewData} 
-          colors={colors} 
           onReset={handleReset}
         />
       </div>
@@ -191,38 +117,21 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         <VerificationPrompt 
           previewData={previewData}
           onVerify={handleVerification}
-          colors={colors}
         />
       )}
 
       {/* Show instructions if needed */}
       {isVerified && !showContent && showInstructions && previewData.enable_instructions && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ backgroundColor: `${colors.background.primary}40` }}
-        >
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/40">
           <div className="absolute inset-0 backdrop-blur-xl" />
-          <div 
-            className="relative max-w-md w-full p-6 rounded-lg"
-            style={{ backgroundColor: colors.background.secondary }}
-          >
-            <h2 
-              className="text-xl font-bold mb-4"
-              style={{ color: colors.font.primary }}
-            >
-              Instructions
-            </h2>
+          <div className="relative max-w-md w-full p-6 rounded-lg bg-card">
+            <h2 className="text-xl font-bold mb-4">Instructions</h2>
             <div 
               className="prose prose-sm mb-6 max-w-none [&_a]:text-blue-500 [&_a]:underline [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
-              style={{ color: colors.font.secondary }}
               dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
             />
             <button 
-              className="w-full px-4 py-2 rounded"
-              style={{
-                backgroundColor: colors.background.accent,
-                color: colors.font.primary
-              }}
+              className="w-full px-4 py-2 rounded bg-primary text-primary-foreground"
               onClick={handleContinue}
             >
               Continue to Site

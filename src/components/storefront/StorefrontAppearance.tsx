@@ -1,13 +1,11 @@
 import { UseFormReturn } from "react-hook-form";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { extractColorsFromLogo } from "@/utils/colorExtractor";
 import { useToast } from "@/components/ui/use-toast";
-import { ColorInput } from "./appearance/ColorInput";
-import { ColorPreview } from "./appearance/ColorPreview";
 import { BrowserAssets } from "./appearance/BrowserAssets";
 
 interface StorefrontAppearanceProps {
@@ -15,7 +13,6 @@ interface StorefrontAppearanceProps {
 }
 
 export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
-  const [previewColors, setPreviewColors] = useState(form.getValues("theme_config.colors"));
   const [isExtracting, setIsExtracting] = useState(false);
   const { toast } = useToast();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -36,15 +33,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
     enabled: !!currentStorefrontId
   });
 
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      if (value.theme_config?.colors) {
-        setPreviewColors(value.theme_config.colors);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
-
   const handleExtractColors = async () => {
     if (!storefront?.logo_url) {
       toast({
@@ -57,8 +45,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
     try {
       setIsExtracting(true);
-      const colors = await extractColorsFromLogo(storefront.logo_url);
-      form.setValue("theme_config.colors", colors);
+      await extractColorsFromLogo(storefront.logo_url);
       
       toast({
         title: "Colors extracted",
@@ -81,7 +68,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
       <div>
         <h2 className="text-lg font-semibold">Appearance</h2>
         <p className="text-sm text-muted-foreground">
-          Customize your storefront's colors and appearance
+          Customize your storefront's appearance
         </p>
       </div>
 
@@ -111,33 +98,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
           </Button>
 
           <BrowserAssets form={form} storefrontId={currentStorefrontId} />
-
-          <Separator />
-
-          <div>
-            <h3 className="mb-4 text-sm font-medium">Background Colors</h3>
-            <div className="space-y-4">
-              <ColorInput label="Primary Background" path="background.primary" form={form} />
-              <ColorInput label="Secondary Background" path="background.secondary" form={form} />
-              <ColorInput label="Accent Background" path="background.accent" form={form} />
-            </div>
-          </div>
-
-          <Separator />
-
-          <div>
-            <h3 className="mb-4 text-sm font-medium">Font Colors</h3>
-            <div className="space-y-4">
-              <ColorInput label="Primary Font" path="font.primary" form={form} />
-              <ColorInput label="Secondary Font" path="font.secondary" form={form} />
-              <ColorInput label="Highlight Font" path="font.highlight" form={form} />
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="mb-4 text-sm font-medium">Live Preview</h3>
-          <ColorPreview colors={previewColors} />
         </div>
       </div>
     </div>

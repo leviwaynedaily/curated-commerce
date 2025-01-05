@@ -8,11 +8,10 @@ import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 
 interface PreviewContentProps {
   previewData: any;
-  colors: any;
   onReset: () => void;
 }
 
-export function PreviewContent({ previewData, colors, onReset }: PreviewContentProps) {
+export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('small');
   const [isScrolled, setIsScrolled] = useState(false);
@@ -94,9 +93,8 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: colors.background.primary }}>
+    <div className="min-h-screen flex flex-col bg-background">
       <PreviewHeader
-        colors={colors}
         logo_url={isScrolled ? previewData.logo_url : undefined}
         name={previewData.name}
         onGridChange={setGridSize}
@@ -130,37 +128,18 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
           {previewData.show_description && previewData.description && (
             <p 
               className="text-lg text-center max-w-2xl mb-8"
-              style={{ color: colors.font.secondary }}
+              style={{ color: 'inherit' }}
             >
               {previewData.description}
             </p>
           )}
-
-          <div className="w-full max-w-6xl">
-            <PreviewHeader
-              colors={colors}
-              name={previewData.name}
-              onGridChange={setGridSize}
-              onSearchChange={setSearchQuery}
-              onSortChange={setCurrentSort}
-              onCategoryChange={setSelectedCategory}
-              searchQuery={searchQuery}
-              gridSize={gridSize}
-              categories={categories}
-              selectedCategory={selectedCategory}
-              currentSort={currentSort}
-              onLogoClick={onReset}
-              showFilters={true}
-            />
-          </div>
         </div>
 
         <div className={`grid ${getGridColumns()} gap-4`}>
           {filteredAndSortedProducts?.map((product) => (
             <div 
               key={product.id}
-              className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()}`}
-              style={{ backgroundColor: colors.background.secondary }}
+              className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} bg-card`}
             >
               {product.images?.[0] && (
                 <div className="relative h-full">
@@ -175,8 +154,8 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
                       {product.category && (
                         <Badge
                           style={{
-                            backgroundColor: colors.background.accent,
-                            color: colors.font.primary
+                            backgroundColor: 'inherit',
+                            color: 'inherit'
                           }}
                         >
                           {product.category}
@@ -205,12 +184,10 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
           currentPage={currentPage}
           totalPages={productsData?.totalPages || 1}
           onPageChange={setCurrentPage}
-          colors={colors}
         />
       </div>
 
       <PreviewLegalFooter 
-        colors={colors}
         businessName={previewData.name}
       />
     </div>

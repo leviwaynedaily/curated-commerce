@@ -232,7 +232,6 @@ export type Database = {
           page_title: string | null
           show_description: boolean | null
           slug: string
-          theme_config: Json
           updated_at: string | null
           verification_age: number | null
           verification_age_text: string | null
@@ -258,7 +257,6 @@ export type Database = {
           page_title?: string | null
           show_description?: boolean | null
           slug: string
-          theme_config?: Json
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
@@ -284,7 +282,6 @@ export type Database = {
           page_title?: string | null
           show_description?: boolean | null
           slug?: string
-          theme_config?: Json
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
