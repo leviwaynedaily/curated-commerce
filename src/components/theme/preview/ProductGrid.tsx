@@ -124,7 +124,11 @@ export function ProductGrid({
                 {product.description && (
                   <p 
                     className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
-                    style={{ color: productDescriptionTextColor }}
+                    style={{ 
+                      color: productDescriptionTextColor,
+                      fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+                      fontSize: '12px'
+                    }}
                   >
                     {product.description}
                   </p>
