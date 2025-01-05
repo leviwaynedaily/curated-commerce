@@ -60,8 +60,8 @@ export function PreviewHeader({
             )}
           </div>
 
-          {/* Filters Row */}
-          <div className="flex flex-col space-y-3">
+          {/* Combined Filters Row */}
+          <div className="grid grid-cols-2 gap-2">
             {categories.length > 0 && (
               <Select
                 value={selectedCategory || "all"}

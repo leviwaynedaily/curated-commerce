@@ -43,13 +43,13 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'aspect-[3/5]'
+        return 'min-h-[16rem] sm:aspect-[3/5]'
       case 'large':
-        return 'aspect-video'
+        return 'min-h-[24rem] md:aspect-video'
       case 'list':
-        return 'min-h-[20rem] md:min-h-[24rem]'
+        return 'min-h-[24rem]'
       default: // medium
-        return 'aspect-[2/3]'
+        return 'min-h-[20rem] sm:aspect-[2/3]'
     }
   }
 
@@ -70,7 +70,7 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-4`}>
+    <div className={`grid ${getGridColumns()} gap-3`}>
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
@@ -93,7 +93,7 @@ export function ProductGrid({
             )}
             
             <div 
-              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : 'flex flex-col h-2/5'} ${styles.textContainer}`}
+              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
             >
               <div>
                 <div className="flex gap-2 flex-wrap mb-2">
@@ -135,7 +135,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-auto"
+                className="space-y-1 text-sm font-open-sans mt-2"
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-2">
