@@ -12,9 +12,10 @@ import { PreviewData } from "@/types/preview";
 interface PreviewContentProps {
   previewData: PreviewData;
   onReset?: () => void;
+  onLogoClick?: () => void;
 }
 
-export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
+export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("medium");
@@ -111,6 +112,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         textPlacement={textPlacement}
         onLayoutChange={setLayout}
         onTextPlacementChange={setTextPlacement}
+        onLogoClick={onLogoClick}
       />
       
       <main className="container mx-auto px-4 py-8">
