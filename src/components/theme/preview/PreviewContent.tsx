@@ -28,10 +28,14 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       const container = document.querySelector('.preview-container');
       if (!container) return;
       
+      const headerElement = document.querySelector('.sticky-header');
+      if (!headerElement) return;
+
+      const headerRect = headerElement.getBoundingClientRect();
       const scrollPosition = container.scrollTop;
       console.log('Current scroll position:', scrollPosition);
       
-      if (scrollPosition > 200) {
+      if (headerRect.top <= 0) {
         if (!isScrolled) {
           console.log('Showing header - scroll position:', scrollPosition);
           setIsScrolled(true);
@@ -132,12 +136,10 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         </div>
       </div>
 
-      {/* Sticky Header */}
+      {/* Header Section - Initially not sticky */}
       <div 
-        className={`sticky top-0 w-full z-50 transition-all duration-300 ${
-          isScrolled 
-            ? 'opacity-100 translate-y-0 shadow-md' 
-            : 'opacity-0 -translate-y-full pointer-events-none'
+        className={`sticky-header bg-background transition-all duration-300 ${
+          isScrolled ? 'sticky top-0 z-50 shadow-md' : ''
         }`}
       >
         <PreviewHeader
