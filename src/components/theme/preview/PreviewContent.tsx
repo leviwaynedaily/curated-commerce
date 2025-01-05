@@ -92,6 +92,13 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
     }
   };
 
+  // Function to strip HTML tags from rich text
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PreviewHeader
@@ -130,7 +137,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
               className="text-lg text-center max-w-2xl mb-8"
               style={{ color: 'inherit' }}
             >
-              {previewData.description}
+              {stripHtml(previewData.description)}
             </p>
           )}
         </div>
