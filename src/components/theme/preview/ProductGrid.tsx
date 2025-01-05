@@ -43,20 +43,20 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[20rem] sm:aspect-[4/6]'
+        return 'min-h-[20rem] aspect-[3/4]' // Changed to 3:4 aspect ratio
       case 'large':
-        return 'min-h-[24rem] md:aspect-video'
+        return 'min-h-[24rem] aspect-[4/5]' // Changed to 4:5 aspect ratio
       case 'list':
         return 'min-h-[24rem]'
       default: // medium
-        return 'min-h-[20rem] sm:aspect-[2/3]'
+        return 'min-h-[20rem] aspect-[3/4]' // Changed to 3:4 aspect ratio
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative",
+        imageContainer: layout === 'small' ? "h-3/4 relative" : "h-3/4 relative", // Adjusted for portrait images
         textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
