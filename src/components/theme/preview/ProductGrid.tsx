@@ -135,17 +135,19 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-2"
+                className="space-y-1"
                 style={{ color: productPriceColor }}
               >
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="font-medium">In Town:</span>
-                  <span>${product.in_town_price}</span>
+                <div className="flex items-center gap-1">
+                  <span className="text-xs font-medium">In Town:</span>
+                  <span className="text-sm font-bold">${product.in_town_price}</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs">
-                  <span className="font-medium">Ship:</span>
-                  <span>${product.shipping_price}</span>
-                </div>
+                {product.shipping_price > 0 && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-medium">Ship:</span>
+                    <span className="text-sm font-bold">${product.shipping_price}</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
