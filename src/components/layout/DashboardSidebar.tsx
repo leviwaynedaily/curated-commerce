@@ -11,7 +11,8 @@ import {
   Eye,
   AppWindow,
   Globe,
-  Palette
+  Palette,
+  Lock
 } from "lucide-react";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -79,7 +80,10 @@ export function DashboardSidebar({
     <div className={cn("w-64 h-screen fixed left-0 top-0 bg-background border-r", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h1 className="text-xl font-semibold mb-4 text-center">Curately</h1>
+          <h1 className="text-xl font-semibold mb-4 text-center flex items-center justify-center gap-2">
+            <Lock className="h-5 w-5" />
+            Curately
+          </h1>
           <div className="mb-2">
             <StorefrontSwitcher />
           </div>
