@@ -83,20 +83,20 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
         gridSize={gridSize}
       />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4">
         {!isScrolled && (
-          <div className="flex flex-col items-center mb-12">
+          <div className="flex flex-col items-center mb-8">
             {previewData.logo_url && (
               <img 
                 src={previewData.logo_url} 
                 alt={previewData.name} 
-                className="h-24 object-contain mb-8"
+                className="h-24 object-contain mb-4"
               />
             )}
             
             {previewData.show_description && previewData.description && (
               <p 
-                className="mb-12 text-lg text-center max-w-2xl"
+                className="text-lg text-center max-w-2xl mb-8"
                 style={{ color: colors.font.secondary }}
               >
                 {previewData.description}
