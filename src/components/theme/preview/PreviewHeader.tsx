@@ -24,7 +24,7 @@ export function PreviewHeader({
 }: PreviewHeaderProps) {
   return (
     <header 
-      className="sticky top-0 z-50 backdrop-blur-lg transition-all duration-300"
+      className="sticky top-0 z-50 backdrop-blur-lg transition-all duration-500 ease-in-out"
       style={{ 
         backgroundColor: `${colors.background.primary}80`,
         borderBottom: `1px solid ${colors.background.secondary}`
@@ -32,12 +32,12 @@ export function PreviewHeader({
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 min-w-[100px] transition-all duration-500 ease-in-out">
             {logo_url && (
               <img 
                 src={logo_url} 
                 alt={name} 
-                className="h-8 object-contain transition-opacity duration-300"
+                className="h-8 w-auto object-contain transition-all duration-500 ease-in-out"
               />
             )}
           </div>
@@ -48,7 +48,7 @@ export function PreviewHeader({
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-full pl-10 transition-all duration-300"
+                className="w-full pl-10 transition-all duration-500 ease-in-out"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 style={{ 

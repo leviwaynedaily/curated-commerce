@@ -40,8 +40,11 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
 
   useEffect(() => {
     const handleScroll = debounce(() => {
-      setIsScrolled(window.scrollY > 100);
-    }, 10); // Small debounce time for smooth transition
+      const shouldBeScrolled = window.scrollY > 50;
+      if (isScrolled !== shouldBeScrolled) {
+        setIsScrolled(shouldBeScrolled);
+      }
+    }, 100); // Increased debounce time for smoother transitions
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
@@ -49,7 +52,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
       handleScroll.cancel();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [isScrolled]); // Added isScrolled to dependencies
 
   const filteredProducts = products?.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,26 +94,28 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
       />
 
       <div className="container mx-auto px-4">
-        {!isScrolled && (
-          <div className="flex flex-col items-center mb-8 transition-opacity duration-300">
-            {previewData.logo_url && (
-              <img 
-                src={previewData.logo_url} 
-                alt={previewData.name} 
-                className="h-24 object-contain mb-4"
-              />
-            )}
-            
-            {previewData.show_description && previewData.description && (
-              <p 
-                className="text-lg text-center max-w-2xl mb-8"
-                style={{ color: colors.font.secondary }}
-              >
-                {previewData.description}
-              </p>
-            )}
-          </div>
-        )}
+        <div 
+          className={`flex flex-col items-center mb-8 transition-all duration-500 ease-in-out ${
+            isScrolled ? 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden' : 'opacity-100 translate-y-0'
+          }`}
+        >
+          {previewData.logo_url && (
+            <img 
+              src={previewData.logo_url} 
+              alt={previewData.name} 
+              className="h-24 object-contain mb-4"
+            />
+          )}
+          
+          {previewData.show_description && previewData.description && (
+            <p 
+              className="text-lg text-center max-w-2xl mb-8"
+              style={{ color: colors.font.secondary }}
+            >
+              {previewData.description}
+            </p>
+          )}
+        </div>
 
         <div className={`grid ${getGridColumns()} gap-4`}>
           {filteredProducts?.map((product) => (
