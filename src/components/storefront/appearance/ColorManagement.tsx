@@ -74,21 +74,8 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </div>
       </CardHeader>
       <CardContent className="space-y-8">
-        {logoUrl && (
-          <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground">Current Logo:</p>
-            <img
-              src={logoUrl}
-              alt="Current logo"
-              className="h-12 w-auto object-contain"
-            />
-          </div>
-        )}
-
-        <SuggestedColorPalette colors={predefinedColors} />
-
+        <SuggestedColorPalette colors={predefinedColors} logoUrl={logoUrl} />
         <BrandColors form={form} onColorChange={handleColorChange} />
-        
         <VerificationColors form={form} onColorChange={handleColorChange} />
       </CardContent>
     </Card>
