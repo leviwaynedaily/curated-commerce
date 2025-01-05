@@ -127,7 +127,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
             onClick={handleVerification}
             style={{ 
               backgroundColor: colors.button,
-              color: previewData.enable_instructions ? colors.nextText : colors.buttonText,
+              color: '#FFFFFF',
               border: 'none'
             }}
           >
