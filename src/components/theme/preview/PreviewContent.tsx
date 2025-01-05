@@ -102,7 +102,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         categories={categories}
         selectedCategory={selectedCategory}
         currentSort={currentSort}
-        onLogoClick={onReset}
         isScrolled={isScrolled}
       />
 
@@ -116,8 +115,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
             <img 
               src={previewData.logo_url} 
               alt={previewData.name} 
-              className="h-24 object-contain mb-4 cursor-pointer"
-              onClick={onReset}
+              className="h-24 object-contain mb-4"
             />
           )}
           
@@ -129,20 +127,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
               {stripHtml(previewData.description)}
             </p>
           )}
-        </div>
-
-        <div className="mb-8">
-          <ProductFilters
-            searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
-            currentSort={currentSort}
-            onSortChange={setCurrentSort}
-            selectedCategory={selectedCategory}
-            onCategoryChange={setSelectedCategory}
-            categories={categories}
-            gridSize={gridSize}
-            onGridChange={setGridSize}
-          />
         </div>
 
         <ProductGrid

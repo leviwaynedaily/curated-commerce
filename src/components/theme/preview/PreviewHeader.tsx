@@ -8,15 +8,13 @@ interface PreviewHeaderProps {
   name: string;
   onGridChange: (size: 'small' | 'medium' | 'large') => void;
   onSearchChange: (query: string) => void;
-  onSortChange: (sort: string) => void;
-  onCategoryChange: (category: string | null) => void;
+  onSortChange?: (sort: string) => void;
+  onCategoryChange?: (category: string | null) => void;
   searchQuery: string;
   gridSize: 'small' | 'medium' | 'large';
-  categories: string[];
-  selectedCategory: string | null;
-  currentSort: string;
-  onLogoClick: () => void;
-  showFilters?: boolean;
+  categories?: string[];
+  selectedCategory?: string | null;
+  currentSort?: string;
   isScrolled: boolean;
 }
 
@@ -29,39 +27,40 @@ export function PreviewHeader({
   onCategoryChange,
   searchQuery,
   gridSize,
-  categories,
+  categories = [],
   selectedCategory,
   currentSort,
-  onLogoClick,
-  showFilters = true,
   isScrolled
 }: PreviewHeaderProps) {
   return (
-    <header className={`w-full bg-background transition-all duration-300 ${isScrolled ? 'fixed top-0 left-0 z-50 right-0 shadow-sm' : ''}`}>
+    <header 
+      className={`w-full transition-all duration-300 ${
+        isScrolled ? 'fixed top-0 left-0 z-50 right-0 bg-white/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
+      }`}
+    >
       <div className="w-full">
-        <div className="flex items-center justify-between py-4 bg-background/95 backdrop-blur-sm px-4 md:px-8">
+        <div className="flex items-center justify-between py-4 px-4 md:px-8">
           <div className="flex items-center space-x-4 min-w-[120px]">
             {isScrolled && logo_url && (
               <img 
                 src={logo_url} 
                 alt={name}
-                className="h-8 object-contain cursor-pointer"
-                onClick={onLogoClick}
+                className="h-8 object-contain"
               />
             )}
           </div>
         </div>
 
-        {isScrolled && showFilters && (
-          <div className="border-t border-border/30 bg-background/95 backdrop-blur-sm">
+        {isScrolled && (
+          <div className="border-t border-gray-200/30">
             <div className="flex flex-col md:flex-row items-center justify-between py-2 px-4 md:px-8 gap-4">
               <div className="flex items-center space-x-4 overflow-x-auto w-full md:w-auto">
                 {categories.length > 0 && (
                   <Select
                     value={selectedCategory || "all"}
-                    onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
+                    onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
                   >
-                    <SelectTrigger className="w-[160px] bg-background/80">
+                    <SelectTrigger className="w-[160px] bg-white/80">
                       <SelectValue placeholder="Category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -77,9 +76,9 @@ export function PreviewHeader({
 
                 <Select
                   value={currentSort}
-                  onValueChange={onSortChange}
+                  onValueChange={(value) => onSortChange?.(value)}
                 >
-                  <SelectTrigger className="w-[160px] bg-background/80">
+                  <SelectTrigger className="w-[160px] bg-white/80">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -97,17 +96,17 @@ export function PreviewHeader({
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="pl-10 bg-background/80"
+                    className="pl-10 bg-white/80"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center gap-1 ml-0 md:ml-4">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => onGridChange('small')}
-                  className={`${gridSize === 'small' ? 'bg-accent' : 'bg-background/80'}`}
+                  className={`${gridSize === 'small' ? 'bg-accent' : 'bg-white/80'}`}
                 >
                   <div className="w-4 h-4 grid grid-cols-3 gap-0.5">
                     {[...Array(9)].map((_, i) => (
@@ -119,7 +118,7 @@ export function PreviewHeader({
                   variant="ghost"
                   size="icon"
                   onClick={() => onGridChange('medium')}
-                  className={`${gridSize === 'medium' ? 'bg-accent' : 'bg-background/80'}`}
+                  className={`${gridSize === 'medium' ? 'bg-accent' : 'bg-white/80'}`}
                 >
                   <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
                     {[...Array(4)].map((_, i) => (
@@ -131,7 +130,7 @@ export function PreviewHeader({
                   variant="ghost"
                   size="icon"
                   onClick={() => onGridChange('large')}
-                  className={`${gridSize === 'large' ? 'bg-accent' : 'bg-background/80'}`}
+                  className={`${gridSize === 'large' ? 'bg-accent' : 'bg-white/80'}`}
                 >
                   <div className="w-4 h-4 grid grid-cols-1 gap-0.5">
                     {[...Array(2)].map((_, i) => (
