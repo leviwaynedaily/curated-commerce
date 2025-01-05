@@ -1,40 +1,40 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { PreviewData } from "@/types/preview";
-import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { PreviewData } from "@/types/preview"
 
 interface VerificationPromptProps {
-  previewData: PreviewData;
-  onVerify: (password?: string) => void;
-  colors: any;
+  previewData: PreviewData
+  onVerify: (password?: string) => void
+  colors: any
 }
 
 export function VerificationPrompt({ previewData, onVerify, colors }: VerificationPromptProps) {
-  const [password, setPassword] = useState("");
-  const [ageConfirmed, setAgeConfirmed] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const showBothPrompts = previewData.verification_type === 'both';
-  const showPassword = previewData.verification_type === 'password' || showBothPrompts;
-  const showAge = previewData.verification_type === 'age' || showBothPrompts;
+  const [password, setPassword] = useState("")
+  const [ageConfirmed, setAgeConfirmed] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const showBothPrompts = previewData.verification_type === 'both'
+  const showPassword = previewData.verification_type === 'password' || showBothPrompts
+  const showAge = previewData.verification_type === 'age' || showBothPrompts
 
   const handleVerification = () => {
     if (showAge && !ageConfirmed) {
-      setError("Please confirm your age");
-      return;
+      setError("Please confirm your age")
+      return
     }
     
     if (showPassword && password !== previewData.verification_password) {
-      setError("Incorrect password");
-      return;
+      setError("Incorrect password")
+      return
     }
 
-    onVerify(password);
-  };
+    onVerify(password)
+  }
 
   return (
     <div 
-      className="fixed inset-0 backdrop-blur-lg flex items-center justify-center p-4"
+      className="fixed inset-0 backdrop-blur-lg flex items-center justify-center p-4 bg-opacity-50"
       style={{ backgroundColor: `${colors.background.primary}99` }}
     >
       <div 
@@ -64,8 +64,8 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                   id="age-verification"
                   checked={ageConfirmed}
                   onCheckedChange={(checked) => {
-                    setAgeConfirmed(checked as boolean);
-                    setError(null);
+                    setAgeConfirmed(checked as boolean)
+                    setError(null)
                   }}
                   className="h-5 w-5 rounded-sm border cursor-pointer"
                   style={{
@@ -97,8 +97,8 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                 placeholder="Enter site password"
                 value={password}
                 onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError(null);
+                  setPassword(e.target.value)
+                  setError(null)
                 }}
                 className="w-full"
                 style={{
@@ -111,7 +111,12 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
           )}
 
           {error && (
-            <p className="text-destructive text-sm">{error}</p>
+            <p 
+              className="text-destructive text-sm"
+              style={{ color: colors.font.highlight }}
+            >
+              {error}
+            </p>
           )}
 
           <Button 
@@ -134,5 +139,5 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
         </div>
       </div>
     </div>
-  );
+  )
 }
