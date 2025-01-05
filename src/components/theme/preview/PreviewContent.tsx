@@ -31,6 +31,9 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
     enabled: !!previewData.id
   })
 
+  console.log("Current theme colors:", colors)
+  console.log("Current preview data:", previewData)
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col items-center">

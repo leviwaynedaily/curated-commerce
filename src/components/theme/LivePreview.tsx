@@ -69,6 +69,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       console.log("Fetched storefront data:", data);
       // Convert the raw data to PreviewData type
       const convertedData: PreviewData = {
+        id: data.id,
         name: data.name,
         description: data.description,
         logo_url: data.logo_url,
@@ -80,12 +81,14 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         verification_password: data.verification_password,
         enable_instructions: data.enable_instructions,
         instructions_text: data.instructions_text,
+        show_description: data.show_description,
       };
       setPreviewData(convertedData);
     };
 
     fetchStorefrontData();
 
+    // Subscribe to realtime changes
     const channel = supabase
       .channel(`storefront_changes_${storefrontId}`)
       .on(
@@ -101,6 +104,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
           const newData = payload.new as StorefrontRow;
           // Convert the payload data to PreviewData type
           const convertedData: PreviewData = {
+            id: newData.id,
             name: newData.name,
             description: newData.description,
             logo_url: newData.logo_url,
@@ -112,6 +116,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
             verification_password: newData.verification_password,
             enable_instructions: newData.enable_instructions,
             instructions_text: newData.instructions_text,
+            show_description: newData.show_description,
           };
           setPreviewData(convertedData);
         }
