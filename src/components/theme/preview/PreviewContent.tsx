@@ -26,9 +26,11 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   useEffect(() => {
     console.log('Setting up scroll listener with initial isScrolled:', isScrolled);
     
-    const handleScroll = () => {
-      // Using document.documentElement for more consistent cross-browser support
-      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+    const handleScroll = debounce(() => {
+      const container = document.querySelector('.preview-container');
+      if (!container) return;
+      
+      const scrollPosition = container.scrollTop;
       console.log('Current scroll position:', scrollPosition);
       
       if (scrollPosition > 100) {
@@ -42,18 +44,22 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           setIsScrolled(false);
         }
       }
-    };
+    }, 10);
 
-    // Add passive event listener for better scroll performance
-    document.addEventListener('scroll', handleScroll, { passive: true });
-    console.log('Scroll listener added to document');
+    const container = document.querySelector('.preview-container');
+    if (container) {
+      container.addEventListener('scroll', handleScroll, { passive: true });
+      console.log('Scroll listener added to preview container');
+    }
     
     // Initial check
     handleScroll();
     
     return () => {
       console.log('Cleaning up scroll listener');
-      document.removeEventListener('scroll', handleScroll);
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
     };
   }, [isScrolled]);
 
@@ -109,7 +115,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="preview-container min-h-screen flex flex-col bg-background">
       <PreviewHeader
         logo_url={previewData.logo_url}
         name={previewData.name}
