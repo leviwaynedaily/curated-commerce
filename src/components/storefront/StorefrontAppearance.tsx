@@ -19,7 +19,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-[1fr,300px]">
         <div className="space-y-8">
           <BrowserAssets form={form} storefrontId={storefrontId} />
           <ColorManagement 
@@ -29,9 +29,20 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
           />
         </div>
         
-        <div className="relative">
+        <div className="relative hidden lg:block">
           <div className="sticky top-4 overflow-hidden rounded-lg border bg-background shadow">
             <div className="aspect-[9/16] w-full">
+              {storefrontId && (
+                <LivePreview storefrontId={storefrontId} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Show preview below on mobile */}
+        <div className="lg:hidden">
+          <div className="overflow-hidden rounded-lg border bg-background shadow">
+            <div className="aspect-[9/16] w-full max-w-[300px] mx-auto">
               {storefrontId && (
                 <LivePreview storefrontId={storefrontId} />
               )}
