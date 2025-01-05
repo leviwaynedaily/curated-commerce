@@ -41,9 +41,9 @@ export function DesktopHeader({
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="hidden md:flex items-center justify-between gap-4">
+    <div className="hidden md:flex items-center w-full relative h-20">
       {/* Left side - Help Icon */}
-      <div className="w-20 flex justify-start">
+      <div className="absolute left-0">
         {previewData.enable_instructions && (
           <Button
             variant="ghost"
@@ -57,7 +57,7 @@ export function DesktopHeader({
       </div>
       
       {/* Centered Logo */}
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center w-full">
         {previewData.logo_url && (
           <img 
             src={previewData.logo_url} 
@@ -69,7 +69,7 @@ export function DesktopHeader({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-2 w-20 justify-end">
+      <div className="absolute right-0 flex items-center gap-2">
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (

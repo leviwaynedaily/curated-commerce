@@ -41,9 +41,9 @@ export function MobileHeader({
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="flex md:hidden items-center justify-between gap-2">
+    <div className="flex md:hidden items-center w-full relative h-16">
       {/* Left side - Help Icon */}
-      <div className="flex-none">
+      <div className="absolute left-0">
         {previewData.enable_instructions && (
           <Button
             variant="ghost"
@@ -57,7 +57,7 @@ export function MobileHeader({
       </div>
       
       {/* Centered Logo */}
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center w-full">
         {previewData.logo_url && (
           <img 
             src={previewData.logo_url} 
@@ -69,7 +69,7 @@ export function MobileHeader({
       </div>
 
       {/* Right side - Search and Options */}
-      <div className="flex-none flex items-center gap-2">
+      <div className="absolute right-0 flex items-center gap-2">
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (
