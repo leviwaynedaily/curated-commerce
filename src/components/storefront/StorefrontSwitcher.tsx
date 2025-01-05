@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Plus, Loader2 } from "lucide-react"
+import { Plus, Loader2, RefreshCw } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -27,67 +27,79 @@ export function StorefrontSwitcher() {
   const queryClient = useQueryClient()
 
   // First check authentication and get business data
-  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
+  const { data: business, isLoading: isLoadingBusiness, error: businessError, refetch: refetchBusiness } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
-      console.log("Checking authentication and fetching business data");
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      
-      if (authError) {
-        console.error("Auth error:", authError);
-        throw authError;
+      try {
+        console.log("Checking authentication and fetching business data");
+        const { data: { user }, error: authError } = await supabase.auth.getUser()
+        
+        if (authError) {
+          console.error("Auth error:", authError);
+          throw authError;
+        }
+
+        if (!user) {
+          console.log("No authenticated user found");
+          navigate("/login");
+          return null;
+        }
+
+        console.log("Fetching business for user:", user.id);
+        const { data, error } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle()
+
+        if (error) {
+          console.error("Error fetching business:", error)
+          throw error
+        }
+
+        console.log("Fetched business data:", data);
+        return data
+      } catch (error) {
+        console.error("Failed to fetch business data:", error);
+        throw error;
       }
-
-      if (!user) {
-        console.log("No authenticated user found");
-        navigate("/login");
-        return null;
-      }
-
-      console.log("Fetching business for user:", user.id);
-      const { data, error } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", user.id)
-        .maybeSingle()
-
-      if (error) {
-        console.error("Error fetching business:", error)
-        throw error
-      }
-
-      console.log("Fetched business data:", data);
-      return data
     },
-    retry: 1
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
   })
 
   // Then fetch storefronts only if we have business data
-  const { data: storefronts, isLoading: isLoadingStorefronts, error: storefrontsError } = useQuery({
+  const { data: storefronts, isLoading: isLoadingStorefronts, error: storefrontsError, refetch: refetchStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
-      if (!business?.id) {
-        console.log("No business ID available");
-        return [];
+      try {
+        if (!business?.id) {
+          console.log("No business ID available");
+          return [];
+        }
+
+        console.log("Fetching storefronts for business:", business.id);
+        const { data, error } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("business_id", business.id)
+          .order("name")
+
+        if (error) {
+          console.error("Error fetching storefronts:", error)
+          throw error
+        }
+
+        console.log("Fetched storefronts:", data)
+        return data || []
+      } catch (error) {
+        console.error("Failed to fetch storefronts:", error);
+        throw error;
       }
-
-      console.log("Fetching storefronts for business:", business.id);
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("business_id", business.id)
-        .order("name")
-
-      if (error) {
-        console.error("Error fetching storefronts:", error)
-        throw error
-      }
-
-      console.log("Fetched storefronts:", data)
-      return data || []
     },
     enabled: !!business?.id,
-    retry: 2
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
   })
 
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
@@ -113,14 +125,28 @@ export function StorefrontSwitcher() {
     )
   }
 
-  // Show error state
+  // Show error state with retry button
   if (businessError || storefrontsError) {
     return (
-      <Alert variant="destructive">
-        <AlertDescription>
-          Failed to load storefronts. Please refresh the page.
-        </AlertDescription>
-      </Alert>
+      <div className="space-y-2">
+        <Alert variant="destructive">
+          <AlertDescription>
+            Failed to load data. Please try again.
+          </AlertDescription>
+        </Alert>
+        <Button 
+          variant="outline" 
+          className="w-full gap-2"
+          onClick={() => {
+            refetchBusiness();
+            refetchStorefronts();
+            toast.info("Retrying to load data...");
+          }}
+        >
+          <RefreshCw className="h-4 w-4" />
+          Retry
+        </Button>
+      </div>
     )
   }
 
