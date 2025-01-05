@@ -4,6 +4,9 @@ import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
 import { RichTextEditor } from "@/components/ui/rich-text-editor";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface StorefrontBasicInfoProps {
   form: UseFormReturn<any>;
@@ -12,10 +15,62 @@ interface StorefrontBasicInfoProps {
 export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
+  const handlePublishToggle = async (value: boolean) => {
+    if (!currentStorefrontId) return;
+
+    try {
+      console.log("Updating storefront publish status to:", value);
+      const { error } = await supabase
+        .from("storefronts")
+        .update({ is_published: value })
+        .eq("id", currentStorefrontId);
+
+      if (error) {
+        console.error("Error updating publish status:", error);
+        throw error;
+      }
+
+      toast.success(value ? "Storefront published!" : "Storefront unpublished");
+    } catch (error) {
+      console.error("Failed to update publish status:", error);
+      toast.error("Failed to update publish status");
+    }
+  };
+
+  const { data: storefront } = useQuery({
+    queryKey: ["storefront-publish-status", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+      
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("is_published")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching storefront status:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!currentStorefrontId,
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Basic Information</h2>
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={storefront?.is_published || false}
+            onCheckedChange={handlePublishToggle}
+          />
+          <span className="text-sm text-muted-foreground">
+            {storefront?.is_published ? "Published" : "Draft"}
+          </span>
+        </div>
       </div>
 
       <FormField
