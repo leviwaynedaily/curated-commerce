@@ -42,7 +42,7 @@ export function PreviewHeader({
   return (
     <header 
       className={`sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300 ${
-        isScrolled ? 'bg-white shadow-sm' : 'bg-white'
+        isScrolled ? 'bg-white/50 backdrop-blur-md shadow-sm' : 'bg-white/50 backdrop-blur-md'
       }`}
     >
       <div className="w-full py-4 px-4 md:px-8">
@@ -64,7 +64,7 @@ export function PreviewHeader({
                 value={selectedCategory || "all"}
                 onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
               >
-                <SelectTrigger className="w-[160px] bg-white">
+                <SelectTrigger className="w-[160px] bg-white/50 backdrop-blur-sm">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -82,7 +82,7 @@ export function PreviewHeader({
               value={currentSort}
               onValueChange={(value) => onSortChange?.(value)}
             >
-              <SelectTrigger className="w-[160px] bg-white">
+              <SelectTrigger className="w-[160px] bg-white/50 backdrop-blur-sm">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -100,7 +100,7 @@ export function PreviewHeader({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 bg-white"
+                className="pl-10 bg-white/50 backdrop-blur-sm"
               />
             </div>
 
