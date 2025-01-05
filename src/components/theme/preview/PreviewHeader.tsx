@@ -42,9 +42,9 @@ export function PreviewHeader({
           : 'relative bg-transparent transform -translate-y-full pointer-events-none opacity-0'
       }`}
     >
-      <div className="w-full">
-        <div className="flex items-center justify-between py-4 px-4 md:px-8">
-          <div className="flex items-center space-x-4 min-w-[120px]">
+      <div className="w-full py-4 px-4 md:px-8">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex-shrink-0">
             {logo_url && (
               <img 
                 src={logo_url} 
@@ -54,55 +54,51 @@ export function PreviewHeader({
               />
             )}
           </div>
-        </div>
 
-        <div className="border-t border-gray-200/30">
-          <div className="flex flex-col md:flex-row items-center justify-between py-2 px-4 md:px-8 gap-4">
-            <div className="flex items-center space-x-4 overflow-x-auto w-full md:w-auto">
-              {categories.length > 0 && (
-                <Select
-                  value={selectedCategory || "all"}
-                  onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
-                >
-                  <SelectTrigger className="w-[160px] bg-white/80">
-                    <SelectValue placeholder="Category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
+          <div className="flex items-center gap-4 flex-grow justify-end">
+            {categories.length > 0 && (
               <Select
-                value={currentSort}
-                onValueChange={(value) => onSortChange?.(value)}
+                value={selectedCategory || "all"}
+                onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
               >
                 <SelectTrigger className="w-[160px] bg-white/80">
-                  <SelectValue placeholder="Sort by" />
+                  <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="newest">Newest First</SelectItem>
-                  <SelectItem value="oldest">Oldest First</SelectItem>
-                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+            )}
 
-              <div className="relative flex-1 min-w-[200px] max-w-xs">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10 bg-white/80"
-                />
-              </div>
+            <Select
+              value={currentSort}
+              onValueChange={(value) => onSortChange?.(value)}
+            >
+              <SelectTrigger className="w-[160px] bg-white/80">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                <SelectItem value="price-desc">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <div className="relative w-[200px]">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="pl-10 bg-white/80"
+              />
             </div>
 
             <div className="flex items-center gap-1">
