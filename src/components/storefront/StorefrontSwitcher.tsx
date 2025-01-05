@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import {
   Select,
@@ -16,12 +16,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { toast } from "sonner"
 
 export function StorefrontSwitcher() {
   const [showCreateStore, setShowCreateStore] = useState(false)
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
   const { data: business } = useQuery({
     queryKey: ["business"],
@@ -44,7 +46,7 @@ export function StorefrontSwitcher() {
     },
   })
 
-  const { data: storefronts } = useQuery({
+  const { data: storefronts, isLoading } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
       if (!business?.id) return []
@@ -69,6 +71,19 @@ export function StorefrontSwitcher() {
   // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
+  // Effect to validate current storefront
+  useEffect(() => {
+    if (storefronts && storefronts.length > 0 && !currentStorefrontId) {
+      // If no storefront is selected but storefronts exist, select the first one
+      const firstStorefront = storefronts[0]
+      console.log("Auto-selecting first storefront:", firstStorefront.id)
+      localStorage.setItem('lastStorefrontId', firstStorefront.id)
+      // Invalidate queries to trigger refetch with new storefront
+      queryClient.invalidateQueries()
+      toast.success(`Selected storefront: ${firstStorefront.name}`)
+    }
+  }, [storefronts, currentStorefrontId, queryClient])
+
   if (!storefronts?.length) {
     return (
       <>
@@ -89,7 +104,10 @@ export function StorefrontSwitcher() {
             {business && (
               <StorefrontForm
                 businessId={business.id}
-                onSuccess={() => setShowCreateStore(false)}
+                onSuccess={() => {
+                  setShowCreateStore(false)
+                  queryClient.invalidateQueries({ queryKey: ["storefronts"] })
+                }}
               />
             )}
           </DialogContent>
@@ -108,6 +126,8 @@ export function StorefrontSwitcher() {
           } else {
             console.log("Switching to storefront:", value)
             localStorage.setItem('lastStorefrontId', value)
+            // Invalidate all queries to refresh data for new storefront
+            queryClient.invalidateQueries()
             // Force a refresh to update the dashboard with the new store
             window.location.reload()
           }
@@ -141,7 +161,10 @@ export function StorefrontSwitcher() {
           {business && (
             <StorefrontForm
               businessId={business.id}
-              onSuccess={() => setShowCreateStore(false)}
+              onSuccess={() => {
+                setShowCreateStore(false)
+                queryClient.invalidateQueries({ queryKey: ["storefronts"] })
+              }}
             />
           )}
         </DialogContent>
