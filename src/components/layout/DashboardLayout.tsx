@@ -17,12 +17,14 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <DashboardSidebar
-          open={sidebarOpen}
-          mobileOpen={mobileSidebarOpen}
-          onOpenChange={setSidebarOpen}
-          onMobileOpenChange={setMobileSidebarOpen}
-        />
+        <div className="w-64 flex-shrink-0">
+          <DashboardSidebar
+            open={sidebarOpen}
+            mobileOpen={mobileSidebarOpen}
+            onOpenChange={setSidebarOpen}
+            onMobileOpenChange={setMobileSidebarOpen}
+          />
+        </div>
 
         <div className="flex-1">
           <header className="h-16 border-b flex items-center gap-4 px-4">
