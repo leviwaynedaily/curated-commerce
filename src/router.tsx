@@ -2,8 +2,6 @@ import { createBrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Products from "./pages/Products";
-import Stores from "./pages/Stores";
-import Appearance from "./pages/Appearance";
 import StorefrontInformation from "./pages/StorefrontInformation";
 import Preview from "./pages/Preview";
 import PWASettings from "./pages/PWASettings";
@@ -21,14 +19,6 @@ export const router = createBrowserRouter([
   {
     path: "/products",
     element: <Products />,
-  },
-  {
-    path: "/stores",
-    element: <Stores />,
-  },
-  {
-    path: "/appearance",
-    element: <Appearance />,
   },
   {
     path: "/storefront-information",

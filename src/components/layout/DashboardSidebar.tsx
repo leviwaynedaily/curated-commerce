@@ -6,9 +6,7 @@ import { UserButton } from "@/components/auth/UserButton";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
-  Package2, 
-  Store, 
-  Paintbrush, 
+  Package2,
   FileText,
   Eye,
   AppWindow,
@@ -43,18 +41,6 @@ export function DashboardSidebar({
       icon: Package2,
       href: '/products',
       active: location.pathname === '/products',
-    },
-    {
-      label: 'Stores',
-      icon: Store,
-      href: '/stores',
-      active: location.pathname === '/stores',
-    },
-    {
-      label: 'Appearance',
-      icon: Paintbrush,
-      href: '/appearance',
-      active: location.pathname === '/appearance',
     },
     {
       label: 'Storefront Information',
