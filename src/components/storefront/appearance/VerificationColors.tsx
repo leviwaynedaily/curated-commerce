@@ -21,7 +21,7 @@ export function VerificationColors({ form, onColorChange }: VerificationColorsPr
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <h3 className="text-lg font-medium">Verification Colors</h3>
       <ColorGrid
         colors={verificationColors}
