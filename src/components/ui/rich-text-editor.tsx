@@ -107,7 +107,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
     content: value,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none',
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[100px]',
       },
     },
     onUpdate: ({ editor }) => {
@@ -118,7 +118,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
   return (
     <div className="min-h-[200px] rounded-md border">
       <MenuBar editor={editor} />
-      <div className="p-3">
+      <div className="p-3 [&_.ProseMirror]:min-h-[100px] [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:ml-4 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:ml-4">
         <EditorContent editor={editor} />
       </div>
     </div>
