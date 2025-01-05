@@ -1,11 +1,14 @@
 import { ThemeConfig } from "./theme";
+import { Database } from "@/integrations/supabase/types";
+
+type VerificationType = Database['public']['Enums']['verification_type'];
 
 export interface PreviewData {
   name?: string;
   description?: string;
   logo_url?: string;
   theme_config?: ThemeConfig;
-  verification_type?: "none" | "age" | "password" | "both";
+  verification_type?: VerificationType;
   verification_age_text?: string;
   verification_legal_text?: string;
   verification_logo_url?: string;

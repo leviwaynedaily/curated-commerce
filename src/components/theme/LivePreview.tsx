@@ -3,10 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
+import { Database } from "@/integrations/supabase/types";
 
 interface LivePreviewProps {
   storefrontId: string;
 }
+
+type StorefrontRow = Database['public']['Tables']['storefronts']['Row'];
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [previewData, setPreviewData] = useState<PreviewData>({});
@@ -28,7 +31,21 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       }
 
       console.log("Fetched storefront data:", data);
-      setPreviewData(data);
+      // Convert the raw data to PreviewData type
+      const convertedData: PreviewData = {
+        name: data.name,
+        description: data.description,
+        logo_url: data.logo_url,
+        theme_config: data.theme_config as PreviewData['theme_config'],
+        verification_type: data.verification_type,
+        verification_age_text: data.verification_age_text,
+        verification_legal_text: data.verification_legal_text,
+        verification_logo_url: data.verification_logo_url,
+        verification_password: data.verification_password,
+        enable_instructions: data.enable_instructions,
+        instructions_text: data.instructions_text,
+      };
+      setPreviewData(convertedData);
     };
 
     fetchStorefrontData();
@@ -45,7 +62,22 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         },
         (payload) => {
           console.log("Received realtime update:", payload);
-          setPreviewData(payload.new);
+          const newData = payload.new as StorefrontRow;
+          // Convert the payload data to PreviewData type
+          const convertedData: PreviewData = {
+            name: newData.name,
+            description: newData.description,
+            logo_url: newData.logo_url,
+            theme_config: newData.theme_config as PreviewData['theme_config'],
+            verification_type: newData.verification_type,
+            verification_age_text: newData.verification_age_text,
+            verification_legal_text: newData.verification_legal_text,
+            verification_logo_url: newData.verification_logo_url,
+            verification_password: newData.verification_password,
+            enable_instructions: newData.enable_instructions,
+            instructions_text: newData.instructions_text,
+          };
+          setPreviewData(convertedData);
         }
       )
       .subscribe();
