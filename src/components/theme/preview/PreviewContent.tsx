@@ -5,6 +5,7 @@ import { ProductDetailView } from "./ProductDetailView";
 import { ProductGrid } from "./ProductGrid";
 import { ProductFilters } from "./ProductFilters";
 import { PreviewPagination } from "./PreviewPagination";
+import { PreviewHeader } from "./PreviewHeader";
 
 interface PreviewContentProps {
   previewData: any;
@@ -89,43 +90,23 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <div 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
-        }`}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center h-16">
-            {previewData.logo_url && (
-              <img 
-                src={previewData.logo_url} 
-                alt={previewData.name} 
-                className={`h-8 object-contain cursor-pointer transition-opacity duration-300 ${
-                  isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                }`}
-                onClick={onReset}
-              />
-            )}
-            <div className={`flex-1 transition-opacity duration-300 ${
-              isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}>
-              <ProductFilters
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                currentSort={currentSort}
-                onSortChange={setCurrentSort}
-                selectedCategory={selectedCategory}
-                onCategoryChange={setSelectedCategory}
-                categories={categories}
-                gridSize={gridSize}
-                onGridChange={setGridSize}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      <PreviewHeader
+        logo_url={previewData.logo_url}
+        name={previewData.name}
+        onGridChange={setGridSize}
+        onSearchChange={setSearchQuery}
+        onSortChange={setCurrentSort}
+        onCategoryChange={setSelectedCategory}
+        searchQuery={searchQuery}
+        gridSize={gridSize}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        currentSort={currentSort}
+        onLogoClick={onReset}
+        isScrolled={isScrolled}
+      />
 
-      <div className="container mx-auto px-4 pt-16">
+      <div className="container mx-auto px-4">
         <div 
           className={`flex flex-col items-center mb-8 transition-all duration-500 ease-in-out ${
             isScrolled ? 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden' : 'opacity-100 translate-y-0'
@@ -150,7 +131,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           )}
         </div>
 
-        <div className={`mb-8 ${isScrolled ? 'hidden' : 'block'}`}>
+        <div className="mb-8">
           <ProductFilters
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

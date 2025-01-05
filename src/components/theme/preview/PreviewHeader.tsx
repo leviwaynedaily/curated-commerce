@@ -17,6 +17,7 @@ interface PreviewHeaderProps {
   currentSort: string;
   onLogoClick: () => void;
   showFilters?: boolean;
+  isScrolled: boolean;
 }
 
 export function PreviewHeader({ 
@@ -32,10 +33,13 @@ export function PreviewHeader({
   selectedCategory,
   currentSort,
   onLogoClick,
-  showFilters = true
+  showFilters = true,
+  isScrolled
 }: PreviewHeaderProps) {
   return (
-    <div className="sticky top-0 z-50 py-4 transition-all duration-300 bg-background/80 backdrop-blur-sm">
+    <div className={`sticky top-0 z-50 py-4 transition-all duration-300 ${
+      isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
+    }`}>
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="flex items-center gap-4">
@@ -43,14 +47,18 @@ export function PreviewHeader({
               <img 
                 src={logo_url} 
                 alt={name} 
-                className="h-8 object-contain cursor-pointer"
+                className={`h-8 object-contain cursor-pointer transition-opacity duration-300 ${
+                  isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
                 onClick={onLogoClick}
               />
             )}
           </div>
 
           {showFilters && (
-            <div className="flex-1 flex flex-col md:flex-row items-center gap-4">
+            <div className={`flex-1 flex flex-col md:flex-row items-center gap-4 transition-opacity duration-300 ${
+              isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}>
               <div className="relative flex-1 max-w-md w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <Input
