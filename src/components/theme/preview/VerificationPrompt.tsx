@@ -35,11 +35,9 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: `${colors.background.primary}40` }}
     >
-      <div className="absolute inset-0 backdrop-blur-xl" />
       <div 
-        className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl bg-white dark:bg-gray-900"
+        className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl"
         style={{ backgroundColor: colors.background.secondary }}
       >
         {previewData.verification_logo_url && (
@@ -140,5 +138,5 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -51,6 +51,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [previewData, setPreviewData] = useState<PreviewData>({});
   const [showContent, setShowContent] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     const fetchStorefrontData = async () => {
@@ -129,6 +130,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }, [storefrontId]);
 
   const handleVerification = (password?: string) => {
+    setIsVerified(true);
     if (previewData.enable_instructions) {
       setShowInstructions(true);
     } else {
@@ -141,6 +143,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   };
 
   const handleReset = () => {
+    setIsVerified(false);
     setShowContent(false);
     setShowInstructions(false);
   };
@@ -155,68 +158,65 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
   const { colors } = previewData.theme_config;
 
-  if (!showContent && !showInstructions && previewData.verification_type !== 'none') {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: colors.background.primary }}
-      >
+  return (
+    <div 
+      className="min-h-screen relative"
+      style={{ backgroundColor: colors.background.primary }}
+    >
+      {/* Always render the content */}
+      <div className={`${!isVerified ? 'filter blur-lg' : ''}`}>
+        <PreviewContent 
+          previewData={previewData} 
+          colors={colors} 
+          onReset={handleReset}
+        />
+      </div>
+
+      {/* Overlay verification prompt if not verified */}
+      {!isVerified && previewData.verification_type !== 'none' && (
         <VerificationPrompt 
           previewData={previewData}
           onVerify={handleVerification}
           colors={colors}
         />
-      </div>
-    );
-  }
+      )}
 
-  if (!showContent && showInstructions && previewData.enable_instructions) {
-    return (
-      <div 
-        className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: colors.background.primary }}
-      >
+      {/* Show instructions if needed */}
+      {isVerified && !showContent && showInstructions && previewData.enable_instructions && (
         <div 
-          className="max-w-md w-full p-6 rounded-lg"
-          style={{ backgroundColor: colors.background.secondary }}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ backgroundColor: `${colors.background.primary}40` }}
         >
-          <h2 
-            className="text-xl font-bold mb-4"
-            style={{ color: colors.font.primary }}
+          <div className="absolute inset-0 backdrop-blur-xl" />
+          <div 
+            className="relative max-w-md w-full p-6 rounded-lg"
+            style={{ backgroundColor: colors.background.secondary }}
           >
-            Instructions
-          </h2>
-          <p 
-            className="mb-6"
-            style={{ color: colors.font.secondary }}
-          >
-            {previewData.instructions_text}
-          </p>
-          <button 
-            className="w-full px-4 py-2 rounded"
-            style={{
-              backgroundColor: colors.background.accent,
-              color: colors.font.primary
-            }}
-            onClick={handleContinue}
-          >
-            Continue to Site
-          </button>
+            <h2 
+              className="text-xl font-bold mb-4"
+              style={{ color: colors.font.primary }}
+            >
+              Instructions
+            </h2>
+            <p 
+              className="mb-6"
+              style={{ color: colors.font.secondary }}
+            >
+              {previewData.instructions_text}
+            </p>
+            <button 
+              className="w-full px-4 py-2 rounded"
+              style={{
+                backgroundColor: colors.background.accent,
+                color: colors.font.primary
+              }}
+              onClick={handleContinue}
+            >
+              Continue to Site
+            </button>
+          </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div 
-      className="min-h-screen"
-      style={{ backgroundColor: colors.background.primary }}
-    >
-      <PreviewContent 
-        previewData={previewData} 
-        colors={colors} 
-        onReset={handleReset}
-      />
+      )}
     </div>
   );
 }
