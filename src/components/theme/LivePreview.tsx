@@ -40,9 +40,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         console.log("Fetching storefront data for preview:", storefrontId);
         const { data, error } = await supabase
           .from("storefronts")
-          .select("*")
-          .eq("id", storefrontId)
-          .eq("is_published", true)
+          .select()
+          .match({ id: storefrontId, is_published: true })
           .maybeSingle();
 
         if (error) {
