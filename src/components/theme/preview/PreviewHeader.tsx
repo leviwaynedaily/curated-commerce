@@ -1,38 +1,47 @@
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { ViewOptionsDropdown } from "./ViewOptionsDropdown"
 
 interface PreviewHeaderProps {
-  logo_url?: string;
-  name: string;
-  onGridChange: (size: 'small' | 'medium' | 'large') => void;
-  onSearchChange: (query: string) => void;
-  onSortChange?: (sort: string) => void;
-  onCategoryChange?: (category: string | null) => void;
-  searchQuery: string;
-  gridSize: 'small' | 'medium' | 'large';
-  categories?: string[];
-  selectedCategory?: string | null;
-  currentSort?: string;
-  isScrolled: boolean;
-  onLogoClick?: () => void;
+  logo_url?: string
+  name: string
+  mainColor: string
+  onGridChange: (size: 'small' | 'medium' | 'large') => void
+  onSearchChange: (query: string) => void
+  onSortChange?: (sort: string) => void
+  onCategoryChange?: (category: string | null) => void
+  searchQuery: string
+  gridSize: 'small' | 'medium' | 'large'
+  categories?: string[]
+  selectedCategory?: string | null
+  currentSort?: string
+  isScrolled: boolean
+  onLogoClick?: () => void
+  layout: string
+  textPlacement: string
+  onLayoutChange: (layout: string) => void
+  onTextPlacementChange: (placement: string) => void
 }
 
-export function PreviewHeader({ 
-  logo_url, 
+export function PreviewHeader({
+  logo_url,
   name,
-  onGridChange,
+  mainColor,
   onSearchChange,
   onSortChange,
   onCategoryChange,
   searchQuery,
-  gridSize,
   categories = [],
   selectedCategory,
   currentSort,
   isScrolled,
-  onLogoClick
+  onLogoClick,
+  layout,
+  textPlacement,
+  onLayoutChange,
+  onTextPlacementChange,
 }: PreviewHeaderProps) {
   return (
     <header 
@@ -101,47 +110,16 @@ export function PreviewHeader({
               />
             </div>
 
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onGridChange('small')}
-                className={`${gridSize === 'small' ? 'bg-accent' : 'bg-white/80'}`}
-              >
-                <div className="w-4 h-4 grid grid-cols-3 gap-0.5">
-                  {[...Array(9)].map((_, i) => (
-                    <div key={i} className="bg-current rounded-sm" />
-                  ))}
-                </div>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onGridChange('medium')}
-                className={`${gridSize === 'medium' ? 'bg-accent' : 'bg-white/80'}`}
-              >
-                <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="bg-current rounded-sm" />
-                  ))}
-                </div>
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onGridChange('large')}
-                className={`${gridSize === 'large' ? 'bg-accent' : 'bg-white/80'}`}
-              >
-                <div className="w-4 h-4 grid grid-cols-1 gap-0.5">
-                  {[...Array(2)].map((_, i) => (
-                    <div key={i} className="bg-current rounded-sm" />
-                  ))}
-                </div>
-              </Button>
-            </div>
+            <ViewOptionsDropdown
+              layout={layout}
+              textPlacement={textPlacement}
+              mainColor={mainColor}
+              onLayoutChange={onLayoutChange}
+              onTextPlacementChange={onTextPlacementChange}
+            />
           </div>
         </div>
       </div>
     </header>
-  );
+  )
 }
