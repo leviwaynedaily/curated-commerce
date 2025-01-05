@@ -8,6 +8,7 @@ import { ViewOptionsDropdown } from "./ViewOptionsDropdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
+import { Button } from "@/components/ui/button";
 
 interface PreviewContentProps {
   previewData: PreviewData;
