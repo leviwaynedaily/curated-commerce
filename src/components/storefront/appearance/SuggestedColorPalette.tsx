@@ -70,12 +70,12 @@ export function SuggestedColorPalette({ colors, logoUrl }: SuggestedColorPalette
           </div>
 
           {logoUrl && (
-            <div className="ml-8 p-4 bg-muted rounded-lg min-w-[200px]">
+            <div className="ml-8 p-4 bg-muted rounded-lg w-[120px]">
               <p className="text-sm text-muted-foreground mb-2">Current Logo:</p>
               <img
                 src={logoUrl}
                 alt="Current logo"
-                className="w-full h-auto object-contain"
+                className="w-full h-auto object-contain max-h-[100px]"
               />
             </div>
           )}
