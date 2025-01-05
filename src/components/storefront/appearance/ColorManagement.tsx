@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { SuggestedColorPalette } from "./SuggestedColorPalette";
 import { BrandColors } from "./BrandColors";
 import { VerificationColors } from "./VerificationColors";
+import { ProductCardColors } from "./ProductCardColors";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -77,6 +78,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         <SuggestedColorPalette colors={predefinedColors} logoUrl={logoUrl} />
         <BrandColors form={form} onColorChange={handleColorChange} />
         <VerificationColors form={form} onColorChange={handleColorChange} />
+        <ProductCardColors form={form} onColorChange={handleColorChange} />
       </CardContent>
     </Card>
   );

@@ -2,17 +2,17 @@ import { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { ColorGrid } from "./ColorGrid";
 
-interface BrandColorsProps {
+interface ProductCardColorsProps {
   form: UseFormReturn<any>;
   onColorChange: (field: string, value: string) => void;
 }
 
-export function BrandColors({ form, onColorChange }: BrandColorsProps) {
-  const brandColors = [
-    { field: "main_color", label: "Main Color" },
-    { field: "secondary_color", label: "Secondary Color" },
-    { field: "font_color", label: "Font Color" },
-    { field: "storefront_background_color", label: "Background Color" },
+export function ProductCardColors({ form, onColorChange }: ProductCardColorsProps) {
+  const productCardColors = [
+    { field: "product_card_background_color", label: "Card Background" },
+    { field: "product_title_text_color", label: "Title Text" },
+    { field: "product_description_text_color", label: "Description Text" },
+    { field: "product_price_color", label: "Price Color" },
   ].map(({ field, label }) => ({
     color: form.watch(field),
     label,
@@ -21,17 +21,17 @@ export function BrandColors({ form, onColorChange }: BrandColorsProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-medium">Brand Colors</h3>
+      <h3 className="text-lg font-medium">Product Card Colors</h3>
       <ColorGrid
-        colors={brandColors}
+        colors={productCardColors}
         onColorClick={(color) => {
-          const field = brandColors.find((c) => c.color === color)?.field;
+          const field = productCardColors.find((c) => c.color === color)?.field;
           if (field) {
             document.getElementById(field)?.click();
           }
         }}
       />
-      {brandColors.map(({ field, color }) => (
+      {productCardColors.map(({ field, color }) => (
         <Input
           key={field}
           id={field}
