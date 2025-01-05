@@ -148,25 +148,23 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
               )}
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
+            <div className="space-y-2">
+              <div 
+                className="flex items-center gap-2"
+                style={{ color: previewData.product_price_color }}
+              >
+                <span className="text-base font-medium">In Town:</span>
+                <span className="text-2xl">${product.in_town_price}</span>
+              </div>
+              {product.shipping_price > 0 && (
                 <div 
-                  className="flex items-center gap-2 text-2xl font-bold"
+                  className="flex items-center gap-2"
                   style={{ color: previewData.product_price_color }}
                 >
-                  <span className="text-sm font-medium">In Town:</span>
-                  <span>${product.in_town_price}</span>
+                  <span className="text-base font-medium">Ship:</span>
+                  <span className="text-2xl">${product.shipping_price}</span>
                 </div>
-                {product.shipping_price > 0 && (
-                  <div 
-                    className="flex items-center gap-2 text-xl"
-                    style={{ color: previewData.product_price_color }}
-                  >
-                    <span className="text-sm font-medium">Ship:</span>
-                    <span>${product.shipping_price}</span>
-                  </div>
-                )}
-              </div>
+              )}
             </div>
           </div>
         </div>
