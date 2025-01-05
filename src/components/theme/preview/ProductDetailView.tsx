@@ -72,8 +72,12 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
                   size="icon"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                   onClick={() => handleDownload(product.images[0])}
+                  style={{ backgroundColor: previewData.product_category_background_color }}
                 >
-                  <Download className="h-4 w-4" />
+                  <Download 
+                    className="h-4 w-4"
+                    style={{ color: previewData.product_category_text_color }}
+                  />
                 </Button>
               </div>
             )}
@@ -100,8 +104,12 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
                     size="icon"
                     className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={() => handleDownload(image)}
+                    style={{ backgroundColor: previewData.product_category_background_color }}
                   >
-                    <Download className="h-4 w-4" />
+                    <Download 
+                      className="h-4 w-4"
+                      style={{ color: previewData.product_category_text_color }}
+                    />
                   </Button>
                 </div>
               ))}
