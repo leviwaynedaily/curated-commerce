@@ -1,14 +1,4 @@
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { LayoutGrid, Settings2 } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 
 interface ViewOptionsDropdownProps {
   layout: string
@@ -26,33 +16,27 @@ export function ViewOptionsDropdown({
   onTextPlacementChange,
 }: ViewOptionsDropdownProps) {
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="bg-white/80 hover:bg-white/90"
-        >
-          <Settings2 className="h-5 w-5" style={{ color: mainColor }} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm">
-        <DropdownMenuLabel>View Options</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Layout</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={layout} onValueChange={onLayoutChange}>
-          <DropdownMenuRadioItem value="list">List View</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="small">Small Grid</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="medium">Medium Grid</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="large">Large Grid</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Text Placement</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={textPlacement} onValueChange={onTextPlacementChange}>
-          <DropdownMenuRadioItem value="overlay">Text Overlay</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="below">Text Below</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Select
+      value={layout}
+      onValueChange={(value) => {
+        if (value.startsWith("text-")) {
+          onTextPlacementChange(value.replace("text-", ""));
+        } else {
+          onLayoutChange(value);
+        }
+      }}
+    >
+      <SelectTrigger className="w-full h-10 text-sm bg-white/80 backdrop-blur-sm">
+        View
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="list">List View</SelectItem>
+        <SelectItem value="small">Small Grid</SelectItem>
+        <SelectItem value="medium">Medium Grid</SelectItem>
+        <SelectItem value="large">Large Grid</SelectItem>
+        <SelectItem value="text-overlay">Text Overlay</SelectItem>
+        <SelectItem value="text-below">Text Below</SelectItem>
+      </SelectContent>
+    </Select>
   )
 }
