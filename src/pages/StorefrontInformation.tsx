@@ -18,7 +18,8 @@ import { Loader2 } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
   logo_url: z.string().nullable(),
-  description: z.string().nullable().optional(),  // Updated to handle null/undefined values
+  favicon_url: z.string().nullable(),
+  description: z.string().nullable().optional(),
   show_description: z.boolean().default(false),
   verification_type: z.enum(["none", "age", "password", "both"]).default("none"),
   verification_logo_url: z.string().nullable(),
@@ -36,7 +37,8 @@ type FormValues = z.infer<typeof formSchema>;
 const DEFAULT_VALUES: FormValues = {
   name: "",
   logo_url: null,
-  description: "",  // Initialize with empty string
+  favicon_url: null,
+  description: "",
   show_description: false,
   verification_type: "none" as const,
   verification_logo_url: null,
@@ -85,25 +87,9 @@ const StorefrontInformation = () => {
       return data;
     },
     enabled: !!currentStorefrontId,
-    staleTime: 0, // Disable caching to always fetch fresh data
-    retry: 1, // Only retry once to avoid infinite loops
+    staleTime: 0,
+    retry: 1,
   });
-
-  // Add useEffect to update favicon when it changes
-  useEffect(() => {
-    if (storefront?.favicon_url) {
-      console.log("Updating favicon to:", storefront.favicon_url);
-      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-      if (!favicon) {
-        const newFavicon = document.createElement('link');
-        newFavicon.rel = 'icon';
-        newFavicon.href = storefront.favicon_url;
-        document.head.appendChild(newFavicon);
-      } else {
-        favicon.href = storefront.favicon_url;
-      }
-    }
-  }, [storefront?.favicon_url]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -117,6 +103,7 @@ const StorefrontInformation = () => {
       form.reset({
         name: storefront.name || DEFAULT_VALUES.name,
         logo_url: storefront.logo_url || DEFAULT_VALUES.logo_url,
+        favicon_url: storefront.favicon_url || DEFAULT_VALUES.favicon_url,
         description: storefront.description || DEFAULT_VALUES.description,
         show_description: storefront.show_description || DEFAULT_VALUES.show_description,
         verification_type: (storefront.verification_type as FormValues['verification_type']) || DEFAULT_VALUES.verification_type,
@@ -149,7 +136,8 @@ const StorefrontInformation = () => {
         .update({
           name: values.name,
           logo_url: values.logo_url,
-          description: values.description || null,  // Handle empty string as null
+          favicon_url: values.favicon_url,
+          description: values.description || null,
           show_description: values.show_description,
           verification_type: values.verification_type,
           verification_logo_url: values.verification_logo_url,
@@ -186,6 +174,7 @@ const StorefrontInformation = () => {
   const debouncedSave = useMemo(
     () =>
       debounce(async (values: FormValues) => {
+        console.log("Auto-saving form values:", values);
         await onSubmit(values);
       }, 1000),
     []
@@ -194,13 +183,31 @@ const StorefrontInformation = () => {
   // Watch for form changes and trigger auto-save
   useEffect(() => {
     const subscription = form.watch((values) => {
-      if (storefront) { // Only auto-save if we have initial data
+      if (storefront) {
         console.log("Form values changed:", values);
         debouncedSave(values as FormValues);
       }
     });
     return () => subscription.unsubscribe();
   }, [form.watch, debouncedSave, storefront]);
+
+  // Update favicon when it changes
+  useEffect(() => {
+    const faviconUrl = form.watch("favicon_url");
+    console.log("Favicon URL changed:", faviconUrl);
+    
+    if (faviconUrl) {
+      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (!favicon) {
+        const newFavicon = document.createElement('link');
+        newFavicon.rel = 'icon';
+        newFavicon.href = faviconUrl;
+        document.head.appendChild(newFavicon);
+      } else {
+        favicon.href = faviconUrl;
+      }
+    }
+  }, [form.watch("favicon_url")]);
 
   if (isLoading) {
     return (
