@@ -1,9 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { Badge } from "@/components/ui/badge";
 import { PreviewHeader } from "./PreviewHeader";
+import debounce from "lodash.debounce";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -37,12 +38,18 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
     enabled: !!previewData.id,
   });
 
-  // Handle scroll events
-  if (typeof window !== 'undefined') {
-    window.addEventListener('scroll', () => {
+  useEffect(() => {
+    const handleScroll = debounce(() => {
       setIsScrolled(window.scrollY > 100);
-    });
-  }
+    }, 10); // Small debounce time for smooth transition
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      handleScroll.cancel();
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const filteredProducts = products?.filter(product =>
     product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -85,7 +92,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
 
       <div className="container mx-auto px-4">
         {!isScrolled && (
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-8 transition-opacity duration-300">
             {previewData.logo_url && (
               <img 
                 src={previewData.logo_url} 

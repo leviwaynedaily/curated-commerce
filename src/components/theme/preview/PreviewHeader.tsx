@@ -24,7 +24,7 @@ export function PreviewHeader({
 }: PreviewHeaderProps) {
   return (
     <header 
-      className="sticky top-0 z-50 backdrop-blur-lg"
+      className="sticky top-0 z-50 backdrop-blur-lg transition-all duration-300"
       style={{ 
         backgroundColor: `${colors.background.primary}80`,
         borderBottom: `1px solid ${colors.background.secondary}`
@@ -37,7 +37,7 @@ export function PreviewHeader({
               <img 
                 src={logo_url} 
                 alt={name} 
-                className="h-8 object-contain"
+                className="h-8 object-contain transition-opacity duration-300"
               />
             )}
           </div>
@@ -48,7 +48,7 @@ export function PreviewHeader({
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-full pl-10"
+                className="w-full pl-10 transition-all duration-300"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 style={{ 
