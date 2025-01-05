@@ -9,9 +9,10 @@ import { Badge } from "@/components/ui/badge";
 interface PreviewContentProps {
   previewData: PreviewData;
   colors: any;
+  onReset: () => void;
 }
 
-export function PreviewContent({ previewData, colors }: PreviewContentProps) {
+export function PreviewContent({ previewData, colors, onReset }: PreviewContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [isScrolled, setIsScrolled] = useState(false);
@@ -120,6 +121,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
         categories={categories}
         selectedCategory={selectedCategory}
         currentSort={currentSort}
+        onLogoClick={onReset}
       />
 
       <div className="container mx-auto px-4">
@@ -132,7 +134,8 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
             <img 
               src={previewData.logo_url} 
               alt={previewData.name} 
-              className="h-24 object-contain mb-4"
+              className="h-24 object-contain mb-4 cursor-pointer"
+              onClick={onReset}
             />
           )}
           

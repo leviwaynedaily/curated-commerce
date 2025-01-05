@@ -140,6 +140,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     setShowContent(true);
   };
 
+  const handleReset = () => {
+    setShowContent(false);
+    setShowInstructions(false);
+  };
+
   if (!previewData.theme_config) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -207,7 +212,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       className="min-h-screen"
       style={{ backgroundColor: colors.background.primary }}
     >
-      <PreviewContent previewData={previewData} colors={colors} />
+      <PreviewContent 
+        previewData={previewData} 
+        colors={colors} 
+        onReset={handleReset}
+      />
     </div>
   );
 }

@@ -1,19 +1,12 @@
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Grid2X2, Grid3X3, LayoutGrid } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ArrowUpDown } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PreviewHeaderProps {
   colors: any;
   logo_url?: string;
-  name?: string;
+  name: string;
   onGridChange: (size: 'small' | 'medium' | 'large') => void;
   onSearchChange: (query: string) => void;
   onSortChange: (sort: string) => void;
@@ -23,11 +16,12 @@ interface PreviewHeaderProps {
   categories: string[];
   selectedCategory: string | null;
   currentSort: string;
+  onLogoClick: () => void;
 }
 
-export function PreviewHeader({
-  colors,
-  logo_url,
+export function PreviewHeader({ 
+  colors, 
+  logo_url, 
   name,
   onGridChange,
   onSearchChange,
@@ -38,125 +32,146 @@ export function PreviewHeader({
   categories,
   selectedCategory,
   currentSort,
+  onLogoClick
 }: PreviewHeaderProps) {
   return (
-    <header 
-      className="sticky top-0 z-50 backdrop-blur-lg transition-all duration-500 ease-in-out"
-      style={{ 
-        backgroundColor: `${colors.background.primary}80`,
-        borderBottom: `1px solid ${colors.background.secondary}`
-      }}
+    <div 
+      className="sticky top-0 z-50 py-4 transition-all duration-300"
+      style={{ backgroundColor: `${colors.background.primary}CC` }}
     >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4 min-w-[100px] transition-all duration-500 ease-in-out">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="flex items-center gap-4">
             {logo_url && (
               <img 
                 src={logo_url} 
                 alt={name} 
-                className="h-8 w-auto object-contain transition-all duration-500 ease-in-out"
+                className="h-8 object-contain cursor-pointer"
+                onClick={onLogoClick}
               />
             )}
           </div>
 
-          <div className="flex-1 max-w-xl">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: colors.font.secondary }} />
+          <div className="flex-1 flex flex-col md:flex-row items-center gap-4">
+            <div className="relative flex-1 max-w-md w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-full pl-10 transition-all duration-500 ease-in-out"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                style={{ 
-                  backgroundColor: `${colors.background.secondary}80`,
+                className="pl-10"
+                style={{
+                  backgroundColor: colors.background.secondary,
                   color: colors.font.primary,
-                  borderColor: colors.background.secondary
+                  borderColor: `${colors.font.secondary}33`
                 }}
               />
             </div>
-          </div>
 
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  style={{ color: colors.font.primary }}
+            <div className="flex items-center gap-2 w-full md:w-auto">
+              <Select
+                value={currentSort}
+                onValueChange={onSortChange}
+              >
+                <SelectTrigger 
+                  className="w-[160px]"
+                  style={{
+                    backgroundColor: colors.background.secondary,
+                    color: colors.font.primary,
+                    borderColor: `${colors.font.secondary}33`
+                  }}
                 >
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  Sort
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onSortChange('newest')}>
-                  Newest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSortChange('oldest')}>
-                  Oldest First
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSortChange('price-asc')}>
-                  Price: Low to High
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onSortChange('price-desc')}>
-                  Price: High to Low
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  style={{ color: colors.font.primary }}
+              {categories.length > 0 && (
+                <Select
+                  value={selectedCategory || ""}
+                  onValueChange={(value) => onCategoryChange(value === "" ? null : value)}
                 >
-                  {selectedCategory || 'All Categories'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => onCategoryChange(null)}>
-                  All Categories
-                </DropdownMenuItem>
-                {categories.map((category) => (
-                  <DropdownMenuItem 
-                    key={category}
-                    onClick={() => onCategoryChange(category)}
+                  <SelectTrigger 
+                    className="w-[160px]"
+                    style={{
+                      backgroundColor: colors.background.secondary,
+                      color: colors.font.primary,
+                      borderColor: `${colors.font.secondary}33`
+                    }}
                   >
-                    {category}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Categories</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onGridChange('small')}
-              className={gridSize === 'small' ? 'bg-primary/10' : ''}
-            >
-              <Grid3X3 className="h-4 w-4" style={{ color: colors.font.primary }} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onGridChange('medium')}
-              className={gridSize === 'medium' ? 'bg-primary/10' : ''}
-            >
-              <Grid2X2 className="h-4 w-4" style={{ color: colors.font.primary }} />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onGridChange('large')}
-              className={gridSize === 'large' ? 'bg-primary/10' : ''}
-            >
-              <LayoutGrid className="h-4 w-4" style={{ color: colors.font.primary }} />
-            </Button>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onGridChange('small')}
+                  className={gridSize === 'small' ? 'bg-accent' : ''}
+                  style={{
+                    backgroundColor: gridSize === 'small' ? colors.background.accent : 'transparent',
+                    color: colors.font.primary
+                  }}
+                >
+                  <div className="w-4 h-4 grid grid-cols-3 gap-0.5">
+                    {[...Array(9)].map((_, i) => (
+                      <div key={i} className="bg-current rounded-sm" />
+                    ))}
+                  </div>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onGridChange('medium')}
+                  className={gridSize === 'medium' ? 'bg-accent' : ''}
+                  style={{
+                    backgroundColor: gridSize === 'medium' ? colors.background.accent : 'transparent',
+                    color: colors.font.primary
+                  }}
+                >
+                  <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="bg-current rounded-sm" />
+                    ))}
+                  </div>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onGridChange('large')}
+                  className={gridSize === 'large' ? 'bg-accent' : ''}
+                  style={{
+                    backgroundColor: gridSize === 'large' ? colors.background.accent : 'transparent',
+                    color: colors.font.primary
+                  }}
+                >
+                  <div className="w-4 h-4 grid grid-cols-1 gap-0.5">
+                    {[...Array(2)].map((_, i) => (
+                      <div key={i} className="bg-current rounded-sm" />
+                    ))}
+                  </div>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </header>
+    </div>
   );
 }
