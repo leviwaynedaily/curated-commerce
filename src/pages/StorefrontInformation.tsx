@@ -89,6 +89,22 @@ const StorefrontInformation = () => {
     retry: 1, // Only retry once to avoid infinite loops
   });
 
+  // Add useEffect to update favicon when it changes
+  useEffect(() => {
+    if (storefront?.favicon_url) {
+      console.log("Updating favicon to:", storefront.favicon_url);
+      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (!favicon) {
+        const newFavicon = document.createElement('link');
+        newFavicon.rel = 'icon';
+        newFavicon.href = storefront.favicon_url;
+        document.head.appendChild(newFavicon);
+      } else {
+        favicon.href = storefront.favicon_url;
+      }
+    }
+  }, [storefront?.favicon_url]);
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: DEFAULT_VALUES,
