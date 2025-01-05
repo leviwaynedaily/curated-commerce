@@ -19,6 +19,20 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
     if (!currentStorefrontId) return;
 
     try {
+      // First check if we have an authenticated session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        toast.error("Authentication required");
+        return;
+      }
+
+      if (!session) {
+        console.error("No active session");
+        toast.error("Please log in to publish your storefront");
+        return;
+      }
+
       console.log("Updating storefront publish status to:", value);
       const { error } = await supabase
         .from("storefronts")
@@ -42,11 +56,18 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
     queryFn: async () => {
       if (!currentStorefrontId) return null;
       
+      // First check if we have an authenticated session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        console.error("Session error or no session:", sessionError);
+        return null;
+      }
+
       const { data, error } = await supabase
         .from("storefronts")
         .select("is_published")
         .eq("id", currentStorefrontId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching storefront status:", error);
