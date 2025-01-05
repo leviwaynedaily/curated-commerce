@@ -4,6 +4,7 @@ import { Database } from "@/integrations/supabase/types";
 type VerificationType = Database['public']['Enums']['verification_type'];
 
 export interface PreviewData {
+  id?: string;
   name?: string;
   description?: string;
   logo_url?: string;
@@ -15,4 +16,5 @@ export interface PreviewData {
   verification_password?: string;
   enable_instructions?: boolean;
   instructions_text?: string;
+  show_description?: boolean;
 }
