@@ -31,24 +31,55 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="logo_url"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Storefront Logo</FormLabel>
-            <FormControl>
-              <ImageUpload
-                value={field.value}
-                onChange={field.onChange}
-                bucket="storefront-assets"
-                path="logos"
-                storefrontId={currentStorefrontId || undefined}
-              />
-            </FormControl>
-          </FormItem>
-        )}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <FormField
+          control={form.control}
+          name="logo_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Storefront Logo</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  bucket="storefront-assets"
+                  path="logos"
+                  storefrontId={currentStorefrontId || undefined}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="favicon_url"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Favicon</FormLabel>
+              <FormControl>
+                <ImageUpload
+                  value={field.value}
+                  onChange={field.onChange}
+                  bucket="storefront-assets"
+                  path="favicons"
+                  storefrontId={currentStorefrontId || undefined}
+                />
+              </FormControl>
+              {field.value && (
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-sm text-muted-foreground">Current favicon:</p>
+                  <img
+                    src={field.value}
+                    alt="Current favicon"
+                    className="h-8 w-8"
+                  />
+                </div>
+              )}
+            </FormItem>
+          )}
+        />
+      </div>
 
       <div className="space-y-2">
         <div className="flex items-center justify-between">
