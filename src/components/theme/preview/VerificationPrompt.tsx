@@ -35,7 +35,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
   return (
     <div 
       className="fixed inset-0 backdrop-blur-lg flex items-center justify-center p-4"
-      style={{ backgroundColor: `${colors.background.primary}99` }} // Using alpha for transparency
+      style={{ backgroundColor: `${colors.background.primary}99` }}
     >
       <div 
         className="max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl"
@@ -45,7 +45,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
           <img 
             src={previewData.verification_logo_url} 
             alt="Verification" 
-            className="h-32 mx-auto object-contain" // Increased logo size
+            className="h-32 mx-auto object-contain"
           />
         )}
         
@@ -67,6 +67,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                   setError(null);
                 }}
                 className="mt-1"
+                accentColor={colors.background.accent}
               />
               <label 
                 htmlFor="age-verification" 
