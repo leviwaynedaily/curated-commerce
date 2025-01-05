@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -19,18 +19,32 @@ import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export function StorefrontSwitcher() {
   const [showCreateStore, setShowCreateStore] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const { data: business } = useQuery({
+  // First check authentication and get business data
+  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      console.log("Checking authentication and fetching business data");
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      
+      if (authError) {
+        console.error("Auth error:", authError);
+        throw authError;
+      }
 
+      if (!user) {
+        console.log("No authenticated user found");
+        navigate("/login");
+        return null;
+      }
+
+      console.log("Fetching business for user:", user.id);
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
@@ -42,15 +56,22 @@ export function StorefrontSwitcher() {
         throw error
       }
 
+      console.log("Fetched business data:", data);
       return data
     },
+    retry: 1
   })
 
-  const { data: storefronts, isLoading } = useQuery({
+  // Then fetch storefronts only if we have business data
+  const { data: storefronts, isLoading: isLoadingStorefronts, error: storefrontsError } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
-      if (!business?.id) return []
+      if (!business?.id) {
+        console.log("No business ID available");
+        return [];
+      }
 
+      console.log("Fetching storefronts for business:", business.id);
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
@@ -63,27 +84,47 @@ export function StorefrontSwitcher() {
       }
 
       console.log("Fetched storefronts:", data)
-      return data
+      return data || []
     },
     enabled: !!business?.id,
+    retry: 2
   })
 
-  // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   // Effect to validate current storefront
   useEffect(() => {
     if (storefronts && storefronts.length > 0 && !currentStorefrontId) {
-      // If no storefront is selected but storefronts exist, select the first one
       const firstStorefront = storefronts[0]
       console.log("Auto-selecting first storefront:", firstStorefront.id)
       localStorage.setItem('lastStorefrontId', firstStorefront.id)
-      // Invalidate queries to trigger refetch with new storefront
       queryClient.invalidateQueries()
       toast.success(`Selected storefront: ${firstStorefront.name}`)
     }
   }, [storefronts, currentStorefrontId, queryClient])
 
+  // Show loading state
+  if (isLoadingBusiness || isLoadingStorefronts) {
+    return (
+      <Button variant="outline" disabled className="gap-2">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading...
+      </Button>
+    )
+  }
+
+  // Show error state
+  if (businessError || storefrontsError) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Failed to load storefronts. Please refresh the page.
+        </AlertDescription>
+      </Alert>
+    )
+  }
+
+  // Show create store button if no storefronts exist
   if (!storefronts?.length) {
     return (
       <>
@@ -116,6 +157,7 @@ export function StorefrontSwitcher() {
     )
   }
 
+  // Show storefront switcher
   return (
     <div>
       <Select
@@ -126,9 +168,7 @@ export function StorefrontSwitcher() {
           } else {
             console.log("Switching to storefront:", value)
             localStorage.setItem('lastStorefrontId', value)
-            // Invalidate all queries to refresh data for new storefront
             queryClient.invalidateQueries()
-            // Force a refresh to update the dashboard with the new store
             window.location.reload()
           }
         }}
