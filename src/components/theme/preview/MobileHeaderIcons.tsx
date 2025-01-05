@@ -70,6 +70,7 @@ export function MobileHeaderIcons({
         mainColor={previewData.main_color || "#000000"}
         onLayoutChange={onLayoutChange}
         onTextPlacementChange={onTextPlacementChange}
+        className="w-full h-10 text-sm bg-white/80 backdrop-blur-sm"
       />
     </div>
   )
