@@ -43,12 +43,12 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
           .select("*")
           .eq("id", storefrontId)
           .eq("is_published", true)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Error fetching storefront:", error);
-          setError("This store is not available.");
-          toast.error("This store is not available.");
+          setError("An error occurred while loading the store.");
+          toast.error("An error occurred while loading the store.");
           return;
         }
 
