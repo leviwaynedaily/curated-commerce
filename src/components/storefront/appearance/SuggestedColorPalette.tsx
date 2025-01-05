@@ -16,6 +16,8 @@ export function SuggestedColorPalette({ colors }: SuggestedColorPaletteProps) {
   return (
     <Card className="mt-4">
       <CardContent className="pt-6 space-y-6">
+        <h3 className="text-lg font-medium">Suggested Color Palette</h3>
+        
         <div className="space-y-2">
           <h4 className="text-sm font-medium">Primary Colors</h4>
           <div className="flex gap-2">
