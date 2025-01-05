@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { extractColorsFromLogo } from "@/utils/colorExtractor";
 import { useToast } from "@/components/ui/use-toast";
-import { Separator } from "@/components/ui/separator";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -56,7 +55,6 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       const colors = await extractColorsFromLogo(logoUrl);
       console.log("Extracted colors:", colors);
 
-      // Update all color fields with extracted colors
       form.setValue("main_color", colors.background.primary);
       form.setValue("secondary_color", colors.background.secondary);
       form.setValue("font_color", colors.font.primary);
@@ -85,7 +83,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className="mb-4">
           <FormLabel>{label}</FormLabel>
           <div className="flex items-center gap-4">
             <input
@@ -107,70 +105,59 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h3 className="text-sm font-medium">Colors</h3>
+        <h3 className="text-lg font-medium mb-4">Colors</h3>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleSuggestColors}
+          className="w-full mb-8"
+        >
+          <Wand2 className="mr-2 h-4 w-4" />
+          Suggest from Logo
+        </Button>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-4">
-          <div className="space-y-4">
-            <h4 className="text-sm font-medium bg-background py-2">General Colors</h4>
-            <ColorPicker name="main_color" label="Main Color" />
-            <ColorPicker name="secondary_color" label="Secondary Color" />
-            <ColorPicker name="font_color" label="Font Color" />
-          </div>
+      <div>
+        <h4 className="text-sm font-medium mb-4">General Colors</h4>
+        <ColorPicker name="main_color" label="Main Color" />
+        <ColorPicker name="secondary_color" label="Secondary Color" />
+        <ColorPicker name="font_color" label="Font Color" />
+      </div>
 
-          <div className="space-y-4">
-            <h4 className="text-sm font-medium bg-background py-2">Verification Colors</h4>
-            <ColorPicker name="verification_button_color" label="Button Color" />
-            <ColorPicker name="verification_button_text_color" label="Button Text Color" />
-            <ColorPicker name="verification_text_color" label="Text Color" />
-            <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
-            <ColorPicker name="verification_input_border_color" label="Input Border Color" />
-          </div>
-        </div>
+      <div>
+        <h4 className="text-sm font-medium mb-4">Verification Colors</h4>
+        <ColorPicker name="verification_button_color" label="Button Color" />
+        <ColorPicker name="verification_button_text_color" label="Button Text Color" />
+        <ColorPicker name="verification_text_color" label="Text Color" />
+        <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
+        <ColorPicker name="verification_input_border_color" label="Input Border Color" />
+      </div>
 
-        <div className="space-y-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSuggestColors}
-            className="gap-2 w-full"
-          >
-            <Wand2 className="h-4 w-4" />
-            Suggest from Logo
-          </Button>
-          
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Suggested Colors</h4>
-            <div className="space-y-4">
-              {Object.entries(predefinedColors).map(([category, colors]) => (
-                <div key={category} className="space-y-2">
-                  <h5 className="text-xs font-medium capitalize">{category}</h5>
-                  <div className="flex flex-wrap gap-2">
-                    {colors.map((color) => (
-                      <button
-                        key={color.value}
-                        type="button"
-                        onClick={() => {
-                          form.setValue("main_color", color.value);
-                        }}
-                        className="group relative h-8 w-8 rounded-full border"
-                        style={{ backgroundColor: color.value }}
-                        title={color.name}
-                      >
-                        <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
-                          {color.name}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+      <div>
+        <h4 className="text-sm font-medium mb-4">Suggested Colors</h4>
+        {Object.entries(predefinedColors).map(([category, colors]) => (
+          <div key={category} className="mb-6">
+            <h5 className="text-xs font-medium capitalize mb-2">{category}</h5>
+            <div className="flex flex-wrap gap-2">
+              {colors.map((color) => (
+                <button
+                  key={color.value}
+                  type="button"
+                  onClick={() => form.setValue("main_color", color.value)}
+                  className="group relative h-8 w-8 rounded-full border"
+                  style={{ backgroundColor: color.value }}
+                  title={color.name}
+                >
+                  <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
+                    {color.name}
+                  </span>
+                </button>
               ))}
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
