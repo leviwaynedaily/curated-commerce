@@ -43,21 +43,21 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'aspect-[3/5]' // Made taller for small cards
+        return 'aspect-[3/5]'
       case 'large':
         return 'aspect-video'
       case 'list':
-        return 'min-h-[20rem] md:min-h-[24rem]' // Increased height further
+        return 'min-h-[20rem] md:min-h-[24rem]'
       default: // medium
-        return 'aspect-[2/3]' // Changed from 3/4 to 2/3 for more height
+        return 'aspect-[2/3]'
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-3/5 relative", // Keep image height ratio
-        textContainer: `p-4 flex flex-col justify-between flex-grow`, // Added flex-grow to ensure text section takes remaining space
+        imageContainer: "h-3/5 relative",
+        textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
     } else {
@@ -77,7 +77,7 @@ export function ProductGrid({
         return (
           <div 
             key={product.id}
-            className={`group relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-2xl shadow-xl transform hover:scale-[1.03] ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
+            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.3)] transform hover:scale-[1.03] ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
             onClick={() => onProductClick(product)}
             style={{ backgroundColor: productCardBackgroundColor }}
           >
