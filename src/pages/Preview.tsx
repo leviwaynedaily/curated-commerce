@@ -5,6 +5,8 @@ export default function Preview() {
   const [searchParams] = useSearchParams();
   const storefrontId = searchParams.get('storefrontId');
 
+  console.log("Preview page - Storefront ID from URL:", storefrontId);
+
   if (!storefrontId) {
     return (
       <div className="flex items-center justify-center h-screen p-4 text-muted-foreground">

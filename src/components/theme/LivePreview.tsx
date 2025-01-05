@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
-import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Database } from "@/integrations/supabase/types";
 
@@ -13,23 +12,6 @@ type StorefrontRow = Database['public']['Tables']['storefronts']['Row'];
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [previewData, setPreviewData] = useState<PreviewData>({});
-  const [showContent, setShowContent] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-
-  useEffect(() => {
-    // Lock scrolling when verification prompt is shown
-    if (!isVerified) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    // Cleanup function to restore scrolling
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isVerified]);
 
   useEffect(() => {
     const fetchStorefrontData = async () => {
@@ -75,25 +57,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     };
   }, [storefrontId]);
 
-  const handleVerification = (password?: string) => {
-    setIsVerified(true);
-    if (previewData.enable_instructions) {
-      setShowInstructions(true);
-    } else {
-      setShowContent(true);
-    }
-  };
-
-  const handleContinue = () => {
-    setShowContent(true);
-  };
-
-  const handleReset = () => {
-    setIsVerified(false);
-    setShowContent(false);
-    setShowInstructions(false);
-  };
-
   if (!previewData) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -102,16 +65,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     );
   }
 
-  // Skip verification in preview mode
-  if (!isVerified) {
-    handleVerification();
-  }
-
   return (
     <div className="h-screen overflow-auto bg-background">
       <PreviewContent 
         previewData={previewData} 
-        onReset={handleReset}
+        onReset={() => {}}
       />
     </div>
   );
