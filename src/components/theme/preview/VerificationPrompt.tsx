@@ -17,6 +17,14 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
   const showPassword = previewData.verification_type === 'password' || showBothPrompts
   const showAge = previewData.verification_type === 'age' || showBothPrompts
 
+  console.log("Verification colors from database:", {
+    buttonColor: previewData.verification_button_color,
+    buttonTextColor: previewData.verification_button_text_color,
+    textColor: previewData.verification_text_color,
+    checkboxColor: previewData.verification_checkbox_color,
+    inputBorderColor: previewData.verification_input_border_color
+  });
+
   const handleVerification = () => {
     if (showAge && !ageConfirmed) {
       setError("Please confirm your age")
@@ -38,11 +46,14 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
           <img 
             src={previewData.verification_logo_url} 
             alt="Verification" 
-            className="h-16 mx-auto object-contain"
+            className="h-24 mx-auto object-contain" // Increased from h-16 to h-24
           />
         )}
         
-        <h2 className="text-xl font-semibold text-center" style={{ color: previewData.verification_text_color }}>
+        <h2 
+          className="text-xl font-semibold text-center" 
+          style={{ color: previewData.verification_text_color }}
+        >
           Verification Required
         </h2>
 
@@ -89,7 +100,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                 }}
                 className="w-full"
                 style={{ 
-                  borderColor: previewData.verification_input_border_color 
+                  borderColor: previewData.verification_input_border_color,
+                  color: previewData.verification_text_color
                 }}
               />
             </div>
