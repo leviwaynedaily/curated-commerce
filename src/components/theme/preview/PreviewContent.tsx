@@ -3,7 +3,6 @@ import debounce from "lodash.debounce";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { ProductDetailView } from "./ProductDetailView";
 import { ProductGrid } from "./ProductGrid";
-import { ProductFilters } from "./ProductFilters";
 import { PreviewPagination } from "./PreviewPagination";
 import { PreviewHeader } from "./PreviewHeader";
 
