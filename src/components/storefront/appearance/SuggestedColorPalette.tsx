@@ -17,64 +17,68 @@ export function SuggestedColorPalette({ colors, logoUrl }: SuggestedColorPalette
   return (
     <Card className="mt-4">
       <CardContent className="pt-6 space-y-6">
-        {logoUrl && (
-          <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
-            <p className="text-sm text-muted-foreground">Current Logo:</p>
-            <img
-              src={logoUrl}
-              alt="Current logo"
-              className="h-12 w-auto object-contain"
-            />
-          </div>
-        )}
-
-        <h3 className="text-lg font-medium">Suggested Color Palette</h3>
-        
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Primary Colors</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {colors.primary.map((color, index) => (
-                <div key={index} className="flex flex-col items-center space-y-2">
-                  <div
-                    className="w-16 h-16 rounded-lg border"
-                    style={{ backgroundColor: color }}
-                  />
-                  <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+        <div className="flex items-start justify-between">
+          <div className="space-y-6 flex-1">
+            <h3 className="text-lg font-medium">Suggested Color Palette</h3>
+            
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Primary Colors</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {colors.primary.map((color, index) => (
+                    <div key={index} className="flex flex-col items-center space-y-2">
+                      <div
+                        className="w-16 h-16 rounded-lg border"
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Secondary Colors</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {colors.secondary.map((color, index) => (
+                    <div key={index} className="flex flex-col items-center space-y-2">
+                      <div
+                        className="w-16 h-16 rounded-lg border"
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-sm font-medium">Accent Colors</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                  {colors.accent.map((color, index) => (
+                    <div key={index} className="flex flex-col items-center space-y-2">
+                      <div
+                        className="w-16 h-16 rounded-lg border"
+                        style={{ backgroundColor: color }}
+                      />
+                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Secondary Colors</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {colors.secondary.map((color, index) => (
-                <div key={index} className="flex flex-col items-center space-y-2">
-                  <div
-                    className="w-16 h-16 rounded-lg border"
-                    style={{ backgroundColor: color }}
-                  />
-                  <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
-                </div>
-              ))}
+          {logoUrl && (
+            <div className="ml-8 p-4 bg-muted rounded-lg min-w-[200px]">
+              <p className="text-sm text-muted-foreground mb-2">Current Logo:</p>
+              <img
+                src={logoUrl}
+                alt="Current logo"
+                className="w-full h-auto object-contain"
+              />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Accent Colors</h4>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-              {colors.accent.map((color, index) => (
-                <div key={index} className="flex flex-col items-center space-y-2">
-                  <div
-                    className="w-16 h-16 rounded-lg border"
-                    style={{ backgroundColor: color }}
-                  />
-                  <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          )}
         </div>
       </CardContent>
     </Card>
