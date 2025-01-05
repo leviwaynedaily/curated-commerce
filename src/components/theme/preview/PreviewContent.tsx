@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { PreviewHeader } from "./PreviewHeader";
+import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import debounce from "lodash.debounce";
 import { Badge } from "@/components/ui/badge";
 import { PreviewPagination } from "./PreviewPagination";
@@ -93,7 +94,7 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: colors.background.primary }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: colors.background.primary }}>
       <PreviewHeader
         colors={colors}
         logo_url={isScrolled ? previewData.logo_url : undefined}
@@ -110,7 +111,7 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
         onLogoClick={onReset}
       />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 flex-1">
         <div 
           className={`flex flex-col items-center mb-8 transition-all duration-500 ease-in-out ${
             isScrolled ? 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden' : 'opacity-100 translate-y-0'
@@ -188,6 +189,11 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
           colors={colors}
         />
       </div>
+
+      <PreviewLegalFooter 
+        colors={colors}
+        businessName={previewData.name}
+      />
     </div>
   );
 }
