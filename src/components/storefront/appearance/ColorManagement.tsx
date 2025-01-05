@@ -5,6 +5,7 @@ import { extractColors } from "@/utils/colorExtractor";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "./ColorPicker";
 import { SuggestedColorPalette } from "./SuggestedColorPalette";
+import { useToast } from "@/hooks/use-toast";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -19,6 +20,7 @@ interface ColorPalette {
 }
 
 export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagementProps) {
+  const { toast } = useToast();
   const [predefinedColors, setPredefinedColors] = useState<ColorPalette>({
     primary: [],
     secondary: [],
@@ -42,6 +44,12 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       const colors = await extractColors(logoUrl);
       console.log('Generated color palette:', colors);
       setPredefinedColors(colors);
+      
+      // Show success toast
+      toast({
+        title: "Colors Generated",
+        description: "Color suggestions have been generated from your logo.",
+      });
     }
   };
 
@@ -61,6 +69,17 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </div>
       </CardHeader>
       <CardContent className="space-y-8">
+        {logoUrl && (
+          <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">Current Logo:</p>
+            <img
+              src={logoUrl}
+              alt="Current logo"
+              className="h-12 w-auto object-contain"
+            />
+          </div>
+        )}
+
         <SuggestedColorPalette colors={predefinedColors} />
 
         <div className="space-y-6">
