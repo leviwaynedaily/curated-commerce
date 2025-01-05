@@ -43,7 +43,7 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[20rem] sm:aspect-[4/6]' // Increased height for small grid
+        return 'min-h-[20rem] sm:aspect-[4/6]'
       case 'large':
         return 'min-h-[24rem] md:aspect-video'
       case 'list':
@@ -56,7 +56,7 @@ export function ProductGrid({
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative", // Adjusted for small grid
+        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative",
         textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
@@ -70,7 +70,7 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-3`}>
+    <div className={`grid ${getGridColumns()} gap-4 p-1`}>
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
@@ -116,7 +116,7 @@ export function ProductGrid({
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                    fontSize: layout === 'small' ? '12px' : '14px' // Smaller font for small grid
+                    fontSize: layout === 'small' ? '12px' : '14px'
                   }}
                 >
                   {product.name}
@@ -127,7 +127,7 @@ export function ProductGrid({
                     style={{ 
                       color: productDescriptionTextColor,
                       fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                      fontSize: layout === 'small' ? '10px' : '12px' // Smaller font for small grid
+                      fontSize: layout === 'small' ? '10px' : '12px'
                     }}
                   >
                     {product.description}
@@ -138,11 +138,11 @@ export function ProductGrid({
                 className="space-y-1 text-sm font-open-sans mt-2"
                 style={{ color: productPriceColor }}
               >
-                <div className="flex items-center gap-1 text-xs"> {/* Reduced gap and font size */}
+                <div className="flex items-center gap-1 text-xs">
                   <span className="font-medium">In Town:</span>
                   <span>${product.in_town_price}</span>
                 </div>
-                <div className="flex items-center gap-1 text-xs"> {/* Reduced gap and font size */}
+                <div className="flex items-center gap-1 text-xs">
                   <span className="font-medium">Ship:</span>
                   <span>${product.shipping_price}</span>
                 </div>
