@@ -46,7 +46,16 @@ export function HeaderDropdown({
           <Settings2 className="h-4 w-4" style={{ color: mainColor }} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm" onCloseAutoFocus={(e) => e.preventDefault()}>
+      <DropdownMenuContent 
+        className="w-56 bg-white/95 backdrop-blur-sm" 
+        onCloseAutoFocus={(e) => e.preventDefault()}
+        onInteractOutside={(e) => {
+          // Only close when clicking outside, not when selecting options
+          if (e.target instanceof Node && !e.currentTarget.contains(e.target)) {
+            e.currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
+          }
+        }}
+      >
         {categories.length > 0 && (
           <>
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
