@@ -43,21 +43,21 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[20rem] sm:aspect-[3/5]' // Increased minimum height to accommodate prices
+        return 'aspect-[3/5]'
       case 'large':
-        return 'min-h-[24rem] md:aspect-video'
+        return 'aspect-video'
       case 'list':
-        return 'min-h-[24rem]'
+        return 'min-h-[20rem] md:min-h-[24rem]'
       default: // medium
-        return 'min-h-[20rem] sm:aspect-[2/3]'
+        return 'aspect-[2/3]'
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative", // Adjusted image height for small layout
-        textContainer: `p-3 flex flex-col justify-between flex-grow`,
+        imageContainer: "h-3/5 relative",
+        textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
     } else {
@@ -70,7 +70,7 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-3`}>
+    <div className={`grid ${getGridColumns()} gap-4`}>
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
@@ -93,14 +93,14 @@ export function ProductGrid({
             )}
             
             <div 
-              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
+              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : 'flex flex-col h-2/5'} ${styles.textContainer}`}
             >
               <div>
-                <div className="flex gap-1 flex-wrap mb-1">
+                <div className="flex gap-2 flex-wrap mb-2">
                   {product.category && (
                     <Badge 
                       variant="outline" 
-                      className={`text-xs ${textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}`}
+                      className={textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}
                       style={{
                         backgroundColor: productCategoryBackgroundColor,
                         color: productCategoryTextColor,
@@ -116,18 +116,18 @@ export function ProductGrid({
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                    fontSize: layout === 'small' ? '12px' : '14px'
+                    fontSize: '14px'
                   }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p 
-                    className="font-open-sans text-xs line-clamp-2 mb-1"
+                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
                     style={{ 
                       color: productDescriptionTextColor,
                       fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                      fontSize: layout === 'small' ? '10px' : '12px'
+                      fontSize: '12px'
                     }}
                   >
                     {product.description}
@@ -135,14 +135,14 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-0.5 text-xs font-open-sans mt-1"
+                className="space-y-1 text-sm font-open-sans mt-auto"
                 style={{ color: productPriceColor }}
               >
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <span className="font-medium">In Town:</span>
                   <span>${product.in_town_price}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <span className="font-medium">Ship:</span>
                   <span>${product.shipping_price}</span>
                 </div>
