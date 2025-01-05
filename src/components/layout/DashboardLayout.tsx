@@ -16,13 +16,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen flex w-full">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[200px] border-r">
+      <div className="hidden md:block w-[225px] border-r">
         <DashboardSidebar />
       </div>
 
       {/* Mobile Sidebar */}
       <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-        <SheetContent side="left" className="p-0 w-[200px]">
+        <SheetContent side="left" className="p-0 w-[225px]">
           <DashboardSidebar />
         </SheetContent>
       </Sheet>
