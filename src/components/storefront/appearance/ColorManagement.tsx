@@ -119,7 +119,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div>
           <h4 className="text-sm font-medium mb-4">General Colors</h4>
           <ColorPicker name="main_color" label="Main Color" />
@@ -135,31 +135,31 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
           <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
           <ColorPicker name="verification_input_border_color" label="Input Border Color" />
         </div>
-      </div>
 
-      <div>
-        <h4 className="text-sm font-medium mb-4">Suggested Colors</h4>
-        {Object.entries(predefinedColors).map(([category, colors]) => (
-          <div key={category} className="mb-6">
-            <h5 className="text-xs font-medium capitalize mb-2">{category}</h5>
-            <div className="flex flex-wrap gap-2">
-              {colors.map((color) => (
-                <button
-                  key={color.value}
-                  type="button"
-                  onClick={() => form.setValue("main_color", color.value)}
-                  className="group relative h-8 w-8 rounded-full border"
-                  style={{ backgroundColor: color.value }}
-                  title={color.name}
-                >
-                  <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
-                    {color.name}
-                  </span>
-                </button>
-              ))}
+        <div>
+          <h4 className="text-sm font-medium mb-4">Suggested Colors</h4>
+          {Object.entries(predefinedColors).map(([category, colors]) => (
+            <div key={category} className="mb-6">
+              <h5 className="text-xs font-medium capitalize mb-2">{category}</h5>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((color) => (
+                  <button
+                    key={color.value}
+                    type="button"
+                    onClick={() => form.setValue("main_color", color.value)}
+                    className="group relative h-8 w-8 rounded-full border"
+                    style={{ backgroundColor: color.value }}
+                    title={color.name}
+                  >
+                    <span className="absolute -bottom-6 left-1/2 hidden -translate-x-1/2 rounded bg-black/75 px-2 py-1 text-xs text-white group-hover:block">
+                      {color.name}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
