@@ -2,7 +2,9 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   LayoutDashboard, 
   Package2,
@@ -18,6 +20,29 @@ interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  // Query to get the current storefront
+  const { data: storefront } = useQuery({
+    queryKey: ["current-storefront"],
+    queryFn: async () => {
+      const lastStorefrontId = localStorage.getItem('lastStorefrontId');
+      if (!lastStorefrontId) return null;
+
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("id", lastStorefrontId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        return null;
+      }
+
+      return data;
+    },
+  });
 
   const routes = [
     {
@@ -59,7 +84,12 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     {
       label: 'Live Preview',
       icon: Eye,
-      href: '/preview',
+      onClick: () => {
+        if (storefront?.id) {
+          navigate(`/preview?storefrontId=${storefront.id}`);
+        }
+      },
+      href: '#',
       active: location.pathname === '/preview',
     },
   ];
@@ -83,12 +113,20 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 key={route.href}
                 variant={route.active ? "secondary" : "ghost"}
                 className="w-full justify-start"
-                asChild
+                onClick={route.onClick}
+                asChild={!route.onClick}
               >
-                <Link to={route.href}>
-                  <route.icon className="mr-2 h-4 w-4" />
-                  {route.label}
-                </Link>
+                {route.onClick ? (
+                  <div className="flex items-center">
+                    <route.icon className="mr-2 h-4 w-4" />
+                    {route.label}
+                  </div>
+                ) : (
+                  <Link to={route.href}>
+                    <route.icon className="mr-2 h-4 w-4" />
+                    {route.label}
+                  </Link>
+                )}
               </Button>
             ))}
           </div>
