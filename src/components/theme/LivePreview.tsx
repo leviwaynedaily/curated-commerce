@@ -29,8 +29,10 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         return;
       }
 
-      // Cast the theme_config to ThemeConfig type
-      const themeConfig = data.theme_config as ThemeConfig;
+      // Safely cast the theme_config to ThemeConfig type
+      const themeConfig = data.theme_config as unknown as ThemeConfig;
+      console.log("Parsed theme config:", themeConfig);
+      
       setPreviewData({
         name: data.name,
         description: data.description,
@@ -59,7 +61,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
             name: newData.name,
             description: newData.description,
             logo_url: newData.logo_url,
-            theme_config: newData.theme_config as ThemeConfig
+            theme_config: newData.theme_config as unknown as ThemeConfig
           });
         }
       )
