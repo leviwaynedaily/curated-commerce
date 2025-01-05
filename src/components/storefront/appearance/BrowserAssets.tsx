@@ -10,7 +10,7 @@ interface BrowserAssetsProps {
 export function BrowserAssets({ form, storefrontId }: BrowserAssetsProps) {
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-medium">Browser Assets</h3>
+      <h4 className="text-sm font-medium">Browser Assets</h4>
       <FormField
         control={form.control}
         name="favicon_url"
