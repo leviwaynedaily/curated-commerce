@@ -24,10 +24,10 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
 
     // Check file type
     const fileType = file.type.toLowerCase();
-    if (!fileType.match(/^image\/(png|jpeg|jpg|svg\+xml)$/)) {
+    if (!fileType.match(/^image\/(png|jpeg|jpg|svg\+xml|x-icon|vnd.microsoft.icon)$/)) {
       toast({
         title: "Invalid file type",
-        description: "Please upload a PNG, JPEG, or SVG file",
+        description: "Please upload a PNG, JPEG, SVG, or ICO file",
         variant: "destructive",
       });
       return;
@@ -37,7 +37,10 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       setIsUploading(true);
       console.log("Starting file upload for storefront:", storefrontId);
 
-      const fileExt = fileType === 'image/svg+xml' ? 'svg' : file.name.split('.').pop();
+      const fileExt = fileType === 'image/svg+xml' ? 'svg' : 
+                     fileType.includes('icon') ? 'ico' : 
+                     file.name.split('.').pop();
+                     
       // Include storefrontId in the path if available
       const filePath = storefrontId 
         ? `${storefrontId}/${path}/${Math.random()}.${fileExt}`
@@ -48,7 +51,7 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
-          contentType: fileType // Explicitly set content type for proper handling of SVGs
+          contentType: fileType // Explicitly set content type for proper handling
         });
 
       if (uploadError) throw uploadError;
@@ -58,10 +61,13 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
         .getPublicUrl(filePath);
 
       console.log("File uploaded successfully, public URL:", publicUrl);
+      
+      // Update the form value
       onChange(publicUrl);
 
-      // Invalidate the storefront query to refresh the data
+      // Force an immediate invalidation of the storefront query
       if (storefrontId) {
+        console.log("Invalidating storefront query after file upload");
         await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
       }
 
@@ -82,9 +88,11 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
   };
 
   const handleRemove = async () => {
+    console.log("Removing image, current value:", value);
     onChange(null);
-    // Invalidate the storefront query to refresh the data
+    // Force an immediate invalidation of the storefront query
     if (storefrontId) {
+      console.log("Invalidating storefront query after image removal");
       await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
     }
   };
@@ -94,7 +102,7 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       <div className="flex items-center gap-4">
         <input
           type="file"
-          accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+          accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/x-icon,image/vnd.microsoft.icon"
           onChange={handleUpload}
           disabled={isUploading}
           className="hidden"
