@@ -30,6 +30,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   useEffect(() => {
     const loadColors = async () => {
       if (logoUrl) {
+        console.log('Initial color extraction from logo URL:', logoUrl);
         const colors = await extractColors(logoUrl);
         setPredefinedColors(colors);
       }
@@ -40,7 +41,8 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   const handleSuggestColors = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Prevent form submission
     if (logoUrl) {
-      console.log('Suggesting colors from logo:', logoUrl);
+      console.log('Suggesting colors from logo URL:', logoUrl);
+      console.log('Current logo preview element:', document.querySelector('img[alt="Current logo"]')?.getAttribute('src'));
       const colors = await extractColors(logoUrl);
       console.log('Generated color palette:', colors);
       setPredefinedColors(colors);
