@@ -14,7 +14,7 @@ interface PreviewContentProps {
 
 export function PreviewContent({ previewData, colors, onReset }: PreviewContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('medium');
+  const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('small'); // Changed default from 'medium' to 'small'
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentSort, setCurrentSort] = useState('newest');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
