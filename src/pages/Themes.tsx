@@ -2,15 +2,13 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ThemePreview } from "@/components/theme/ThemePreview";
 import { z } from "zod";
-import { ThemeConfig } from "@/types/theme";
+import { ThemeGrid } from "@/components/theme/ThemeGrid";
 import { Tables } from "@/integrations/supabase/types";
 
-// Schema for theme validation
 const themeConfigSchema = z.object({
   colors: z.object({
     background: z.object({
@@ -29,12 +27,28 @@ const themeConfigSchema = z.object({
 const Themes = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
+  // Fetch current storefront to get its theme_config
+  const { data: storefront } = useQuery({
+    queryKey: ["storefront", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("theme_config")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentStorefrontId
+  });
+
   // Fetch themes
-  const { data: themes, refetch: refetchThemes } = useQuery({
+  const { data: themes } = useQuery({
     queryKey: ["themes"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -46,6 +60,11 @@ const Themes = () => {
       return data as Tables<"themes">[];
     },
   });
+
+  // Find selected theme by comparing theme_config
+  const selectedThemeId = themes?.find(theme => 
+    JSON.stringify(theme.layout_config) === JSON.stringify(storefront?.theme_config)
+  )?.id || null;
 
   // Mutation to apply theme to storefront
   const applyThemeMutation = useMutation({
@@ -112,7 +131,7 @@ const Themes = () => {
         description: "Theme imported successfully",
       });
 
-      refetchThemes();
+      queryClient.invalidateQueries({ queryKey: ["themes"] });
     } catch (error) {
       console.error("Error importing theme:", error);
       toast({
@@ -138,7 +157,6 @@ const Themes = () => {
       return;
     }
 
-    setSelectedTheme(themeId);
     applyThemeMutation.mutate(themeId);
   };
 
@@ -191,47 +209,11 @@ const Themes = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {themes?.map((theme) => {
-            // First cast to unknown, then to ThemeConfig to satisfy TypeScript
-            const layoutConfig = (theme.layout_config as unknown) as ThemeConfig;
-            
-            return (
-              <div
-                key={theme.id}
-                className={`border rounded-lg p-4 transition-all ${
-                  selectedTheme === theme.id
-                    ? "ring-2 ring-primary"
-                    : "hover:border-primary"
-                }`}
-              >
-                <ThemePreview 
-                  theme={{
-                    name: theme.name,
-                    layout_config: layoutConfig
-                  }} 
-                />
-                <div className="mt-4 space-y-4">
-                  <div>
-                    <h3 className="font-semibold">{theme.name}</h3>
-                    {theme.description && (
-                      <p className="text-sm text-muted-foreground">
-                        {theme.description}
-                      </p>
-                    )}
-                  </div>
-                  <Button 
-                    onClick={() => handleApplyTheme(theme.id)}
-                    className="w-full"
-                    variant={selectedTheme === theme.id ? "secondary" : "default"}
-                  >
-                    {selectedTheme === theme.id ? "Theme Applied" : "Apply Theme"}
-                  </Button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        <ThemeGrid 
+          themes={themes || []}
+          selectedThemeId={selectedThemeId}
+          onApplyTheme={handleApplyTheme}
+        />
       </div>
     </DashboardLayout>
   );
