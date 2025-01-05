@@ -78,6 +78,11 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
     return tmp.textContent || tmp.innerText || '';
   };
 
+  const handleLogoClick = () => {
+    console.log("Logo clicked, resetting verification");
+    onReset();
+  };
+
   if (selectedProduct) {
     return (
       <ProductDetailView
@@ -114,7 +119,8 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
             <img 
               src={previewData.logo_url} 
               alt={previewData.name} 
-              className="h-24 object-contain mb-4"
+              className="h-24 object-contain mb-4 cursor-pointer"
+              onClick={handleLogoClick}
             />
           )}
           
