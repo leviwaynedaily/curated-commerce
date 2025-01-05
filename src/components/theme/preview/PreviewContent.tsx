@@ -1,45 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { PreviewData } from "@/types/preview";
 import { PreviewHeader } from "./PreviewHeader";
 import debounce from "lodash.debounce";
 import { Badge } from "@/components/ui/badge";
+import { PreviewPagination } from "./PreviewPagination";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 
 interface PreviewContentProps {
-  previewData: PreviewData;
+  previewData: any;
   colors: any;
   onReset: () => void;
 }
 
 export function PreviewContent({ previewData, colors, onReset }: PreviewContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('small'); // Changed default from 'medium' to 'small'
+  const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('small');
   const [isScrolled, setIsScrolled] = useState(false);
   const [currentSort, setCurrentSort] = useState('newest');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: products } = useQuery({
-    queryKey: ["preview-products", previewData.id],
-    queryFn: async () => {
-      console.log("Fetching products for preview", previewData.id);
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("storefront_id", previewData.id)
-        .eq("status", "active")
-        .order("sort_order", { ascending: true });
-
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-
-      console.log("Fetched products:", data);
-      return data;
-    },
-    enabled: !!previewData.id,
-  });
+  const { data: productsData } = useStorefrontProducts(previewData.id, currentPage);
+  const products = productsData?.products || [];
 
   useEffect(() => {
     const handleScroll = debounce(() => {
@@ -56,6 +37,11 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isScrolled]);
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory, currentSort]);
 
   const categories = products 
     ? [...new Set(products.map(product => product.category).filter(Boolean))]
@@ -177,21 +163,15 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
                         </Badge>
                       )}
                     </div>
-                    <h3 
-                      className="font-semibold text-white mb-1"
-                    >
+                    <h3 className="font-semibold text-white mb-1">
                       {product.name}
                     </h3>
                     {product.description && (
-                      <p 
-                        className="text-sm text-white/80 line-clamp-2"
-                      >
+                      <p className="text-sm text-white/80 line-clamp-2">
                         {product.description}
                       </p>
                     )}
-                    <div 
-                      className="text-sm font-medium mt-2 text-white"
-                    >
+                    <div className="text-sm font-medium mt-2 text-white">
                       ${product.in_town_price}
                     </div>
                   </div>
@@ -200,6 +180,13 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
             </div>
           ))}
         </div>
+
+        <PreviewPagination
+          currentPage={currentPage}
+          totalPages={productsData?.totalPages || 1}
+          onPageChange={setCurrentPage}
+          colors={colors}
+        />
       </div>
     </div>
   );
