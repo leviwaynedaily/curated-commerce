@@ -14,6 +14,7 @@ export function VerificationColors({ form, onColorChange }: VerificationColorsPr
     { field: "verification_text_color", label: "Text Color" },
     { field: "verification_checkbox_color", label: "Checkbox Color" },
     { field: "verification_input_border_color", label: "Input Border" },
+    { field: "verification_next_text_color", label: "Next Button Text" },
   ].map(({ field, label }) => ({
     color: form.watch(field),
     label,

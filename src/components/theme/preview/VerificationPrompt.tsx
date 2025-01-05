@@ -23,7 +23,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
     buttonText: previewData.verification_button_text_color || '#FFFFFF',
     text: previewData.verification_text_color || '#1A1F2C',
     checkbox: previewData.verification_checkbox_color || '#D946EF',
-    inputBorder: previewData.verification_input_border_color || '#E5E7EB'
+    inputBorder: previewData.verification_input_border_color || '#E5E7EB',
+    nextText: previewData.verification_next_text_color || '#4CAF50'
   }
 
   console.log("Verification colors being used:", colors);
@@ -126,7 +127,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
             onClick={handleVerification}
             style={{ 
               backgroundColor: colors.button,
-              color: colors.buttonText,
+              color: previewData.enable_instructions ? colors.nextText : colors.buttonText,
               border: 'none'
             }}
           >
