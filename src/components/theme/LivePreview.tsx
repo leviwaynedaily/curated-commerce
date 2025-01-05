@@ -70,6 +70,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     fetchStorefrontData();
   }, [storefrontId]);
 
+  const handleLogoClick = () => {
+    console.log("Logo clicked, resetting verification state");
+    handleReset();
+  };
+
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen bg-background">
@@ -100,6 +105,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         <PreviewContent 
           previewData={previewData} 
           onReset={handleReset}
+          onLogoClick={handleLogoClick}
         />
       </div>
 
