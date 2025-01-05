@@ -107,24 +107,22 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   );
 
   return (
-    <div className="space-y-6 overflow-visible">
+    <div className="space-y-6">
       <div>
         <h3 className="text-sm font-medium">Colors</h3>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="space-y-4 overflow-y-auto max-h-[calc(100vh-12rem)]">
+        <div className="space-y-4">
           <div className="space-y-4">
-            <h4 className="text-sm font-medium sticky top-0 bg-background py-2">General Colors</h4>
+            <h4 className="text-sm font-medium bg-background py-2">General Colors</h4>
             <ColorPicker name="main_color" label="Main Color" />
             <ColorPicker name="secondary_color" label="Secondary Color" />
             <ColorPicker name="font_color" label="Font Color" />
           </div>
 
-          <Separator className="my-4" />
-
           <div className="space-y-4">
-            <h4 className="text-sm font-medium sticky top-0 bg-background py-2">Verification Colors</h4>
+            <h4 className="text-sm font-medium bg-background py-2">Verification Colors</h4>
             <ColorPicker name="verification_button_color" label="Button Color" />
             <ColorPicker name="verification_button_text_color" label="Button Text Color" />
             <ColorPicker name="verification_text_color" label="Text Color" />

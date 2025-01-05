@@ -39,7 +39,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-8">
       <div className="grid gap-8 lg:grid-cols-[1fr,300px]">
         <div className="space-y-8">
           <BrowserAssets form={form} storefrontId={storefrontId} />
@@ -50,7 +50,7 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
           />
         </div>
         
-        <div>
+        <div className="sticky top-4">
           <Button 
             onClick={openPreviewWindow}
             className="w-full"
