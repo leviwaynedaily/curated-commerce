@@ -94,8 +94,8 @@ export function PreviewHeader({
 
               {categories.length > 0 && (
                 <Select
-                  value={selectedCategory || ""}
-                  onValueChange={(value) => onCategoryChange(value === "" ? null : value)}
+                  value={selectedCategory || "all"}
+                  onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
                 >
                   <SelectTrigger 
                     className="w-[160px]"
@@ -108,7 +108,7 @@ export function PreviewHeader({
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
