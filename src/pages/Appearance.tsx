@@ -69,13 +69,21 @@ const Appearance = () => {
         throw error;
       }
 
-      // Ensure the theme_config matches our expected structure
-      const themeConfig = data?.theme_config as ThemeConfig;
-      if (!themeConfig) {
+      // Validate and ensure the theme_config matches our expected structure
+      const rawThemeConfig = data?.theme_config;
+      if (!rawThemeConfig || typeof rawThemeConfig !== 'object') {
+        console.log("Invalid theme_config, using default:", defaultThemeConfig);
         return { theme_config: defaultThemeConfig };
       }
 
-      console.log("Fetched storefront:", data);
+      // Type assertion after validation
+      const themeConfig = rawThemeConfig as ThemeConfig;
+      if (!themeConfig.colors || !themeConfig.colors.background || !themeConfig.colors.font) {
+        console.log("Incomplete theme_config, using default:", defaultThemeConfig);
+        return { theme_config: defaultThemeConfig };
+      }
+
+      console.log("Fetched storefront theme_config:", themeConfig);
       return { theme_config: themeConfig };
     },
     enabled: !!currentStorefrontId,
@@ -115,7 +123,7 @@ const Appearance = () => {
 
       if (error) throw error;
 
-      await refetch(); // Refetch the data to ensure we have the latest state
+      await refetch();
       
       toast({
         title: "Success",
@@ -143,7 +151,7 @@ const Appearance = () => {
   // Watch for form changes and trigger auto-save
   useEffect(() => {
     const subscription = form.watch((values) => {
-      if (storefront) { // Only auto-save if we have initial data
+      if (storefront) {
         console.log("Form values changed:", values);
         debouncedSave(values as FormValues);
       }
