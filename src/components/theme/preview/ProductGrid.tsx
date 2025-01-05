@@ -47,16 +47,16 @@ export function ProductGrid({
       case 'large':
         return 'aspect-video'
       case 'list':
-        return 'min-h-[12rem] md:min-h-[16rem]' // Changed from fixed height to min-height
+        return 'min-h-[16rem] md:min-h-[20rem]' // Increased height
       default: // medium
-        return 'aspect-[4/5]'
+        return 'aspect-[3/4]' // Changed from 4/5 to 3/4 for better photo fit
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-1/2 relative", // Reduced image height to make more room for text
+        imageContainer: "h-3/5 relative", // Increased image height
         textContainer: `p-4`,
         overlay: "hidden"
       }
@@ -77,7 +77,7 @@ export function ProductGrid({
         return (
           <div 
             key={product.id}
-            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
+            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg transform hover:scale-105 ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
             onClick={() => onProductClick(product)}
             style={{ backgroundColor: productCardBackgroundColor }}
           >
@@ -112,14 +112,14 @@ export function ProductGrid({
                   )}
                 </div>
                 <h3 
-                  className="font-semibold mb-1 text-sm sm:text-base" // Reduced font size
+                  className="font-dancing font-bold mb-1 text-base sm:text-lg" // Changed font and adjusted size
                   style={{ color: productTitleTextColor }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p 
-                    className="text-xs sm:text-sm line-clamp-2 mb-2" // Reduced font size and added margin
+                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2" // Changed font and reduced size
                     style={{ color: productDescriptionTextColor }}
                   >
                     {product.description}
@@ -127,7 +127,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm" // Added spacing between price elements
+                className="space-y-1 text-sm font-open-sans" // Added Open Sans to prices
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-2">

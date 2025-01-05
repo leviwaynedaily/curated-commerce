@@ -18,6 +18,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'open-sans': ['Open Sans', 'sans-serif'],
+        'dancing': ['Dancing Script', 'cursive'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -80,6 +84,10 @@ export default {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0)" },
         },
+        popScale: {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.05)" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -87,6 +95,7 @@ export default {
         fadeIn: "fadeIn 0.5s ease-out",
         slideUp: "slideUp 0.5s ease-out",
         slideDown: "slideDown 0.5s ease-out",
+        popScale: "popScale 0.3s ease-out forwards",
       },
     },
   },
