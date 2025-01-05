@@ -4,7 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { ThemePreview } from "@/components/theme/ThemePreview";
 import { z } from "zod";
 import { ThemeConfig } from "@/types/theme";
@@ -30,8 +30,10 @@ const Themes = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  // Fetch themes with proper typing
+  // Fetch themes
   const { data: themes, refetch: refetchThemes } = useQuery({
     queryKey: ["themes"],
     queryFn: async () => {
@@ -42,6 +44,47 @@ const Themes = () => {
 
       if (error) throw error;
       return data as Tables<"themes">[];
+    },
+  });
+
+  // Mutation to apply theme to storefront
+  const applyThemeMutation = useMutation({
+    mutationFn: async (themeId: string) => {
+      if (!currentStorefrontId) {
+        throw new Error("No storefront selected");
+      }
+
+      const { data: theme, error: themeError } = await supabase
+        .from("themes")
+        .select("layout_config")
+        .eq("id", themeId)
+        .single();
+
+      if (themeError) throw themeError;
+
+      const { error: updateError } = await supabase
+        .from("storefronts")
+        .update({ theme_config: theme.layout_config })
+        .eq("id", currentStorefrontId);
+
+      if (updateError) throw updateError;
+
+      return theme;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Theme Applied",
+        description: "Your storefront theme has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["storefront", currentStorefrontId] });
+    },
+    onError: (error) => {
+      console.error("Error applying theme:", error);
+      toast({
+        title: "Error",
+        description: "Failed to apply theme. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -85,6 +128,20 @@ const Themes = () => {
     }
   };
 
+  const handleApplyTheme = async (themeId: string) => {
+    if (!currentStorefrontId) {
+      toast({
+        title: "Error",
+        description: "Please select a storefront first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSelectedTheme(themeId);
+    applyThemeMutation.mutate(themeId);
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -121,12 +178,11 @@ const Themes = () => {
             return (
               <div
                 key={theme.id}
-                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                className={`border rounded-lg p-4 transition-all ${
                   selectedTheme === theme.id
                     ? "ring-2 ring-primary"
                     : "hover:border-primary"
                 }`}
-                onClick={() => setSelectedTheme(theme.id)}
               >
                 <ThemePreview 
                   theme={{
@@ -134,13 +190,22 @@ const Themes = () => {
                     layout_config: layoutConfig
                   }} 
                 />
-                <div className="mt-4">
-                  <h3 className="font-semibold">{theme.name}</h3>
-                  {theme.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {theme.description}
-                    </p>
-                  )}
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <h3 className="font-semibold">{theme.name}</h3>
+                    {theme.description && (
+                      <p className="text-sm text-muted-foreground">
+                        {theme.description}
+                      </p>
+                    )}
+                  </div>
+                  <Button 
+                    onClick={() => handleApplyTheme(theme.id)}
+                    className="w-full"
+                    variant={selectedTheme === theme.id ? "secondary" : "default"}
+                  >
+                    {selectedTheme === theme.id ? "Theme Applied" : "Apply Theme"}
+                  </Button>
                 </div>
               </div>
             );
