@@ -4,12 +4,48 @@ import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Database } from "@/integrations/supabase/types";
+import { ThemeConfig } from "@/types/theme";
 
 interface LivePreviewProps {
   storefrontId: string;
 }
 
 type StorefrontRow = Database['public']['Tables']['storefronts']['Row'];
+
+// Helper function to validate theme config
+const validateThemeConfig = (config: unknown): ThemeConfig => {
+  if (typeof config !== 'object' || !config) {
+    throw new Error('Invalid theme config');
+  }
+
+  const themeConfig = config as any;
+  
+  if (!themeConfig.colors?.background?.primary ||
+      !themeConfig.colors?.background?.secondary ||
+      !themeConfig.colors?.background?.accent ||
+      !themeConfig.colors?.font?.primary ||
+      !themeConfig.colors?.font?.secondary ||
+      !themeConfig.colors?.font?.highlight) {
+    console.error('Invalid theme config structure:', themeConfig);
+    // Return default theme config
+    return {
+      colors: {
+        background: {
+          primary: "#000000",
+          secondary: "#f5f5f5",
+          accent: "#56b533"
+        },
+        font: {
+          primary: "#ffffff",
+          secondary: "#cccccc",
+          highlight: "#ee459a"
+        }
+      }
+    };
+  }
+
+  return themeConfig as ThemeConfig;
+};
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [previewData, setPreviewData] = useState<PreviewData>({});
@@ -36,7 +72,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         name: data.name,
         description: data.description,
         logo_url: data.logo_url,
-        theme_config: data.theme_config as PreviewData['theme_config'],
+        theme_config: validateThemeConfig(data.theme_config),
         verification_type: data.verification_type,
         verification_age_text: data.verification_age_text,
         verification_legal_text: data.verification_legal_text,
@@ -68,7 +104,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
             name: newData.name,
             description: newData.description,
             logo_url: newData.logo_url,
-            theme_config: newData.theme_config as PreviewData['theme_config'],
+            theme_config: validateThemeConfig(newData.theme_config),
             verification_type: newData.verification_type,
             verification_age_text: newData.verification_age_text,
             verification_legal_text: newData.verification_legal_text,
