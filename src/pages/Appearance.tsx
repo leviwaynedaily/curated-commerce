@@ -78,7 +78,7 @@ const Appearance = () => {
 
       // Type assertion after validation
       const themeConfig = rawThemeConfig as ThemeConfig;
-      if (!themeConfig.colors || !themeConfig.colors.background || !themeConfig.colors.font) {
+      if (!themeConfig.colors?.background || !themeConfig.colors?.font) {
         console.log("Incomplete theme_config, using default:", defaultThemeConfig);
         return { theme_config: defaultThemeConfig };
       }
