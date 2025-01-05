@@ -108,15 +108,6 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
     <div className="space-y-8">
       <div>
         <h3 className="text-lg font-medium mb-4">Colors</h3>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleSuggestColors}
-          className="w-auto mb-8"
-        >
-          <Wand2 className="mr-2 h-4 w-4" />
-          Suggest from Logo
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -138,6 +129,15 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
 
         <div>
           <h4 className="text-sm font-medium mb-4">Suggested Colors</h4>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSuggestColors}
+            className="w-auto mb-6"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            Suggest from Logo
+          </Button>
           {Object.entries(predefinedColors).map(([category, colors]) => (
             <div key={category} className="mb-6">
               <h5 className="text-xs font-medium capitalize mb-2">{category}</h5>
