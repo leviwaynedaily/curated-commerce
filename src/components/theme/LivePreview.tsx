@@ -90,6 +90,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   };
 
   const handleContinue = () => {
+    setShowInstructions(false);
     setShowContent(true);
   };
 
@@ -114,6 +115,27 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
           previewData={previewData} 
           onVerify={handleVerification}
         />
+      )}
+      {isVerified && showInstructions && previewData.enable_instructions && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <div className="w-[280px] rounded-lg shadow-xl bg-card p-4 space-y-4">
+            <div 
+              className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
+              dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
+            />
+            <button
+              className="w-full h-7 text-xs rounded"
+              onClick={handleContinue}
+              style={{ 
+                backgroundColor: previewData.verification_button_color,
+                color: previewData.verification_button_text_color,
+                border: 'none'
+              }}
+            >
+              Continue to Site
+            </button>
+          </div>
+        </div>
       )}
       {((isVerified && showContent) || previewData.verification_type === 'none') && (
         <PreviewContent 
