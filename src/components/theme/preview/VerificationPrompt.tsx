@@ -58,7 +58,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
 
         <div className="space-y-6">
           {showAge && (
-            <div className="flex items-start space-x-3">
+            <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="age-verification"
@@ -67,11 +67,15 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                     setAgeConfirmed(checked as boolean);
                     setError(null);
                   }}
-                  accentColor={colors.background.accent}
+                  className="h-5 w-5 rounded-sm border cursor-pointer"
+                  style={{
+                    borderColor: colors.background.accent,
+                    backgroundColor: ageConfirmed ? colors.background.accent : 'transparent',
+                  }}
                 />
                 <label 
                   htmlFor="age-verification" 
-                  className="text-sm cursor-pointer"
+                  className="text-sm cursor-pointer select-none"
                   style={{ color: colors.font.secondary }}
                 >
                   {previewData.verification_age_text}
