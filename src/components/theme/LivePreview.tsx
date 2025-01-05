@@ -44,6 +44,9 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
           .match({ id: storefrontId, is_published: true })
           .maybeSingle();
 
+        console.log("Supabase response - Data:", data);
+        console.log("Supabase response - Error:", error);
+
         if (error) {
           console.error("Error fetching storefront:", error);
           setError("An error occurred while loading the store.");
@@ -53,8 +56,22 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
         if (!data) {
           console.error("No storefront found or not published");
-          setError("This store is not available or has not been published.");
-          toast.error("This store is not available or has not been published.");
+          // Let's check if the storefront exists but is not published
+          const { data: unpublishedData } = await supabase
+            .from("storefronts")
+            .select()
+            .match({ id: storefrontId })
+            .maybeSingle();
+          
+          console.log("Checking unpublished storefront:", unpublishedData);
+          
+          if (unpublishedData) {
+            setError("This store exists but has not been published yet.");
+            toast.error("This store exists but has not been published yet.");
+          } else {
+            setError("This store is not available.");
+            toast.error("This store is not available.");
+          }
           return;
         }
 
@@ -79,6 +96,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
     fetchStorefrontData();
   }, [storefrontId]);
+
+  // ... keep existing code (handleVerification, handleContinue, handleReset functions)
 
   if (error) {
     return (
