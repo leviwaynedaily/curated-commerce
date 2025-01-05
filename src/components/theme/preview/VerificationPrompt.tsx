@@ -33,20 +33,26 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
   };
 
   return (
-    <div className="fixed inset-0 backdrop-blur-md bg-black/50 flex items-center justify-center p-4">
+    <div 
+      className="fixed inset-0 backdrop-blur-lg flex items-center justify-center p-4"
+      style={{ backgroundColor: `${colors.background.primary}99` }} // Using alpha for transparency
+    >
       <div 
-        className="max-w-md w-full rounded-lg p-8 space-y-6"
-        style={{ backgroundColor: "white" }}
+        className="max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl"
+        style={{ backgroundColor: colors.background.secondary }}
       >
         {previewData.verification_logo_url && (
           <img 
             src={previewData.verification_logo_url} 
             alt="Verification" 
-            className="h-20 mx-auto"
+            className="h-32 mx-auto object-contain" // Increased logo size
           />
         )}
         
-        <h2 className="text-2xl font-bold text-center text-black">
+        <h2 
+          className="text-2xl font-bold text-center"
+          style={{ color: colors.font.primary }}
+        >
           Verification Required
         </h2>
 
@@ -64,7 +70,8 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
               />
               <label 
                 htmlFor="age-verification" 
-                className="text-sm text-gray-700 cursor-pointer"
+                className="text-sm cursor-pointer"
+                style={{ color: colors.font.secondary }}
               >
                 {previewData.verification_age_text}
               </label>
@@ -73,7 +80,10 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
 
           {showPassword && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label 
+                className="text-sm font-medium"
+                style={{ color: colors.font.primary }}
+              >
                 Site Password
               </label>
               <Input
@@ -85,19 +95,24 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                   setError(null);
                 }}
                 className="w-full"
+                style={{
+                  backgroundColor: colors.background.primary,
+                  color: colors.font.primary,
+                  borderColor: `${colors.font.secondary}33`
+                }}
               />
             </div>
           )}
 
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <p className="text-destructive text-sm">{error}</p>
           )}
 
           <Button 
             className="w-full"
             style={{
-              backgroundColor: "#FF69B4",
-              color: "white"
+              backgroundColor: colors.background.accent,
+              color: colors.font.primary
             }}
             onClick={handleVerification}
           >
@@ -105,7 +120,8 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
           </Button>
 
           <p 
-            className="text-sm text-center text-gray-600"
+            className="text-sm text-center"
+            style={{ color: colors.font.secondary }}
           >
             {previewData.verification_legal_text}
           </p>
