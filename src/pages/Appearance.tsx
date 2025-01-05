@@ -73,24 +73,38 @@ const Appearance = () => {
       }
 
       // Ensure theme_config is properly structured
-      const themeConfig = data?.theme_config;
-      if (!themeConfig || typeof themeConfig !== 'object' || Array.isArray(themeConfig)) {
+      const themeConfig = data?.theme_config as { 
+        colors?: { 
+          background?: { 
+            primary?: string;
+            secondary?: string;
+            accent?: string;
+          };
+          font?: {
+            primary?: string;
+            secondary?: string;
+            highlight?: string;
+          };
+        };
+      } | null;
+
+      if (!themeConfig || !themeConfig.colors) {
         console.log("Invalid theme_config, using default:", defaultThemeConfig);
         return { theme_config: defaultThemeConfig, logo_url: data?.logo_url };
       }
 
       // Validate theme_config structure
-      const validatedConfig = {
+      const validatedConfig: ThemeConfig = {
         colors: {
           background: {
-            primary: themeConfig.colors?.background?.primary || defaultThemeConfig.colors.background.primary,
-            secondary: themeConfig.colors?.background?.secondary || defaultThemeConfig.colors.background.secondary,
-            accent: themeConfig.colors?.background?.accent || defaultThemeConfig.colors.background.accent,
+            primary: themeConfig.colors.background?.primary || defaultThemeConfig.colors.background.primary,
+            secondary: themeConfig.colors.background?.secondary || defaultThemeConfig.colors.background.secondary,
+            accent: themeConfig.colors.background?.accent || defaultThemeConfig.colors.background.accent,
           },
           font: {
-            primary: themeConfig.colors?.font?.primary || defaultThemeConfig.colors.font.primary,
-            secondary: themeConfig.colors?.font?.secondary || defaultThemeConfig.colors.font.secondary,
-            highlight: themeConfig.colors?.font?.highlight || defaultThemeConfig.colors.font.highlight,
+            primary: themeConfig.colors.font?.primary || defaultThemeConfig.colors.font.primary,
+            secondary: themeConfig.colors.font?.secondary || defaultThemeConfig.colors.font.secondary,
+            highlight: themeConfig.colors.font?.highlight || defaultThemeConfig.colors.font.highlight,
           },
         },
       };
