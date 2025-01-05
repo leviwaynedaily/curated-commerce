@@ -3,12 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, Globe, Link as LinkIcon } from "lucide-react";
+import { Loader2, Globe, Link as LinkIcon, Eye } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 const DomainManagement = () => {
   const [subdomain, setSubdomain] = useState("");
@@ -80,19 +81,56 @@ const DomainManagement = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="basic" className="space-y-4">
+        <Tabs defaultValue="preview" className="space-y-4">
           <TabsList>
+            <TabsTrigger value="preview">Development Preview</TabsTrigger>
             <TabsTrigger value="basic">Basic URL</TabsTrigger>
             <TabsTrigger value="subdomain">Subdomain</TabsTrigger>
             <TabsTrigger value="custom">Custom Domain</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="preview">
+            <Card>
+              <CardHeader>
+                <CardTitle>Development Preview</CardTitle>
+                <CardDescription>
+                  Access your storefront while in development
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <Eye className="h-4 w-4" />
+                  <AlertTitle>Preview Your Store</AlertTitle>
+                  <AlertDescription className="space-y-4">
+                    <p>
+                      While developing your store, you can preview it using the internal preview URL:
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <Button variant="outline" asChild>
+                        <Link to="/preview">
+                          Open Preview
+                        </Link>
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        (or click "View Store" in the sidebar)
+                      </span>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Note: To make your store accessible to customers, you'll need to deploy your project
+                      using the "Deploy" button in the top-right corner of Lovable.
+                    </p>
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="basic">
             <Card>
               <CardHeader>
                 <CardTitle>Basic URL</CardTitle>
                 <CardDescription>
-                  Your storefront is automatically available at a basic URL using your store's slug
+                  Your storefront will be available at this URL after deployment
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -105,7 +143,7 @@ const DomainManagement = () => {
                   <Globe className="h-4 w-4" />
                   <AlertTitle>Always Available</AlertTitle>
                   <AlertDescription>
-                    This URL is always available, even if you set up a custom domain
+                    This URL will be available after deployment, even if you set up a custom domain
                   </AlertDescription>
                 </Alert>
               </CardContent>
