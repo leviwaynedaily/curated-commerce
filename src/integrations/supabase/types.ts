@@ -233,6 +233,8 @@ export type Database = {
           name: string
           page_title: string | null
           product_card_background_color: string | null
+          product_category_background_color: string | null
+          product_category_text_color: string | null
           product_description_text_color: string | null
           product_price_color: string | null
           product_title_text_color: string | null
@@ -272,6 +274,8 @@ export type Database = {
           name: string
           page_title?: string | null
           product_card_background_color?: string | null
+          product_category_background_color?: string | null
+          product_category_text_color?: string | null
           product_description_text_color?: string | null
           product_price_color?: string | null
           product_title_text_color?: string | null
@@ -311,6 +315,8 @@ export type Database = {
           name?: string
           page_title?: string | null
           product_card_background_color?: string | null
+          product_category_background_color?: string | null
+          product_category_text_color?: string | null
           product_description_text_color?: string | null
           product_price_color?: string | null
           product_title_text_color?: string | null
