@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
-import { Badge } from "@/components/ui/badge";
 import { PreviewHeader } from "./PreviewHeader";
 import debounce from "lodash.debounce";
 
@@ -15,6 +14,8 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [gridSize, setGridSize] = useState<'small' | 'medium' | 'large'>('medium');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [currentSort, setCurrentSort] = useState('newest');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { data: products } = useQuery({
     queryKey: ["preview-products", previewData.id],
@@ -44,7 +45,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
       if (isScrolled !== shouldBeScrolled) {
         setIsScrolled(shouldBeScrolled);
       }
-    }, 100); // Increased debounce time for smoother transitions
+    }, 100);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
@@ -52,12 +53,34 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
       handleScroll.cancel();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [isScrolled]); // Added isScrolled to dependencies
+  }, [isScrolled]);
 
-  const filteredProducts = products?.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const categories = products 
+    ? [...new Set(products.map(product => product.category).filter(Boolean))]
+    : [];
+
+  const filteredAndSortedProducts = products
+    ?.filter(product =>
+      (searchQuery === "" || 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) &&
+      (!selectedCategory || product.category === selectedCategory)
+    )
+    .sort((a, b) => {
+      switch (currentSort) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'price-asc':
+          return (a.in_town_price || 0) - (b.in_town_price || 0);
+        case 'price-desc':
+          return (b.in_town_price || 0) - (a.in_town_price || 0);
+        default:
+          return 0;
+      }
+    });
 
   const getGridColumns = () => {
     switch (gridSize) {
@@ -89,8 +112,13 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
         name={previewData.name}
         onGridChange={setGridSize}
         onSearchChange={setSearchQuery}
+        onSortChange={setCurrentSort}
+        onCategoryChange={setSelectedCategory}
         searchQuery={searchQuery}
         gridSize={gridSize}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        currentSort={currentSort}
       />
 
       <div className="container mx-auto px-4">
@@ -118,7 +146,7 @@ export function PreviewContent({ previewData, colors }: PreviewContentProps) {
         </div>
 
         <div className={`grid ${getGridColumns()} gap-4`}>
-          {filteredProducts?.map((product) => (
+          {filteredAndSortedProducts?.map((product) => (
             <div 
               key={product.id}
               className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()}`}

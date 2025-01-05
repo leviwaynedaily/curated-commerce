@@ -2,6 +2,13 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Grid2X2, Grid3X3, LayoutGrid } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ArrowUpDown } from "lucide-react";
 
 interface PreviewHeaderProps {
   colors: any;
@@ -9,8 +16,13 @@ interface PreviewHeaderProps {
   name?: string;
   onGridChange: (size: 'small' | 'medium' | 'large') => void;
   onSearchChange: (query: string) => void;
+  onSortChange: (sort: string) => void;
+  onCategoryChange: (category: string | null) => void;
   searchQuery: string;
   gridSize: 'small' | 'medium' | 'large';
+  categories: string[];
+  selectedCategory: string | null;
+  currentSort: string;
 }
 
 export function PreviewHeader({
@@ -19,8 +31,13 @@ export function PreviewHeader({
   name,
   onGridChange,
   onSearchChange,
+  onSortChange,
+  onCategoryChange,
   searchQuery,
   gridSize,
+  categories,
+  selectedCategory,
+  currentSort,
 }: PreviewHeaderProps) {
   return (
     <header 
@@ -61,6 +78,58 @@ export function PreviewHeader({
           </div>
 
           <div className="flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  style={{ color: colors.font.primary }}
+                >
+                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onSortChange('newest')}>
+                  Newest First
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSortChange('oldest')}>
+                  Oldest First
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSortChange('price-asc')}>
+                  Price: Low to High
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onSortChange('price-desc')}>
+                  Price: High to Low
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  style={{ color: colors.font.primary }}
+                >
+                  {selectedCategory || 'All Categories'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onCategoryChange(null)}>
+                  All Categories
+                </DropdownMenuItem>
+                {categories.map((category) => (
+                  <DropdownMenuItem 
+                    key={category}
+                    onClick={() => onCategoryChange(category)}
+                  >
+                    {category}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Button
               variant="ghost"
               size="icon"
