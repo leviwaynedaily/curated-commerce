@@ -12,13 +12,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
   return (
     <div className="space-y-8 min-h-screen pb-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Storefront Appearance</h1>
-        <p className="text-muted-foreground mt-2">
-          Customize how your storefront looks. Changes are saved automatically.
-        </p>
-      </div>
-
       <div className="grid gap-8 lg:grid-cols-[1fr,300px]">
         <div className="space-y-8">
           <BrowserAssets form={form} storefrontId={storefrontId} />
