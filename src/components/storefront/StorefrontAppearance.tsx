@@ -1,6 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { Separator } from "@/components/ui/separator";
 import { BrowserAssets } from "./appearance/BrowserAssets";
+import { ColorManagement } from "./appearance/ColorManagement";
 
 interface StorefrontAppearanceProps {
   form: UseFormReturn<any>;
@@ -18,9 +19,19 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-8">
         <div className="space-y-4">
           <BrowserAssets form={form} storefrontId={currentStorefrontId} />
+        </div>
+
+        <Separator />
+
+        <div className="space-y-4">
+          <ColorManagement 
+            form={form} 
+            storefrontId={currentStorefrontId}
+            logoUrl={form.watch("logo_url")}
+          />
         </div>
       </div>
     </div>

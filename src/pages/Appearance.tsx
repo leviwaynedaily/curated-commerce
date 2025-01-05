@@ -12,6 +12,12 @@ import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   favicon_url: z.string().nullable(),
+  logo_url: z.string().nullable(),
+  main_color: z.string().default("#1A1F2C"),
+  secondary_color: z.string().default("#D6BCFA"),
+  font_color: z.string().default("#FFFFFF"),
+  verification_color: z.string().default("#1A1F2C"),
+  instructions_color: z.string().default("#1A1F2C"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -29,7 +35,7 @@ const Appearance = () => {
 
       const { data, error } = await supabase
         .from("storefronts")
-        .select("logo_url")
+        .select("*")
         .eq("id", currentStorefrontId)
         .single();
 
@@ -43,6 +49,12 @@ const Appearance = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       favicon_url: null,
+      logo_url: null,
+      main_color: "#1A1F2C",
+      secondary_color: "#D6BCFA",
+      font_color: "#FFFFFF",
+      verification_color: "#1A1F2C",
+      instructions_color: "#1A1F2C",
     },
   });
 
