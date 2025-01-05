@@ -43,20 +43,20 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[20rem] aspect-[3/4]' // Changed to 3:4 aspect ratio
+        return 'min-h-[24rem] aspect-[3/4]' // Increased height and kept 3:4 ratio
       case 'large':
-        return 'min-h-[24rem] aspect-[4/5]' // Changed to 4:5 aspect ratio
+        return 'min-h-[28rem] aspect-[4/5]' // Increased height and kept 4:5 ratio
       case 'list':
-        return 'min-h-[24rem]'
+        return 'min-h-[28rem]'
       default: // medium
-        return 'min-h-[20rem] aspect-[3/4]' // Changed to 3:4 aspect ratio
+        return 'min-h-[26rem] aspect-[3/4]' // Increased height and kept 3:4 ratio
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-3/4 relative" : "h-3/4 relative", // Adjusted for portrait images
+        imageContainer: "h-3/5 relative", // Reduced image height to give more space for text
         textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
@@ -70,7 +70,7 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-4 p-1`}>
+    <div className={`grid ${getGridColumns()} gap-6 p-4`}> {/* Increased gap and padding */}
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
@@ -112,7 +112,7 @@ export function ProductGrid({
                   )}
                 </div>
                 <h3 
-                  className="text-sm font-bold mb-1 line-clamp-2"
+                  className="text-sm font-bold mb-2 line-clamp-2"
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -123,7 +123,7 @@ export function ProductGrid({
                 </h3>
                 {product.description && (
                   <p 
-                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
+                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-3"
                     style={{ 
                       color: productDescriptionTextColor,
                       fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
@@ -135,7 +135,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-2"
+                className="space-y-1 text-sm font-open-sans mt-auto"
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-1 text-xs">
