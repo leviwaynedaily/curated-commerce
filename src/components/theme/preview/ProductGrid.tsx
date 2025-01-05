@@ -11,6 +11,8 @@ interface ProductGridProps {
   productTitleTextColor: string
   productDescriptionTextColor: string
   productPriceColor: string
+  productCategoryBackgroundColor: string
+  productCategoryTextColor: string
 }
 
 export function ProductGrid({ 
@@ -21,7 +23,9 @@ export function ProductGrid({
   productCardBackgroundColor,
   productTitleTextColor,
   productDescriptionTextColor,
-  productPriceColor
+  productPriceColor,
+  productCategoryBackgroundColor,
+  productCategoryTextColor
 }: ProductGridProps) {
   const getGridColumns = () => {
     switch (layout) {
@@ -97,6 +101,11 @@ export function ProductGrid({
                     <Badge 
                       variant="outline" 
                       className={textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}
+                      style={{
+                        backgroundColor: productCategoryBackgroundColor,
+                        color: productCategoryTextColor,
+                        borderColor: 'transparent'
+                      }}
                     >
                       {product.category}
                     </Badge>
