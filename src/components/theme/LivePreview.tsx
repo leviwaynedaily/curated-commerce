@@ -92,8 +92,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Main content area - always scrollable */}
+    <div className="h-screen w-full overflow-y-auto bg-background">
+      {/* Main content area */}
       <div 
         className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}
       >
@@ -106,13 +106,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       {/* Verification overlay */}
       {!isVerified && previewData.verification_type !== 'none' && (
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
-          <div className="min-h-full w-full overflow-y-auto">
-            <div className="min-h-full flex items-center justify-center p-4">
-              <VerificationPrompt 
-                previewData={previewData} 
-                onVerify={handleVerification}
-              />
-            </div>
+          <div className="h-full w-full flex items-center justify-center p-4">
+            <VerificationPrompt 
+              previewData={previewData} 
+              onVerify={handleVerification}
+            />
           </div>
         </div>
       )}
@@ -120,38 +118,36 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       {/* Instructions overlay */}
       {isVerified && showInstructions && previewData.enable_instructions && (
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
-          <div className="min-h-full w-full overflow-y-auto">
-            <div className="min-h-full flex items-center justify-center p-4">
-              <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
-                {previewData.logo_url && (
-                  <img 
-                    src={previewData.logo_url} 
-                    alt={previewData.name} 
-                    className="h-16 mx-auto object-contain"
-                  />
-                )}
-                
-                <h2 className="text-xl font-semibold text-center">
-                  Welcome to {previewData.name}
-                </h2>
-                
-                <div 
-                  className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
-                  dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
+          <div className="h-full w-full flex items-center justify-center p-4">
+            <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
+              {previewData.logo_url && (
+                <img 
+                  src={previewData.logo_url} 
+                  alt={previewData.name} 
+                  className="h-16 mx-auto object-contain"
                 />
+              )}
+              
+              <h2 className="text-xl font-semibold text-center">
+                Welcome to {previewData.name}
+              </h2>
+              
+              <div 
+                className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
+                dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
+              />
 
-                <Button
-                  className="w-full"
-                  onClick={handleContinue}
-                  style={{ 
-                    backgroundColor: previewData.verification_button_color,
-                    color: '#FFFFFF',
-                    border: 'none'
-                  }}
-                >
-                  Enter Site
-                </Button>
-              </div>
+              <Button
+                className="w-full"
+                onClick={handleContinue}
+                style={{ 
+                  backgroundColor: previewData.verification_button_color,
+                  color: '#FFFFFF',
+                  border: 'none'
+                }}
+              >
+                Enter Site
+              </Button>
             </div>
           </div>
         </div>
