@@ -213,7 +213,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
               Instructions
             </h2>
             <div 
-              className="prose prose-sm mb-6 max-w-none [&_a]:text-blue-500 [&_a]:underline"
+              className="prose prose-sm mb-6 max-w-none [&_a]:text-blue-500 [&_a]:underline [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
               style={{ color: colors.font.secondary }}
               dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
             />

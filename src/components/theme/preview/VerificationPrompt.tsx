@@ -74,7 +74,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                 />
                 <label 
                   htmlFor="age-verification" 
-                  className="text-sm cursor-pointer select-none prose prose-sm"
+                  className="text-sm cursor-pointer select-none prose prose-sm [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
                   style={{ color: colors.font.secondary }}
                   dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
                 />
@@ -129,7 +129,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
           </Button>
 
           <div 
-            className="text-sm text-center prose prose-sm"
+            className="text-sm text-center prose prose-sm [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
             style={{ color: colors.font.secondary }}
             dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
           />
