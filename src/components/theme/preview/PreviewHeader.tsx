@@ -46,7 +46,83 @@ export function PreviewHeader({
       }`}
     >
       <div className="w-full py-4 px-4 md:px-8">
-        <div className="flex items-center justify-between gap-4">
+        {/* Mobile Layout */}
+        <div className="flex flex-col space-y-4 md:hidden">
+          {/* Logo Row */}
+          <div className="flex justify-center">
+            {previewData.logo_url && (
+              <img 
+                src={previewData.logo_url} 
+                alt={previewData.name}
+                className="h-12 object-contain cursor-pointer"
+                onClick={onLogoClick}
+              />
+            )}
+          </div>
+
+          {/* Filters Row */}
+          <div className="flex flex-col space-y-3">
+            {categories.length > 0 && (
+              <Select
+                value={selectedCategory || "all"}
+                onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
+              >
+                <SelectTrigger className="w-full h-12 bg-white/80 backdrop-blur-sm">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            <Select
+              value={currentSort}
+              onValueChange={(value) => onSortChange?.(value)}
+            >
+              <SelectTrigger className="w-full h-12 bg-white/80 backdrop-blur-sm">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="oldest">Oldest First</SelectItem>
+                <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                <SelectItem value="price-desc">Price: High to Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Search Row */}
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 bg-white/80 backdrop-blur-sm h-12 w-full"
+            />
+          </div>
+
+          {/* View Options */}
+          <div className="flex justify-end">
+            <ViewOptionsDropdown
+              layout={layout}
+              textPlacement={textPlacement}
+              mainColor={previewData.main_color || "#000000"}
+              onLayoutChange={onLayoutChange}
+              onTextPlacementChange={onTextPlacementChange}
+            />
+          </div>
+        </div>
+
+        {/* Desktop Layout */}
+        <div className="hidden md:flex items-center justify-between gap-4">
           <div className="flex-shrink-0">
             {previewData.logo_url && (
               <img 
@@ -64,7 +140,7 @@ export function PreviewHeader({
                 value={selectedCategory || "all"}
                 onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
               >
-                <SelectTrigger className="w-[160px] bg-white/50 backdrop-blur-sm">
+                <SelectTrigger className="w-[160px] bg-white/80 backdrop-blur-sm">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -82,7 +158,7 @@ export function PreviewHeader({
               value={currentSort}
               onValueChange={(value) => onSortChange?.(value)}
             >
-              <SelectTrigger className="w-[160px] bg-white/50 backdrop-blur-sm">
+              <SelectTrigger className="w-[160px] bg-white/80 backdrop-blur-sm">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -100,7 +176,7 @@ export function PreviewHeader({
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-10 bg-white/50 backdrop-blur-sm"
+                className="pl-10 bg-white/80 backdrop-blur-sm"
               />
             </div>
 
@@ -115,5 +191,5 @@ export function PreviewHeader({
         </div>
       </div>
     </header>
-  )
+  );
 }
