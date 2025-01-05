@@ -104,13 +104,25 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }
 
   return (
-    <div className="h-screen overflow-auto bg-background">
-      {!isVerified && previewData.verification_type !== 'none' && (
-        <VerificationPrompt 
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Always render the content but blur it when verification/instructions are shown */}
+      <div className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}>
+        <PreviewContent 
           previewData={previewData} 
-          onVerify={handleVerification}
+          onReset={handleReset}
         />
+      </div>
+
+      {/* Verification and Instructions overlays */}
+      {!isVerified && previewData.verification_type !== 'none' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+          <VerificationPrompt 
+            previewData={previewData} 
+            onVerify={handleVerification}
+          />
+        </div>
       )}
+
       {isVerified && showInstructions && previewData.enable_instructions && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
           <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
@@ -144,12 +156,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
             </Button>
           </div>
         </div>
-      )}
-      {((isVerified && showContent) || previewData.verification_type === 'none') && (
-        <PreviewContent 
-          previewData={previewData} 
-          onReset={handleReset}
-        />
       )}
     </div>
   );
