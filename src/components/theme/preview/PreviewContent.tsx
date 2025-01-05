@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { PreviewHeader } from "./PreviewHeader";
 import debounce from "lodash.debounce";
+import { Badge } from "@/components/ui/badge";
 
 interface PreviewContentProps {
   previewData: PreviewData;
