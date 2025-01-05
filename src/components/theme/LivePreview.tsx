@@ -54,6 +54,20 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
+    // Lock scrolling when verification prompt is shown
+    if (!isVerified) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup function to restore scrolling
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isVerified]);
+
+  useEffect(() => {
     const fetchStorefrontData = async () => {
       console.log("Fetching storefront data for preview:", storefrontId);
       const { data, error } = await supabase
