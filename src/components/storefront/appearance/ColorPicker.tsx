@@ -12,32 +12,28 @@ export function ColorPicker({ colors, selectedColor, onColorSelect, label }: Col
   return (
     <div className="space-y-2">
       {label && <Label>{label}</Label>}
-      <div className="flex gap-2">
-        <div className="flex gap-2 flex-wrap">
-          {colors.map((color, index) => (
-            <button
-              key={index}
-              className={`w-8 h-8 rounded-full border-2 ${
-                selectedColor === color ? 'border-gray-900' : 'border-transparent'
-              }`}
-              style={{ backgroundColor: color }}
-              onClick={() => onColorSelect(color)}
-              type="button"
+      <div className="flex items-center gap-4">
+        <div
+          className="w-12 h-12 rounded-lg border"
+          style={{ backgroundColor: selectedColor }}
+        />
+        <div className="flex-1">
+          <div className="flex gap-2">
+            <Input
+              type="color"
+              value={selectedColor}
+              onChange={(e) => onColorSelect(e.target.value)}
+              className="w-12 h-12 p-1 rounded-lg"
             />
-          ))}
+            <Input
+              type="text"
+              value={selectedColor}
+              onChange={(e) => onColorSelect(e.target.value)}
+              className="flex-1"
+            />
+          </div>
+          <p className="text-xs font-mono mt-1">{selectedColor}</p>
         </div>
-        <Input
-          type="color"
-          value={selectedColor}
-          onChange={(e) => onColorSelect(e.target.value)}
-          className="w-12 h-12 p-1 rounded-lg"
-        />
-        <Input
-          type="text"
-          value={selectedColor}
-          onChange={(e) => onColorSelect(e.target.value)}
-          className="flex-1"
-        />
       </div>
     </div>
   );
