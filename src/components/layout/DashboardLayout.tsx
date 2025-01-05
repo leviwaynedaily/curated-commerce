@@ -5,6 +5,7 @@ import { Menu } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,14 +18,23 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <div className="w-64 flex-shrink-0">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:block">
           <DashboardSidebar
             open={sidebarOpen}
-            mobileOpen={mobileSidebarOpen}
             onOpenChange={setSidebarOpen}
-            onMobileOpenChange={setMobileSidebarOpen}
           />
         </div>
+
+        {/* Mobile Sidebar */}
+        <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-64">
+            <DashboardSidebar
+              mobileOpen={mobileSidebarOpen}
+              onMobileOpenChange={setMobileSidebarOpen}
+            />
+          </SheetContent>
+        </Sheet>
 
         <div className="flex-1">
           <header className="h-16 border-b flex items-center gap-4 px-4">

@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
-import { UserButton } from "@/components/auth/UserButton";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, 
@@ -77,7 +76,7 @@ export function DashboardSidebar({
   ];
 
   return (
-    <div className={cn("w-64 h-screen fixed left-0 top-0 bg-background border-r", className)}>
+    <div className={cn("h-full bg-background", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h1 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -88,7 +87,7 @@ export function DashboardSidebar({
             <StorefrontSwitcher />
           </div>
         </div>
-        <div className="px-3 py-2">
+        <ScrollArea className="px-3 py-2">
           <div className="space-y-1">
             {routes.map((route) => (
               <Button
@@ -104,7 +103,7 @@ export function DashboardSidebar({
               </Button>
             ))}
           </div>
-        </div>
+        </ScrollArea>
       </div>
     </div>
   );
