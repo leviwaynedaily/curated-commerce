@@ -36,7 +36,7 @@ export function HeaderDropdown({
   mainColor,
 }: HeaderDropdownProps) {
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
@@ -46,7 +46,7 @@ export function HeaderDropdown({
           <Settings2 className="h-4 w-4" style={{ color: mainColor }} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm">
+      <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm" onCloseAutoFocus={(e) => e.preventDefault()}>
         {categories.length > 0 && (
           <>
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
