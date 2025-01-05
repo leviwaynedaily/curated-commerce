@@ -26,17 +26,31 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   useEffect(() => {
     const handleScroll = debounce(() => {
       const scrollPosition = window.scrollY;
-      console.log('Scroll position:', scrollPosition); // Debug log
-      setIsScrolled(scrollPosition > 100); // Reduced threshold to 100px
-    }, 50); // Reduced debounce time for more responsive behavior
+      const wasScrolled = isScrolled;
+      const newScrolled = scrollPosition > 100;
+      
+      console.log('Scroll Debug:', {
+        position: scrollPosition,
+        threshold: 100,
+        previousState: wasScrolled,
+        newState: newScrolled
+      });
 
+      if (wasScrolled !== newScrolled) {
+        console.log(`Header state changing from ${wasScrolled ? 'visible' : 'hidden'} to ${newScrolled ? 'visible' : 'hidden'}`);
+        setIsScrolled(newScrolled);
+      }
+    }, 50);
+
+    console.log('Setting up scroll listener');
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
+      console.log('Cleaning up scroll listener');
       handleScroll.cancel();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [isScrolled]);
 
   useEffect(() => {
     setCurrentPage(1);
