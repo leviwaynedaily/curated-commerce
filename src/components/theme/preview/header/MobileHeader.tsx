@@ -42,8 +42,19 @@ export function MobileHeader({
 
   return (
     <div className="flex md:hidden items-center justify-between gap-2">
-      {/* Left spacer */}
-      <div className="w-9" />
+      {/* Left side - Help Icon */}
+      <div className="w-9 flex justify-start">
+        {previewData.enable_instructions && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onShowInstructions}
+            className="bg-white/80 hover:bg-white/90 h-9 w-9"
+          >
+            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
+          </Button>
+        )}
+      </div>
       
       {/* Centered Logo */}
       <div className="flex-1 flex justify-center">
@@ -59,18 +70,6 @@ export function MobileHeader({
 
       {/* Search and Options */}
       <div className="flex items-center gap-2">
-        {/* Instructions Icon */}
-        {previewData.enable_instructions && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onShowInstructions}
-            className="bg-white/80 hover:bg-white/90 h-9 w-9"
-          >
-            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
-          </Button>
-        )}
-
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (

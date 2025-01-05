@@ -42,8 +42,19 @@ export function DesktopHeader({
 
   return (
     <div className="hidden md:flex items-center justify-between gap-4">
-      {/* Left spacer */}
-      <div className="w-20" />
+      {/* Left side - Help Icon */}
+      <div className="w-20 flex justify-start">
+        {previewData.enable_instructions && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onShowInstructions}
+            className="bg-white/80 hover:bg-white/90"
+          >
+            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
+          </Button>
+        )}
+      </div>
       
       {/* Centered Logo */}
       <div className="flex-1 flex justify-center">
@@ -59,18 +70,6 @@ export function DesktopHeader({
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 w-20 justify-end">
-        {/* Instructions Icon */}
-        {previewData.enable_instructions && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onShowInstructions}
-            className="bg-white/80 hover:bg-white/90"
-          >
-            <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
-          </Button>
-        )}
-
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (
