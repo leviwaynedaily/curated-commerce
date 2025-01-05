@@ -1,8 +1,15 @@
-import { Search } from "lucide-react"
+import { Search, Grid, ArrowUpDown, Filter } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ViewOptionsDropdown } from "./ViewOptionsDropdown"
 import { PreviewData } from "@/types/preview"
+import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface PreviewHeaderProps {
   previewData: PreviewData;
@@ -60,16 +67,24 @@ export function PreviewHeader({
             )}
           </div>
 
-          {/* Combined Filters Row */}
-          <div className="grid grid-cols-2 gap-2">
-            {categories.length > 0 && (
+          {/* Icons Row */}
+          <div className="flex justify-between items-center px-2">
+            <TooltipProvider>
+              {/* Categories Button */}
               <Select
                 value={selectedCategory || "all"}
                 onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
               >
-                <SelectTrigger className="w-full h-12 bg-white/80 backdrop-blur-sm">
-                  <SelectValue placeholder="All Categories" />
-                </SelectTrigger>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SelectTrigger className="w-12 h-12 p-0 border-none bg-transparent hover:bg-accent/20 rounded-full flex items-center justify-center">
+                      <Grid className="h-6 w-6" />
+                    </SelectTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Categories</p>
+                  </TooltipContent>
+                </Tooltip>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
@@ -79,22 +94,55 @@ export function PreviewHeader({
                   ))}
                 </SelectContent>
               </Select>
-            )}
 
-            <Select
-              value={currentSort}
-              onValueChange={(value) => onSortChange?.(value)}
-            >
-              <SelectTrigger className="w-full h-12 bg-white/80 backdrop-blur-sm">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="newest">Newest First</SelectItem>
-                <SelectItem value="oldest">Oldest First</SelectItem>
-                <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                <SelectItem value="price-desc">Price: High to Low</SelectItem>
-              </SelectContent>
-            </Select>
+              {/* Sort Button */}
+              <Select
+                value={currentSort}
+                onValueChange={(value) => onSortChange?.(value)}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SelectTrigger className="w-12 h-12 p-0 border-none bg-transparent hover:bg-accent/20 rounded-full flex items-center justify-center">
+                      <ArrowUpDown className="h-6 w-6" />
+                    </SelectTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Sort</p>
+                  </TooltipContent>
+                </Tooltip>
+                <SelectContent>
+                  <SelectItem value="newest">Newest First</SelectItem>
+                  <SelectItem value="oldest">Oldest First</SelectItem>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Filter Button */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="w-12 h-12 rounded-full hover:bg-accent/20"
+                  >
+                    <Filter className="h-6 w-6" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Filter</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {/* View Options */}
+              <ViewOptionsDropdown
+                layout={layout}
+                textPlacement={textPlacement}
+                mainColor={previewData.main_color || "#000000"}
+                onLayoutChange={onLayoutChange}
+                onTextPlacementChange={onTextPlacementChange}
+              />
+            </TooltipProvider>
           </div>
 
           {/* Search Row */}
@@ -106,17 +154,6 @@ export function PreviewHeader({
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-10 bg-white/80 backdrop-blur-sm h-12 w-full"
-            />
-          </div>
-
-          {/* View Options */}
-          <div className="flex justify-end">
-            <ViewOptionsDropdown
-              layout={layout}
-              textPlacement={textPlacement}
-              mainColor={previewData.main_color || "#000000"}
-              onLayoutChange={onLayoutChange}
-              onTextPlacementChange={onTextPlacementChange}
             />
           </div>
         </div>
