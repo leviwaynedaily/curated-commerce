@@ -235,9 +235,14 @@ export type Database = {
           updated_at: string | null
           verification_age: number | null
           verification_age_text: string | null
+          verification_button_color: string | null
+          verification_button_text_color: string | null
+          verification_checkbox_color: string | null
+          verification_input_border_color: string | null
           verification_legal_text: string | null
           verification_logo_url: string | null
           verification_password: string | null
+          verification_text_color: string | null
           verification_type:
             | Database["public"]["Enums"]["verification_type"]
             | null
@@ -260,9 +265,14 @@ export type Database = {
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
+          verification_button_color?: string | null
+          verification_button_text_color?: string | null
+          verification_checkbox_color?: string | null
+          verification_input_border_color?: string | null
           verification_legal_text?: string | null
           verification_logo_url?: string | null
           verification_password?: string | null
+          verification_text_color?: string | null
           verification_type?:
             | Database["public"]["Enums"]["verification_type"]
             | null
@@ -285,9 +295,14 @@ export type Database = {
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
+          verification_button_color?: string | null
+          verification_button_text_color?: string | null
+          verification_checkbox_color?: string | null
+          verification_input_border_color?: string | null
           verification_legal_text?: string | null
           verification_logo_url?: string | null
           verification_password?: string | null
+          verification_text_color?: string | null
           verification_type?:
             | Database["public"]["Enums"]["verification_type"]
             | null

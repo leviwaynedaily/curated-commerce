@@ -33,7 +33,10 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl bg-card">
+      <div 
+        className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl bg-card"
+        style={{ color: previewData.verification_text_color }}
+      >
         {previewData.verification_logo_url && (
           <img 
             src={previewData.verification_logo_url} 
@@ -58,6 +61,10 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                     setError(null)
                   }}
                   className="h-5 w-5 rounded-sm border cursor-pointer"
+                  style={{ 
+                    backgroundColor: ageConfirmed ? previewData.verification_checkbox_color : 'transparent',
+                    borderColor: previewData.verification_checkbox_color 
+                  }}
                 />
                 <label 
                   htmlFor="age-verification" 
@@ -82,6 +89,9 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                   setError(null)
                 }}
                 className="w-full"
+                style={{ 
+                  borderColor: previewData.verification_input_border_color 
+                }}
               />
             </div>
           )}
@@ -95,6 +105,11 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
           <Button 
             className="w-full"
             onClick={handleVerification}
+            style={{ 
+              backgroundColor: previewData.verification_button_color,
+              color: previewData.verification_button_text_color,
+              border: 'none'
+            }}
           >
             {previewData.enable_instructions ? "Next" : "Enter Site"}
           </Button>

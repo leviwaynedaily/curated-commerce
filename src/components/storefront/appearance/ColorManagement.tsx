@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Wand2 } from "lucide-react";
 import { extractColorsFromLogo } from "@/utils/colorExtractor";
 import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -55,11 +56,15 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       const colors = await extractColorsFromLogo(logoUrl);
       console.log("Extracted colors:", colors);
 
+      // Update all color fields with extracted colors
       form.setValue("main_color", colors.background.primary);
       form.setValue("secondary_color", colors.background.secondary);
       form.setValue("font_color", colors.font.primary);
-      form.setValue("verification_color", colors.background.primary);
-      form.setValue("instructions_color", colors.background.primary);
+      form.setValue("verification_button_color", colors.background.primary);
+      form.setValue("verification_button_text_color", "#FFFFFF");
+      form.setValue("verification_text_color", colors.font.primary);
+      form.setValue("verification_checkbox_color", colors.background.primary);
+      form.setValue("verification_input_border_color", "#E5E7EB");
 
       toast({
         title: "Colors updated",
@@ -118,11 +123,23 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-4">
-          <ColorPicker name="main_color" label="Main Color" />
-          <ColorPicker name="secondary_color" label="Secondary Color" />
-          <ColorPicker name="font_color" label="Font Color" />
-          <ColorPicker name="verification_color" label="Verification Background" />
-          <ColorPicker name="instructions_color" label="Instructions Background" />
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">General Colors</h4>
+            <ColorPicker name="main_color" label="Main Color" />
+            <ColorPicker name="secondary_color" label="Secondary Color" />
+            <ColorPicker name="font_color" label="Font Color" />
+          </div>
+
+          <Separator className="my-4" />
+
+          <div className="space-y-4">
+            <h4 className="text-sm font-medium">Verification Colors</h4>
+            <ColorPicker name="verification_button_color" label="Button Color" />
+            <ColorPicker name="verification_button_text_color" label="Button Text Color" />
+            <ColorPicker name="verification_text_color" label="Text Color" />
+            <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
+            <ColorPicker name="verification_input_border_color" label="Input Border Color" />
+          </div>
         </div>
 
         <div className="space-y-4">
