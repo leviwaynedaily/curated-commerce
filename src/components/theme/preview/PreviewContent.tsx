@@ -109,6 +109,7 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
         selectedCategory={selectedCategory}
         currentSort={currentSort}
         onLogoClick={onReset}
+        showFilters={isScrolled}
       />
 
       <div className="container mx-auto px-4 flex-1">
@@ -134,6 +135,24 @@ export function PreviewContent({ previewData, colors, onReset }: PreviewContentP
               {previewData.description}
             </p>
           )}
+
+          <div className="w-full max-w-6xl">
+            <PreviewHeader
+              colors={colors}
+              name={previewData.name}
+              onGridChange={setGridSize}
+              onSearchChange={setSearchQuery}
+              onSortChange={setCurrentSort}
+              onCategoryChange={setSelectedCategory}
+              searchQuery={searchQuery}
+              gridSize={gridSize}
+              categories={categories}
+              selectedCategory={selectedCategory}
+              currentSort={currentSort}
+              onLogoClick={onReset}
+              showFilters={true}
+            />
+          </div>
         </div>
 
         <div className={`grid ${getGridColumns()} gap-4`}>
