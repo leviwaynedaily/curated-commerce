@@ -24,12 +24,12 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const { data: productsData } = useStorefrontProducts(previewData.id, currentPage);
   const products = productsData?.products || [];
 
-  // Properly set up scroll event listener
   useEffect(() => {
     const handleScroll = debounce(() => {
-      const shouldBeScrolled = window.scrollY > 300;
-      setIsScrolled(shouldBeScrolled);
-    }, 100);
+      const scrollPosition = window.scrollY;
+      console.log('Scroll position:', scrollPosition); // Debug log
+      setIsScrolled(scrollPosition > 100); // Reduced threshold to 100px
+    }, 50); // Reduced debounce time for more responsive behavior
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     
@@ -39,7 +39,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
     };
   }, []);
 
-  // Reset to first page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedCategory, currentSort]);
@@ -71,7 +70,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       }
     });
 
-  // Function to strip HTML tags from rich text
   const stripHtml = (html: string) => {
     const tmp = document.createElement('div');
     tmp.innerHTML = html;
@@ -107,6 +105,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
         selectedCategory={selectedCategory}
         currentSort={currentSort}
         isScrolled={isScrolled}
+        onLogoClick={handleLogoClick}
       />
 
       <div className="container mx-auto px-4">
