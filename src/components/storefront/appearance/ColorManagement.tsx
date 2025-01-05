@@ -12,8 +12,14 @@ interface ColorManagementProps {
   logoUrl: string | null;
 }
 
+interface ColorPalette {
+  primary: string[];
+  secondary: string[];
+  accent: string[];
+}
+
 export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagementProps) {
-  const [predefinedColors, setPredefinedColors] = useState<Record<string, string[]>>({
+  const [predefinedColors, setPredefinedColors] = useState<ColorPalette>({
     primary: [],
     secondary: [],
     accent: [],
