@@ -1,105 +1,105 @@
-import {
-  Sheet,
-  SheetContent,
-} from "@/components/ui/sheet";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { 
-  Home,
-  Package,
-  Store,
-  Palette,
-  Globe,
-  Smartphone,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
+import { UserButton } from "@/components/auth/UserButton";
+import { Link, useLocation } from "react-router-dom";
+import { 
+  LayoutDashboard, 
+  Package2, 
+  Store, 
+  Paintbrush, 
+  FileText,
+  Eye,
+  AppWindow,
+  Globe
+} from "lucide-react";
 
-interface DashboardSidebarProps {
-  open?: boolean;
-  mobileOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onMobileOpenChange?: (open: boolean) => void;
-}
+interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
-const menuItems = [
-  { title: "Dashboard", icon: Home, url: "/" },
-  { title: "Products", icon: Package, url: "/products" },
-  { title: "Storefront Information", icon: Store, url: "/storefront-information" },
-  { title: "Appearance", icon: Palette, url: "/appearance" },
-  { title: "Themes", icon: Palette, url: "/themes" },
-  { title: "PWA", icon: Smartphone, url: "/pwa" },
-  { title: "Domain Management", icon: Globe, url: "/domain" },
-  { title: "View Store", icon: Globe, url: "/preview" },
-];
+export function DashboardSidebar({ className }: DashboardSidebarProps) {
+  const location = useLocation();
 
-const DashboardSidebarContent = () => (
-  <>
-    <SidebarHeader className="h-16 flex items-center px-6 border-b">
-      <span className="text-xl font-semibold text-primary">Curately</span>
-    </SidebarHeader>
-    <SidebarContent>
-      <div className="px-4 py-2">
-        <StorefrontSwitcher />
-      </div>
-      <SidebarGroup>
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {menuItems.map((item) => (
-              <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to={item.url}
-                    className="flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors"
-                  >
-                    <item.icon className="h-5 w-5" />
-                    <span>{item.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    </SidebarContent>
-  </>
-);
+  const routes = [
+    {
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      href: '/',
+      active: location.pathname === '/',
+    },
+    {
+      label: 'Products',
+      icon: Package2,
+      href: '/products',
+      active: location.pathname === '/products',
+    },
+    {
+      label: 'Stores',
+      icon: Store,
+      href: '/stores',
+      active: location.pathname === '/stores',
+    },
+    {
+      label: 'Appearance',
+      icon: Paintbrush,
+      href: '/appearance',
+      active: location.pathname === '/appearance',
+    },
+    {
+      label: 'Storefront Information',
+      icon: FileText,
+      href: '/storefront-information',
+      active: location.pathname === '/storefront-information',
+    },
+    {
+      label: 'Live Preview',
+      icon: Eye,
+      href: '/preview',
+      active: location.pathname === '/preview',
+    },
+    {
+      label: 'PWA Settings',
+      icon: AppWindow,
+      href: '/pwa-settings',
+      active: location.pathname === '/pwa-settings',
+    },
+    {
+      label: 'Domain Management',
+      icon: Globe,
+      href: '/domain-management',
+      active: location.pathname === '/domain-management',
+    },
+  ];
 
-export function DashboardSidebar({ 
-  open, 
-  mobileOpen = false,
-  onOpenChange,
-  onMobileOpenChange 
-}: DashboardSidebarProps) {
   return (
-    <>
-      {/* Mobile Sidebar */}
-      <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetContent side="left" className="p-0 w-[220px]">
-          <DashboardSidebarContent />
-        </SheetContent>
-      </Sheet>
-
-      {/* Desktop Sidebar */}
-      <div
-        className={cn(
-          "hidden md:block fixed left-0 top-0 z-20 h-full w-[220px] border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60",
-          "transition-transform duration-300 ease-in-out lg:relative lg:transform-none",
-          !open && "-translate-x-full"
-        )}
-      >
-        <DashboardSidebarContent />
+    <div className={cn("pb-12", className)}>
+      <div className="space-y-4 py-4">
+        <div className="px-3 py-2">
+          <div className="mb-2">
+            <StorefrontSwitcher />
+          </div>
+          <div className="mb-2">
+            <UserButton />
+          </div>
+        </div>
+        <div className="px-3 py-2">
+          <div className="space-y-1">
+            {routes.map((route) => (
+              <Button
+                key={route.href}
+                variant={route.active ? "secondary" : "ghost"}
+                className="w-full justify-start"
+                asChild
+              >
+                <Link to={route.href}>
+                  <route.icon className="mr-2 h-4 w-4" />
+                  {route.label}
+                </Link>
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

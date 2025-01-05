@@ -232,7 +232,7 @@ export type Database = {
           page_title: string | null
           show_description: boolean | null
           slug: string
-          theme_config: Json | null
+          theme_config: Json
           updated_at: string | null
           verification_age: number | null
           verification_age_text: string | null
@@ -258,7 +258,7 @@ export type Database = {
           page_title?: string | null
           show_description?: boolean | null
           slug: string
-          theme_config?: Json | null
+          theme_config?: Json
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
@@ -284,7 +284,7 @@ export type Database = {
           page_title?: string | null
           show_description?: boolean | null
           slug?: string
-          theme_config?: Json | null
+          theme_config?: Json
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
@@ -304,45 +304,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      themes: {
-        Row: {
-          category: Database["public"]["Enums"]["theme_category"]
-          created_at: string | null
-          description: string | null
-          id: string
-          is_default: boolean | null
-          layout_config: Json
-          name: string
-          preview_image: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          category: Database["public"]["Enums"]["theme_category"]
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_default?: boolean | null
-          layout_config?: Json
-          name: string
-          preview_image?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          category?: Database["public"]["Enums"]["theme_category"]
-          created_at?: string | null
-          description?: string | null
-          id?: string
-          is_default?: boolean | null
-          layout_config?: Json
-          name?: string
-          preview_image?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
       }
     }
     Views: {
