@@ -17,6 +17,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   useEffect(() => {
     // Initial data fetch
     const fetchStorefrontData = async () => {
+      console.log("Fetching storefront data for preview:", storefrontId);
       const { data, error } = await supabase
         .from("storefronts")
         .select("name, description, logo_url, theme_config")
@@ -28,7 +29,14 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         return;
       }
 
-      setPreviewData(data);
+      // Cast the theme_config to ThemeConfig type
+      const themeConfig = data.theme_config as ThemeConfig;
+      setPreviewData({
+        name: data.name,
+        description: data.description,
+        logo_url: data.logo_url,
+        theme_config: themeConfig
+      });
     };
 
     fetchStorefrontData();
@@ -46,7 +54,13 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         },
         (payload) => {
           console.log("Received realtime update:", payload);
-          setPreviewData(payload.new);
+          const newData = payload.new;
+          setPreviewData({
+            name: newData.name,
+            description: newData.description,
+            logo_url: newData.logo_url,
+            theme_config: newData.theme_config as ThemeConfig
+          });
         }
       )
       .subscribe();
@@ -57,7 +71,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   }, [storefrontId]);
 
   if (!previewData.theme_config) {
-    return <div>Loading preview...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
   }
 
   const { colors } = previewData.theme_config;
