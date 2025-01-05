@@ -30,26 +30,26 @@ export function ProductGrid({
   const getGridColumns = () => {
     switch (layout) {
       case 'small':
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+        return 'grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
       case 'large':
         return 'grid-cols-1 md:grid-cols-2'
       case 'list':
         return 'grid-cols-1'
       default: // medium
-        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+        return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
     }
   }
 
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'aspect-[3/5]'
+        return 'min-h-[24rem] sm:aspect-[3/5]'
       case 'large':
-        return 'aspect-video'
+        return 'min-h-[24rem] md:aspect-video'
       case 'list':
-        return 'min-h-[20rem] md:min-h-[24rem]'
+        return 'min-h-[24rem]'
       default: // medium
-        return 'aspect-[2/3]'
+        return 'min-h-[24rem] sm:aspect-[2/3]'
     }
   }
 
@@ -93,7 +93,7 @@ export function ProductGrid({
             )}
             
             <div 
-              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : 'flex flex-col h-2/5'} ${styles.textContainer}`}
+              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
             >
               <div>
                 <div className="flex gap-2 flex-wrap mb-2">
@@ -135,7 +135,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-auto"
+                className="space-y-1 text-sm font-open-sans mt-2"
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-2">
