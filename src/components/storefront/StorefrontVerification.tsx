@@ -1,9 +1,9 @@
 import { FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { UseFormReturn } from "react-hook-form";
 import { ImageUpload } from "./ImageUpload";
+import { RichTextEditor } from "@/components/ui/rich-text-editor";
 
 interface StorefrontVerificationProps {
   form: UseFormReturn<any>;
@@ -89,7 +89,7 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
                         <FormItem>
                           <FormLabel>Age Verification Text</FormLabel>
                           <FormControl>
-                            <Textarea {...field} />
+                            <RichTextEditor value={field.value || ''} onChange={field.onChange} />
                           </FormControl>
                         </FormItem>
                       )}
@@ -144,7 +144,7 @@ export function StorefrontVerification({ form }: StorefrontVerificationProps) {
               <FormItem>
                 <FormLabel>Verification Legal Text</FormLabel>
                 <FormControl>
-                  <Textarea {...field} />
+                  <RichTextEditor value={field.value || ''} onChange={field.onChange} />
                 </FormControl>
               </FormItem>
             )}
