@@ -24,8 +24,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const products = productsData?.products || [];
 
   useEffect(() => {
-    console.log('Setting up scroll listener with initial isScrolled:', isScrolled);
-    
     const handleScroll = debounce(() => {
       const container = document.querySelector('.preview-container');
       if (!container) return;
@@ -33,7 +31,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       const scrollPosition = container.scrollTop;
       console.log('Current scroll position:', scrollPosition);
       
-      if (scrollPosition > 100) {
+      if (scrollPosition > 200) {
         if (!isScrolled) {
           console.log('Showing header - scroll position:', scrollPosition);
           setIsScrolled(true);
@@ -52,11 +50,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       console.log('Scroll listener added to preview container');
     }
     
-    // Initial check
-    handleScroll();
-    
     return () => {
-      console.log('Cleaning up scroll listener');
       if (container) {
         container.removeEventListener('scroll', handleScroll);
       }
@@ -115,48 +109,56 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   }
 
   return (
-    <div className="preview-container min-h-screen flex flex-col bg-background">
-      <PreviewHeader
-        logo_url={previewData.logo_url}
-        name={previewData.name}
-        onGridChange={setGridSize}
-        onSearchChange={setSearchQuery}
-        onSortChange={setCurrentSort}
-        onCategoryChange={setSelectedCategory}
-        searchQuery={searchQuery}
-        gridSize={gridSize}
-        categories={categories}
-        selectedCategory={selectedCategory}
-        currentSort={currentSort}
-        isScrolled={isScrolled}
-        onLogoClick={handleLogoClick}
-      />
-
-      <div className="container mx-auto px-4">
-        <div 
-          className={`flex flex-col items-center mb-8 transition-all duration-500 ease-in-out ${
-            isScrolled ? 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden' : 'opacity-100 translate-y-0'
-          }`}
-        >
-          {previewData.logo_url && (
-            <img 
-              src={previewData.logo_url} 
-              alt={previewData.name} 
-              className="h-24 object-contain mb-4 cursor-pointer"
-              onClick={handleLogoClick}
-            />
-          )}
-          
-          {previewData.show_description && previewData.description && (
-            <p 
-              className="text-lg text-center max-w-2xl mb-8"
-              style={{ color: 'inherit' }}
-            >
-              {stripHtml(previewData.description)}
-            </p>
-          )}
+    <div className="preview-container h-screen overflow-y-auto bg-background">
+      {/* Static Logo Section */}
+      <div className="w-full bg-background py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col items-center justify-center space-y-6">
+            {previewData.logo_url && (
+              <img 
+                src={previewData.logo_url} 
+                alt={previewData.name} 
+                className="h-24 object-contain cursor-pointer"
+                onClick={handleLogoClick}
+              />
+            )}
+            
+            {previewData.show_description && previewData.description && (
+              <p className="text-lg text-center max-w-2xl">
+                {stripHtml(previewData.description)}
+              </p>
+            )}
+          </div>
         </div>
+      </div>
 
+      {/* Sticky Header */}
+      <div 
+        className={`sticky top-0 w-full z-50 transition-all duration-300 ${
+          isScrolled 
+            ? 'opacity-100 translate-y-0 shadow-md' 
+            : 'opacity-0 -translate-y-full pointer-events-none'
+        }`}
+      >
+        <PreviewHeader
+          logo_url={previewData.logo_url}
+          name={previewData.name}
+          onGridChange={setGridSize}
+          onSearchChange={setSearchQuery}
+          onSortChange={setCurrentSort}
+          onCategoryChange={setSelectedCategory}
+          searchQuery={searchQuery}
+          gridSize={gridSize}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          currentSort={currentSort}
+          isScrolled={isScrolled}
+          onLogoClick={handleLogoClick}
+        />
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
         <ProductGrid
           products={filteredAndSortedProducts}
           gridSize={gridSize}
