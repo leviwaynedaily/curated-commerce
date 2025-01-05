@@ -40,8 +40,11 @@ export function MobileHeader({
 
   return (
     <div className="flex md:hidden items-center justify-between gap-2">
-      {/* Logo */}
-      <div className="flex-shrink-0">
+      {/* Left spacer */}
+      <div className="w-9" /> {/* Same width as the buttons on the right */}
+      
+      {/* Centered Logo */}
+      <div className="flex-1 flex justify-center">
         {previewData.logo_url && (
           <img 
             src={previewData.logo_url} 

@@ -1,8 +1,8 @@
-import { Search } from "lucide-react";
+import { Search, Settings2 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { HeaderDropdown } from "./HeaderDropdown";
 import { PreviewData } from "@/types/preview";
 
 interface DesktopHeaderProps {
@@ -16,6 +16,8 @@ interface DesktopHeaderProps {
   currentSort?: string;
   layout?: string;
   onLayoutChange?: (layout: string) => void;
+  textPlacement?: string;
+  onTextPlacementChange?: (placement: string) => void;
   onLogoClick?: () => void;
 }
 
@@ -30,13 +32,19 @@ export function DesktopHeader({
   currentSort,
   layout = "medium",
   onLayoutChange,
+  textPlacement = "below",
+  onTextPlacementChange,
   onLogoClick,
 }: DesktopHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="hidden md:flex items-center gap-4">
-      <div className="flex-shrink-0">
+    <div className="hidden md:flex items-center justify-between gap-4">
+      {/* Left spacer */}
+      <div className="w-20" /> {/* Adjust width to match right side controls */}
+      
+      {/* Centered Logo */}
+      <div className="flex-1 flex justify-center">
         {previewData.logo_url && (
           <img 
             src={previewData.logo_url} 
@@ -47,41 +55,9 @@ export function DesktopHeader({
         )}
       </div>
 
-      <div className="flex items-center gap-4 flex-grow justify-end">
-        {categories.length > 0 && (
-          <Select
-            value={selectedCategory || "all"}
-            onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
-          >
-            <SelectTrigger className="w-[160px] bg-white/80 backdrop-blur-sm">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        )}
-
-        <Select
-          value={currentSort}
-          onValueChange={onSortChange}
-        >
-          <SelectTrigger className="w-[160px] bg-white/80 backdrop-blur-sm">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-          </SelectContent>
-        </Select>
-
+      {/* Right Controls */}
+      <div className="flex items-center gap-2 w-20 justify-end">
+        {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (
             <div className="absolute right-0 top-0 w-[200px] animate-slideDown">
@@ -112,44 +88,19 @@ export function DesktopHeader({
           )}
         </div>
 
-        <div className="flex gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onLayoutChange('small')}
-            className={layout === 'small' ? 'bg-accent' : ''}
-          >
-            <div className="w-4 h-4 grid grid-cols-3 gap-0.5">
-              {[...Array(9)].map((_, i) => (
-                <div key={i} className="bg-current rounded-sm" />
-              ))}
-            </div>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onLayoutChange('medium')}
-            className={layout === 'medium' ? 'bg-accent' : ''}
-          >
-            <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-current rounded-sm" />
-              ))}
-            </div>
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onLayoutChange('large')}
-            className={layout === 'large' ? 'bg-accent' : ''}
-          >
-            <div className="w-4 h-4 grid grid-cols-1 gap-0.5">
-              {[...Array(2)].map((_, i) => (
-                <div key={i} className="bg-current rounded-sm" />
-              ))}
-            </div>
-          </Button>
-        </div>
+        {/* Combined Options Dropdown */}
+        <HeaderDropdown
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={onCategoryChange}
+          currentSort={currentSort}
+          onSortChange={onSortChange}
+          layout={layout}
+          onLayoutChange={onLayoutChange}
+          textPlacement={textPlacement}
+          onTextPlacementChange={onTextPlacementChange}
+          mainColor={previewData.main_color}
+        />
       </div>
     </div>
   );
