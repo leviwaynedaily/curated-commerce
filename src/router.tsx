@@ -6,6 +6,7 @@ import StorefrontInformation from "./pages/StorefrontInformation";
 import Preview from "./pages/Preview";
 import PWASettings from "./pages/PWASettings";
 import DomainManagement from "./pages/DomainManagement";
+import Appearance from "./pages/Appearance";
 
 export const router = createBrowserRouter([
   {
@@ -25,8 +26,8 @@ export const router = createBrowserRouter([
     element: <StorefrontInformation />,
   },
   {
-    path: "/preview",
-    element: <Preview />,
+    path: "/appearance",
+    element: <Appearance />,
   },
   {
     path: "/pwa-settings",
@@ -35,5 +36,9 @@ export const router = createBrowserRouter([
   {
     path: "/domain-management",
     element: <DomainManagement />,
+  },
+  {
+    path: "/preview",
+    element: <Preview />,
   },
 ]);

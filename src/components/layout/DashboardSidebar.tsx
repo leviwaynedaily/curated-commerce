@@ -10,7 +10,8 @@ import {
   FileText,
   Eye,
   AppWindow,
-  Globe
+  Globe,
+  Palette
 } from "lucide-react";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -49,10 +50,10 @@ export function DashboardSidebar({
       active: location.pathname === '/storefront-information',
     },
     {
-      label: 'Live Preview',
-      icon: Eye,
-      href: '/preview',
-      active: location.pathname === '/preview',
+      label: 'Appearance',
+      icon: Palette,
+      href: '/appearance',
+      active: location.pathname === '/appearance',
     },
     {
       label: 'PWA Settings',
@@ -65,6 +66,12 @@ export function DashboardSidebar({
       icon: Globe,
       href: '/domain-management',
       active: location.pathname === '/domain-management',
+    },
+    {
+      label: 'Live Preview',
+      icon: Eye,
+      href: '/preview',
+      active: location.pathname === '/preview',
     },
   ];
 
