@@ -1,4 +1,4 @@
-import { Search, Settings2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ export function MobileHeader({
   return (
     <div className="flex md:hidden items-center justify-between gap-2">
       {/* Left spacer */}
-      <div className="w-9" /> {/* Same width as the buttons on the right */}
+      <div className="w-9" />
       
       {/* Centered Logo */}
       <div className="flex-1 flex justify-center">
@@ -49,7 +49,7 @@ export function MobileHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-8 object-contain cursor-pointer"
+            className="h-10 object-contain cursor-pointer" // Increased from h-8 to h-10
             onClick={onLogoClick}
           />
         )}

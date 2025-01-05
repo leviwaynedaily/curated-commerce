@@ -1,4 +1,4 @@
-import { Search, Settings2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -41,7 +41,7 @@ export function DesktopHeader({
   return (
     <div className="hidden md:flex items-center justify-between gap-4">
       {/* Left spacer */}
-      <div className="w-20" /> {/* Adjust width to match right side controls */}
+      <div className="w-20" />
       
       {/* Centered Logo */}
       <div className="flex-1 flex justify-center">
@@ -49,7 +49,7 @@ export function DesktopHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-12 object-contain cursor-pointer"
+            className="h-16 object-contain cursor-pointer" // Increased from h-12 to h-16
             onClick={onLogoClick}
           />
         )}
