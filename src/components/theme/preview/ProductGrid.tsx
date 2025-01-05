@@ -43,7 +43,7 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[16rem] sm:aspect-[3/5]'
+        return 'min-h-[20rem] sm:aspect-[3/5]' // Increased minimum height to accommodate prices
       case 'large':
         return 'min-h-[24rem] md:aspect-video'
       case 'list':
@@ -56,8 +56,8 @@ export function ProductGrid({
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-3/5 relative",
-        textContainer: `p-4 flex flex-col justify-between flex-grow`,
+        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative", // Adjusted image height for small layout
+        textContainer: `p-3 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
     } else {
@@ -96,11 +96,11 @@ export function ProductGrid({
               className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
             >
               <div>
-                <div className="flex gap-2 flex-wrap mb-2">
+                <div className="flex gap-1 flex-wrap mb-1">
                   {product.category && (
                     <Badge 
                       variant="outline" 
-                      className={textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}
+                      className={`text-xs ${textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}`}
                       style={{
                         backgroundColor: productCategoryBackgroundColor,
                         color: productCategoryTextColor,
@@ -116,18 +116,18 @@ export function ProductGrid({
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                    fontSize: '14px'
+                    fontSize: layout === 'small' ? '12px' : '14px'
                   }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p 
-                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
+                    className="font-open-sans text-xs line-clamp-2 mb-1"
                     style={{ 
                       color: productDescriptionTextColor,
                       fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                      fontSize: '12px'
+                      fontSize: layout === 'small' ? '10px' : '12px'
                     }}
                   >
                     {product.description}
@@ -135,14 +135,14 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-2"
+                className="space-y-0.5 text-xs font-open-sans mt-1"
                 style={{ color: productPriceColor }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <span className="font-medium">In Town:</span>
                   <span>${product.in_town_price}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <span className="font-medium">Ship:</span>
                   <span>${product.shipping_price}</span>
                 </div>
