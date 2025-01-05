@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { extractColors } from "@/utils/colorExtractor";
 import { Button } from "@/components/ui/button";
 import { ColorPicker } from "./ColorPicker";
+import { SuggestedColorPalette } from "./SuggestedColorPalette";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -30,7 +31,9 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
 
   const handleSuggestColors = async () => {
     if (logoUrl) {
+      console.log('Suggesting colors from logo:', logoUrl);
       const colors = await extractColors(logoUrl);
+      console.log('Generated color palette:', colors);
       setPredefinedColors(colors);
     }
   };
@@ -50,23 +53,25 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </div>
       </CardHeader>
       <CardContent className="space-y-8">
+        <SuggestedColorPalette colors={predefinedColors} />
+
         <div className="space-y-6">
           <h3 className="text-lg font-medium">Brand Colors</h3>
           <ColorPicker
             label="Main Color"
-            colors={predefinedColors.primary}
+            colors={[]}
             selectedColor={form.watch("main_color")}
             onColorSelect={(color) => form.setValue("main_color", color)}
           />
           <ColorPicker
             label="Secondary Color"
-            colors={predefinedColors.secondary}
+            colors={[]}
             selectedColor={form.watch("secondary_color")}
             onColorSelect={(color) => form.setValue("secondary_color", color)}
           />
           <ColorPicker
             label="Font Color"
-            colors={predefinedColors.accent}
+            colors={[]}
             selectedColor={form.watch("font_color")}
             onColorSelect={(color) => form.setValue("font_color", color)}
           />
@@ -76,31 +81,31 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
           <h3 className="text-lg font-medium">Verification Colors</h3>
           <ColorPicker
             label="Button Color"
-            colors={predefinedColors.primary}
+            colors={[]}
             selectedColor={form.watch("verification_button_color")}
             onColorSelect={(color) => form.setValue("verification_button_color", color)}
           />
           <ColorPicker
             label="Button Text Color"
-            colors={predefinedColors.accent}
+            colors={[]}
             selectedColor={form.watch("verification_button_text_color")}
             onColorSelect={(color) => form.setValue("verification_button_text_color", color)}
           />
           <ColorPicker
             label="Text Color"
-            colors={predefinedColors.accent}
+            colors={[]}
             selectedColor={form.watch("verification_text_color")}
             onColorSelect={(color) => form.setValue("verification_text_color", color)}
           />
           <ColorPicker
             label="Checkbox Color"
-            colors={predefinedColors.primary}
+            colors={[]}
             selectedColor={form.watch("verification_checkbox_color")}
             onColorSelect={(color) => form.setValue("verification_checkbox_color", color)}
           />
           <ColorPicker
             label="Input Border Color"
-            colors={predefinedColors.accent}
+            colors={[]}
             selectedColor={form.watch("verification_input_border_color")}
             onColorSelect={(color) => form.setValue("verification_input_border_color", color)}
           />
