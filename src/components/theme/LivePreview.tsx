@@ -212,12 +212,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
             >
               Instructions
             </h2>
-            <p 
-              className="mb-6"
+            <div 
+              className="prose prose-sm mb-6 max-w-none [&_a]:text-blue-500 [&_a]:underline"
               style={{ color: colors.font.secondary }}
-            >
-              {previewData.instructions_text}
-            </p>
+              dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
+            />
             <button 
               className="w-full px-4 py-2 rounded"
               style={{

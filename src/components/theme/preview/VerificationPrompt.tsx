@@ -74,11 +74,10 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                 />
                 <label 
                   htmlFor="age-verification" 
-                  className="text-sm cursor-pointer select-none"
+                  className="text-sm cursor-pointer select-none prose prose-sm"
                   style={{ color: colors.font.secondary }}
-                >
-                  {previewData.verification_age_text}
-                </label>
+                  dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
+                />
               </div>
             </div>
           )}
@@ -129,12 +128,11 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
             {previewData.enable_instructions ? "Next" : "Enter Site"}
           </Button>
 
-          <p 
-            className="text-sm text-center"
+          <div 
+            className="text-sm text-center prose prose-sm"
             style={{ color: colors.font.secondary }}
-          >
-            {previewData.verification_legal_text}
-          </p>
+            dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
+          />
         </div>
       </div>
     </div>
