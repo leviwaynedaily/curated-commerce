@@ -2,43 +2,42 @@ import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ViewOptionsDropdown } from "./ViewOptionsDropdown"
+import { PreviewData } from "@/types/preview"
 
 interface PreviewHeaderProps {
-  logo_url?: string
-  name: string
-  mainColor: string
-  onSearchChange: (query: string) => void
-  onSortChange?: (sort: string) => void
-  onCategoryChange?: (category: string | null) => void
-  searchQuery: string
-  categories?: string[]
-  selectedCategory?: string | null
-  currentSort?: string
-  isScrolled: boolean
-  onLogoClick?: () => void
-  layout: string
-  textPlacement: string
-  onLayoutChange: (layout: string) => void
-  onTextPlacementChange: (placement: string) => void
+  previewData: PreviewData;
+  onReset?: () => void;
+  searchQuery?: string;
+  onSearchChange?: (query: string) => void;
+  onSortChange?: (sort: string) => void;
+  onCategoryChange?: (category: string | null) => void;
+  categories?: string[];
+  selectedCategory?: string | null;
+  currentSort?: string;
+  isScrolled?: boolean;
+  onLogoClick?: () => void;
+  layout?: string;
+  textPlacement?: string;
+  onLayoutChange?: (layout: string) => void;
+  onTextPlacementChange?: (placement: string) => void;
 }
 
 export function PreviewHeader({
-  logo_url,
-  name,
-  mainColor,
-  onSearchChange,
+  previewData,
+  onReset,
+  searchQuery = "",
+  onSearchChange = () => {},
   onSortChange,
   onCategoryChange,
-  searchQuery,
   categories = [],
   selectedCategory,
   currentSort,
-  isScrolled,
+  isScrolled = false,
   onLogoClick,
-  layout,
-  textPlacement,
-  onLayoutChange,
-  onTextPlacementChange,
+  layout = "medium",
+  textPlacement = "below",
+  onLayoutChange = () => {},
+  onTextPlacementChange = () => {},
 }: PreviewHeaderProps) {
   return (
     <header 
@@ -51,10 +50,10 @@ export function PreviewHeader({
       <div className="w-full py-4 px-4 md:px-8">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-shrink-0">
-            {logo_url && (
+            {previewData.logo_url && (
               <img 
-                src={logo_url} 
-                alt={name}
+                src={previewData.logo_url} 
+                alt={previewData.name}
                 className="h-8 object-contain cursor-pointer"
                 onClick={onLogoClick}
               />
@@ -110,7 +109,7 @@ export function PreviewHeader({
             <ViewOptionsDropdown
               layout={layout}
               textPlacement={textPlacement}
-              mainColor={mainColor}
+              mainColor={previewData.main_color || "#000000"}
               onLayoutChange={onLayoutChange}
               onTextPlacementChange={onTextPlacementChange}
             />

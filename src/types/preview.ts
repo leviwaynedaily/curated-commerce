@@ -17,4 +17,13 @@ export interface PreviewData {
   verification_checkbox_color?: string;
   verification_input_border_color?: string;
   verification_next_text_color?: string;
+  main_color?: string;
+  font_color?: string;
+  product_card_background_color?: string;
+  product_title_text_color?: string;
+  product_description_text_color?: string;
+  product_price_color?: string;
+  product_category_background_color?: string;
+  product_category_text_color?: string;
+  storefront_background_color?: string;
 }

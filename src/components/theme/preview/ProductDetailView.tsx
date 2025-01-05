@@ -1,17 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft } from "lucide-react";
+import { PreviewData } from "@/types/preview";
 
 interface ProductDetailViewProps {
   product: any;
   onBack: () => void;
+  previewData: PreviewData;
 }
 
-export function ProductDetailView({ product, onBack }: ProductDetailViewProps) {
+export function ProductDetailView({ product, onBack, previewData }: ProductDetailViewProps) {
   if (!product) return null;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div 
+      className="min-h-screen"
+      style={{ backgroundColor: previewData.storefront_background_color }}
+    >
       <div className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
@@ -53,23 +58,46 @@ export function ProductDetailView({ product, onBack }: ProductDetailViewProps) {
             <div>
               <div className="flex gap-2 mb-4">
                 {product.category && (
-                  <Badge variant="outline">{product.category}</Badge>
+                  <Badge 
+                    variant="outline"
+                    style={{
+                      backgroundColor: previewData.product_category_background_color,
+                      color: previewData.product_category_text_color,
+                      borderColor: 'transparent'
+                    }}
+                  >
+                    {product.category}
+                  </Badge>
                 )}
               </div>
-              <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
+              <h1 
+                className="text-4xl font-bold mb-4"
+                style={{ color: previewData.product_title_text_color }}
+              >
+                {product.name}
+              </h1>
               {product.description && (
-                <p className="text-lg text-muted-foreground">
+                <p 
+                  className="text-lg"
+                  style={{ color: previewData.product_description_text_color }}
+                >
                   {product.description}
                 </p>
               )}
             </div>
 
             <div className="space-y-4">
-              <div className="text-3xl font-bold">
+              <div 
+                className="text-3xl font-bold"
+                style={{ color: previewData.product_price_color }}
+              >
                 ${product.in_town_price}
               </div>
               {product.shipping_price > 0 && (
-                <p className="text-sm text-muted-foreground">
+                <p 
+                  className="text-sm"
+                  style={{ color: previewData.product_description_text_color }}
+                >
                   Shipping: ${product.shipping_price}
                 </p>
               )}
