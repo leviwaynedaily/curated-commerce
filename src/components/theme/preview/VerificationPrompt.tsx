@@ -59,23 +59,24 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
         <div className="space-y-6">
           {showAge && (
             <div className="flex items-start space-x-3">
-              <Checkbox
-                id="age-verification"
-                checked={ageConfirmed}
-                onCheckedChange={(checked) => {
-                  setAgeConfirmed(checked as boolean);
-                  setError(null);
-                }}
-                className="mt-1"
-                accentColor={colors.background.accent}
-              />
-              <label 
-                htmlFor="age-verification" 
-                className="text-sm cursor-pointer"
-                style={{ color: colors.font.secondary }}
-              >
-                {previewData.verification_age_text}
-              </label>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="age-verification"
+                  checked={ageConfirmed}
+                  onCheckedChange={(checked) => {
+                    setAgeConfirmed(checked as boolean);
+                    setError(null);
+                  }}
+                  accentColor={colors.background.accent}
+                />
+                <label 
+                  htmlFor="age-verification" 
+                  className="text-sm cursor-pointer"
+                  style={{ color: colors.font.secondary }}
+                >
+                  {previewData.verification_age_text}
+                </label>
+              </div>
             </div>
           )}
 
