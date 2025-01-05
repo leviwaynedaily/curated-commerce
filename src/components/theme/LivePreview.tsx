@@ -21,14 +21,12 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Lock scrolling when verification or instructions prompt is shown
     if (!showContent) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
 
-    // Cleanup function to restore scrolling
     return () => {
       document.body.style.overflow = 'unset';
     };
@@ -37,11 +35,12 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   useEffect(() => {
     const fetchStorefrontData = async () => {
       try {
-        console.log("Fetching storefront data for preview:", storefrontId);
+        console.log("Fetching storefront data for preview. ID:", storefrontId);
+        
         const { data, error } = await supabase
           .from("storefronts")
           .select()
-          .match({ id: storefrontId, is_published: true })
+          .match({ id: storefrontId })
           .maybeSingle();
 
         console.log("Supabase response - Data:", data);
@@ -55,23 +54,9 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         }
 
         if (!data) {
-          console.error("No storefront found or not published");
-          // Let's check if the storefront exists but is not published
-          const { data: unpublishedData } = await supabase
-            .from("storefronts")
-            .select()
-            .match({ id: storefrontId })
-            .maybeSingle();
-          
-          console.log("Checking unpublished storefront:", unpublishedData);
-          
-          if (unpublishedData) {
-            setError("This store exists but has not been published yet.");
-            toast.error("This store exists but has not been published yet.");
-          } else {
-            setError("This store is not available.");
-            toast.error("This store is not available.");
-          }
+          console.error("No storefront found");
+          setError("This store is not available.");
+          toast.error("This store is not available.");
           return;
         }
 
@@ -96,8 +81,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
     fetchStorefrontData();
   }, [storefrontId]);
-
-  // ... keep existing code (handleVerification, handleContinue, handleReset functions)
 
   if (error) {
     return (
