@@ -5,6 +5,7 @@ import debounce from "lodash.debounce";
 import { Badge } from "@/components/ui/badge";
 import { PreviewPagination } from "./PreviewPagination";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { ProductDetailView } from "./ProductDetailView";
 
 interface PreviewContentProps {
   previewData: any;
@@ -18,6 +19,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const [currentSort, setCurrentSort] = useState('newest');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   const { data: productsData } = useStorefrontProducts(previewData.id, currentPage);
   const products = productsData?.products || [];
@@ -99,6 +101,15 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
     return tmp.textContent || tmp.innerText || '';
   };
 
+  if (selectedProduct) {
+    return (
+      <ProductDetailView
+        product={selectedProduct}
+        onBack={() => setSelectedProduct(null)}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <PreviewHeader
@@ -146,7 +157,8 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           {filteredAndSortedProducts?.map((product) => (
             <div 
               key={product.id}
-              className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} bg-card`}
+              className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} bg-card cursor-pointer`}
+              onClick={() => setSelectedProduct(product)}
             >
               {product.images?.[0] && (
                 <div className="relative h-full">
