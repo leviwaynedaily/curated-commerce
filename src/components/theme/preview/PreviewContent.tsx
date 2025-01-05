@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
@@ -19,14 +19,31 @@ interface PreviewContentProps {
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [layout, setLayout] = useState("small"); // Changed default to "small"
+  const [layout, setLayout] = useState("small");
   const [textPlacement, setTextPlacement] = useState("below");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 12;
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        setShowInstructions(false);
+      }
+    };
+
+    if (showInstructions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showInstructions]);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products", previewData.id, currentPage, searchQuery, currentSort, selectedCategory],
@@ -158,7 +175,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       {showInstructions && previewData.enable_instructions && (
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
           <div className="h-full w-full flex items-center justify-center p-4">
-            <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
+            <div ref={modalRef} className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
               {previewData.logo_url && (
                 <img 
                   src={previewData.logo_url} 
