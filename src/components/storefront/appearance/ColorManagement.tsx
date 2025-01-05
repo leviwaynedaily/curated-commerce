@@ -119,20 +119,22 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
         </Button>
       </div>
 
-      <div>
-        <h4 className="text-sm font-medium mb-4">General Colors</h4>
-        <ColorPicker name="main_color" label="Main Color" />
-        <ColorPicker name="secondary_color" label="Secondary Color" />
-        <ColorPicker name="font_color" label="Font Color" />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h4 className="text-sm font-medium mb-4">General Colors</h4>
+          <ColorPicker name="main_color" label="Main Color" />
+          <ColorPicker name="secondary_color" label="Secondary Color" />
+          <ColorPicker name="font_color" label="Font Color" />
+        </div>
 
-      <div>
-        <h4 className="text-sm font-medium mb-4">Verification Colors</h4>
-        <ColorPicker name="verification_button_color" label="Button Color" />
-        <ColorPicker name="verification_button_text_color" label="Button Text Color" />
-        <ColorPicker name="verification_text_color" label="Text Color" />
-        <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
-        <ColorPicker name="verification_input_border_color" label="Input Border Color" />
+        <div>
+          <h4 className="text-sm font-medium mb-4">Verification Colors</h4>
+          <ColorPicker name="verification_button_color" label="Button Color" />
+          <ColorPicker name="verification_button_text_color" label="Button Text Color" />
+          <ColorPicker name="verification_text_color" label="Text Color" />
+          <ColorPicker name="verification_checkbox_color" label="Checkbox Color" />
+          <ColorPicker name="verification_input_border_color" label="Input Border Color" />
+        </div>
       </div>
 
       <div>
