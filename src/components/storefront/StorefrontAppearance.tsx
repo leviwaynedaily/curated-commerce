@@ -1,6 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
 import { ColorManagement } from "./appearance/ColorManagement";
-import { BrowserAssets } from "./appearance/BrowserAssets";
 import { Button } from "@/components/ui/button";
 import { ExternalLink } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -47,8 +46,6 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
       </Button>
 
       <div className="space-y-8">
-        <BrowserAssets form={form} storefrontId={storefrontId} />
-        
         <ColorManagement 
           form={form} 
           storefrontId={storefrontId} 
