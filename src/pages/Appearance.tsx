@@ -17,8 +17,11 @@ const formSchema = z.object({
   main_color: z.string().default("#1A1F2C"),
   secondary_color: z.string().default("#D6BCFA"),
   font_color: z.string().default("#FFFFFF"),
-  verification_color: z.string().default("#1A1F2C"),
-  instructions_color: z.string().default("#1A1F2C"),
+  verification_button_color: z.string().default("#D946EF"),
+  verification_button_text_color: z.string().default("#FFFFFF"),
+  verification_text_color: z.string().default("#1A1F2C"),
+  verification_checkbox_color: z.string().default("#D946EF"),
+  verification_input_border_color: z.string().default("#E5E7EB"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -61,8 +64,11 @@ const Appearance = () => {
       main_color: "#1A1F2C",
       secondary_color: "#D6BCFA",
       font_color: "#FFFFFF",
-      verification_color: "#1A1F2C",
-      instructions_color: "#1A1F2C",
+      verification_button_color: "#D946EF",
+      verification_button_text_color: "#FFFFFF",
+      verification_text_color: "#1A1F2C",
+      verification_checkbox_color: "#D946EF",
+      verification_input_border_color: "#E5E7EB",
     },
   });
 
@@ -73,14 +79,58 @@ const Appearance = () => {
       form.reset({
         favicon_url: storefront.favicon_url,
         logo_url: storefront.logo_url,
-        main_color: "#1A1F2C",
-        secondary_color: "#D6BCFA",
-        font_color: "#FFFFFF",
-        verification_color: "#1A1F2C",
-        instructions_color: "#1A1F2C",
+        main_color: storefront.main_color || "#1A1F2C",
+        secondary_color: storefront.secondary_color || "#D6BCFA",
+        font_color: storefront.font_color || "#FFFFFF",
+        verification_button_color: storefront.verification_button_color || "#D946EF",
+        verification_button_text_color: storefront.verification_button_text_color || "#FFFFFF",
+        verification_text_color: storefront.verification_text_color || "#1A1F2C",
+        verification_checkbox_color: storefront.verification_checkbox_color || "#D946EF",
+        verification_input_border_color: storefront.verification_input_border_color || "#E5E7EB",
       });
     }
   }, [storefront, form]);
+
+  // Add auto-save functionality
+  useEffect(() => {
+    const subscription = form.watch(async (values) => {
+      if (storefront && currentStorefrontId) {
+        console.log("Form values changed, saving to database:", values);
+        
+        const { error } = await supabase
+          .from("storefronts")
+          .update({
+            main_color: values.main_color,
+            secondary_color: values.secondary_color,
+            font_color: values.font_color,
+            verification_button_color: values.verification_button_color,
+            verification_button_text_color: values.verification_button_text_color,
+            verification_text_color: values.verification_text_color,
+            verification_checkbox_color: values.verification_checkbox_color,
+            verification_input_border_color: values.verification_input_border_color,
+          })
+          .eq("id", currentStorefrontId);
+
+        if (error) {
+          console.error("Error saving color changes:", error);
+          toast({
+            title: "Error",
+            description: "Failed to save color changes",
+            variant: "destructive",
+          });
+        } else {
+          console.log("Color changes saved successfully");
+          queryClient.invalidateQueries({ queryKey: ["storefront", currentStorefrontId] });
+          toast({
+            title: "Success",
+            description: "Color changes saved",
+          });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, storefront, currentStorefrontId, queryClient, toast]);
 
   if (isLoading) {
     return (
@@ -95,7 +145,11 @@ const Appearance = () => {
   if (!currentStorefrontId) {
     return (
       <DashboardLayout>
-        <div>Please select a storefront first</div>
+        <Alert>
+          <AlertDescription>
+            Please select a storefront first
+          </AlertDescription>
+        </Alert>
       </DashboardLayout>
     );
   }
