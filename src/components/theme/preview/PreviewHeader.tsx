@@ -37,9 +37,9 @@ export function PreviewHeader({
   isScrolled
 }: PreviewHeaderProps) {
   return (
-    <header className={`w-full transition-all duration-300 ${isScrolled ? 'fixed top-0 left-0 z-50 right-0' : ''}`}>
+    <header className={`w-full bg-background transition-all duration-300 ${isScrolled ? 'fixed top-0 left-0 z-50 right-0 shadow-sm' : ''}`}>
       <div className="w-full">
-        <div className="flex items-center justify-between py-4 bg-background/80 backdrop-blur-sm px-4 md:px-8">
+        <div className="flex items-center justify-between py-4 bg-background/95 backdrop-blur-sm px-4 md:px-8">
           <div className="flex items-center space-x-4 min-w-[120px]">
             {isScrolled && logo_url && (
               <img 
@@ -53,7 +53,7 @@ export function PreviewHeader({
         </div>
 
         {isScrolled && showFilters && (
-          <div className="border-t border-border/30 bg-background/10 backdrop-blur-sm">
+          <div className="border-t border-border/30 bg-background/95 backdrop-blur-sm">
             <div className="flex flex-col md:flex-row items-center justify-between py-2 px-4 md:px-8 gap-4">
               <div className="flex items-center space-x-4 overflow-x-auto w-full md:w-auto">
                 {categories.length > 0 && (
