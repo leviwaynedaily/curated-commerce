@@ -19,15 +19,18 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   });
 
   useEffect(() => {
-    if (logoUrl) {
-      const colors = extractColors(logoUrl);
-      setPredefinedColors(colors);
-    }
+    const loadColors = async () => {
+      if (logoUrl) {
+        const colors = await extractColors(logoUrl);
+        setPredefinedColors(colors);
+      }
+    };
+    loadColors();
   }, [logoUrl]);
 
-  const handleSuggestColors = () => {
+  const handleSuggestColors = async () => {
     if (logoUrl) {
-      const colors = extractColors(logoUrl);
+      const colors = await extractColors(logoUrl);
       setPredefinedColors(colors);
     }
   };
