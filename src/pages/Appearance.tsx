@@ -10,6 +10,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useMemo } from "react";
 import debounce from "lodash.debounce";
 import { ThemeConfig } from "@/types/theme";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const defaultThemeConfig: ThemeConfig = {
   colors: {
@@ -41,6 +43,7 @@ const formSchema = z.object({
       }),
     }),
   }).default(defaultThemeConfig),
+  favicon_url: z.string().nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,7 +63,7 @@ const Appearance = () => {
 
       const { data, error } = await supabase
         .from("storefronts")
-        .select("theme_config")
+        .select("theme_config, logo_url")
         .eq("id", currentStorefrontId)
         .maybeSingle();
 
@@ -69,22 +72,34 @@ const Appearance = () => {
         throw error;
       }
 
-      // Validate and ensure the theme_config matches our expected structure
-      const rawThemeConfig = data?.theme_config;
-      if (!rawThemeConfig || typeof rawThemeConfig !== 'object') {
+      // Ensure theme_config is properly structured
+      const themeConfig = data?.theme_config;
+      if (!themeConfig || typeof themeConfig !== 'object' || Array.isArray(themeConfig)) {
         console.log("Invalid theme_config, using default:", defaultThemeConfig);
-        return { theme_config: defaultThemeConfig };
+        return { theme_config: defaultThemeConfig, logo_url: data?.logo_url };
       }
 
-      // Type assertion after validation
-      const themeConfig = rawThemeConfig as ThemeConfig;
-      if (!themeConfig.colors?.background || !themeConfig.colors?.font) {
-        console.log("Incomplete theme_config, using default:", defaultThemeConfig);
-        return { theme_config: defaultThemeConfig };
-      }
+      // Validate theme_config structure
+      const validatedConfig = {
+        colors: {
+          background: {
+            primary: themeConfig.colors?.background?.primary || defaultThemeConfig.colors.background.primary,
+            secondary: themeConfig.colors?.background?.secondary || defaultThemeConfig.colors.background.secondary,
+            accent: themeConfig.colors?.background?.accent || defaultThemeConfig.colors.background.accent,
+          },
+          font: {
+            primary: themeConfig.colors?.font?.primary || defaultThemeConfig.colors.font.primary,
+            secondary: themeConfig.colors?.font?.secondary || defaultThemeConfig.colors.font.secondary,
+            highlight: themeConfig.colors?.font?.highlight || defaultThemeConfig.colors.font.highlight,
+          },
+        },
+      };
 
-      console.log("Fetched storefront theme_config:", themeConfig);
-      return { theme_config: themeConfig };
+      console.log("Fetched and validated theme_config:", validatedConfig);
+      return { 
+        theme_config: validatedConfig,
+        logo_url: data?.logo_url 
+      };
     },
     enabled: !!currentStorefrontId,
   });
@@ -92,7 +107,8 @@ const Appearance = () => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      theme_config: storefront?.theme_config || defaultThemeConfig,
+      theme_config: defaultThemeConfig,
+      favicon_url: null,
     },
   });
 
@@ -102,6 +118,7 @@ const Appearance = () => {
       console.log("Setting form values from storefront theme_config:", storefront.theme_config);
       form.reset({
         theme_config: storefront.theme_config,
+        favicon_url: null,
       });
     }
   }, [storefront, form]);
@@ -184,6 +201,15 @@ const Appearance = () => {
             Customize how your storefront looks. Changes are saved automatically.
           </p>
         </div>
+
+        {!storefront?.logo_url && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Please upload a logo in the Basic Information section first to use the color suggestion feature.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Form {...form}>
           <form className="space-y-8">
