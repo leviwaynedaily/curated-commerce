@@ -24,12 +24,11 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const { data: productsData } = useStorefrontProducts(previewData.id, currentPage);
   const products = productsData?.products || [];
 
+  // Properly set up scroll event listener
   useEffect(() => {
     const handleScroll = debounce(() => {
       const shouldBeScrolled = window.scrollY > 300;
-      if (isScrolled !== shouldBeScrolled) {
-        setIsScrolled(shouldBeScrolled);
-      }
+      setIsScrolled(shouldBeScrolled);
     }, 100);
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -38,7 +37,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       handleScroll.cancel();
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [isScrolled]);
+  }, []);
 
   // Reset to first page when filters change
   useEffect(() => {
