@@ -24,30 +24,38 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const products = productsData?.products || [];
 
   useEffect(() => {
-    const handleScroll = debounce(() => {
-      const scrollPosition = window.scrollY;
-      const wasScrolled = isScrolled;
-      const newScrolled = scrollPosition > 100;
-      
-      console.log('Scroll Debug:', {
-        position: scrollPosition,
-        threshold: 100,
-        previousState: wasScrolled,
-        newState: newScrolled
-      });
-
-      if (wasScrolled !== newScrolled) {
-        console.log(`Header state changing from ${wasScrolled ? 'visible' : 'hidden'} to ${newScrolled ? 'visible' : 'hidden'}`);
-        setIsScrolled(newScrolled);
-      }
+    console.log('Initial scroll setup with isScrolled:', isScrolled);
+    
+    const debouncedSetIsScrolled = debounce((newValue: boolean) => {
+      console.log('Debounced scroll state update:', newValue);
+      setIsScrolled(newValue);
     }, 50);
 
-    console.log('Setting up scroll listener');
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      console.log('Raw scroll event - position:', scrollPosition);
+      
+      if (scrollPosition > 100) {
+        console.log('Scroll threshold exceeded:', scrollPosition);
+        if (!isScrolled) {
+          console.log('Triggering header show');
+          debouncedSetIsScrolled(true);
+        }
+      } else {
+        console.log('Below scroll threshold:', scrollPosition);
+        if (isScrolled) {
+          console.log('Triggering header hide');
+          debouncedSetIsScrolled(false);
+        }
+      }
+    };
+
+    console.log('Adding scroll listener');
+    window.addEventListener('scroll', handleScroll);
     
     return () => {
-      console.log('Cleaning up scroll listener');
-      handleScroll.cancel();
+      console.log('Removing scroll listener and canceling debounce');
+      debouncedSetIsScrolled.cancel();
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isScrolled]);
