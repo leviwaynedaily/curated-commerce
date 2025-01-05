@@ -76,7 +76,7 @@ export function DashboardSidebar({
   ];
 
   return (
-    <div className={cn("h-full bg-background", className)}>
+    <div className={cn("h-full bg-background w-52", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
           <h1 className="text-xl font-semibold mb-4 flex items-center gap-2">
