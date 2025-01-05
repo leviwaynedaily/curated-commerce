@@ -43,7 +43,7 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[16rem] sm:aspect-[3/5]'
+        return 'min-h-[20rem] sm:aspect-[4/6]' // Increased height for small grid
       case 'large':
         return 'min-h-[24rem] md:aspect-video'
       case 'list':
@@ -56,7 +56,7 @@ export function ProductGrid({
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-3/5 relative",
+        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative", // Adjusted for small grid
         textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
@@ -100,7 +100,7 @@ export function ProductGrid({
                   {product.category && (
                     <Badge 
                       variant="outline" 
-                      className={textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}
+                      className={`text-xs ${textPlacement === 'overlay' ? 'bg-transparent border-white/40 text-white' : ''}`}
                       style={{
                         backgroundColor: productCategoryBackgroundColor,
                         color: productCategoryTextColor,
@@ -116,7 +116,7 @@ export function ProductGrid({
                   style={{ 
                     color: productTitleTextColor,
                     fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                    fontSize: '14px'
+                    fontSize: layout === 'small' ? '12px' : '14px' // Smaller font for small grid
                   }}
                 >
                   {product.name}
@@ -127,7 +127,7 @@ export function ProductGrid({
                     style={{ 
                       color: productDescriptionTextColor,
                       fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                      fontSize: '12px'
+                      fontSize: layout === 'small' ? '10px' : '12px' // Smaller font for small grid
                     }}
                   >
                     {product.description}
@@ -138,11 +138,11 @@ export function ProductGrid({
                 className="space-y-1 text-sm font-open-sans mt-2"
                 style={{ color: productPriceColor }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-xs"> {/* Reduced gap and font size */}
                   <span className="font-medium">In Town:</span>
                   <span>${product.in_town_price}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-xs"> {/* Reduced gap and font size */}
                   <span className="font-medium">Ship:</span>
                   <span>${product.shipping_price}</span>
                 </div>

@@ -18,7 +18,7 @@ interface PreviewContentProps {
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [layout, setLayout] = useState("medium");
+  const [layout, setLayout] = useState("small"); // Changed default to "small"
   const [textPlacement, setTextPlacement] = useState("below");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentSort, setCurrentSort] = useState("newest");
