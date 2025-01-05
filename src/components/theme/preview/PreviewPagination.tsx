@@ -11,14 +11,12 @@ interface PreviewPaginationProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
-  colors: any;
 }
 
 export function PreviewPagination({ 
   currentPage, 
   totalPages, 
   onPageChange,
-  colors 
 }: PreviewPaginationProps) {
   if (totalPages <= 1) return null;
 
@@ -31,10 +29,6 @@ export function PreviewPagination({
           <PaginationPrevious
             onClick={() => currentPage > 1 && onPageChange(currentPage - 1)}
             className={currentPage <= 1 ? 'pointer-events-none opacity-50' : ''}
-            style={{
-              backgroundColor: colors.background.secondary,
-              color: colors.font.primary,
-            }}
           />
         </PaginationItem>
 
@@ -43,10 +37,6 @@ export function PreviewPagination({
             <PaginationLink
               onClick={() => onPageChange(page)}
               isActive={currentPage === page}
-              style={{
-                backgroundColor: currentPage === page ? colors.background.accent : colors.background.secondary,
-                color: colors.font.primary,
-              }}
             >
               {page}
             </PaginationLink>
@@ -57,10 +47,6 @@ export function PreviewPagination({
           <PaginationNext
             onClick={() => currentPage < totalPages && onPageChange(currentPage + 1)}
             className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
-            style={{
-              backgroundColor: colors.background.secondary,
-              color: colors.font.primary,
-            }}
           />
         </PaginationItem>
       </PaginationContent>

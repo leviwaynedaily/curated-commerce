@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PreviewHeaderProps {
-  colors: any;
   logo_url?: string;
   name: string;
   onGridChange: (size: 'small' | 'medium' | 'large') => void;
@@ -21,7 +20,6 @@ interface PreviewHeaderProps {
 }
 
 export function PreviewHeader({ 
-  colors, 
   logo_url, 
   name,
   onGridChange,
@@ -37,10 +35,7 @@ export function PreviewHeader({
   showFilters = true
 }: PreviewHeaderProps) {
   return (
-    <div 
-      className="sticky top-0 z-50 py-4 transition-all duration-300"
-      style={{ backgroundColor: `${colors.background.primary}CC` }}
-    >
+    <div className="sticky top-0 z-50 py-4 transition-all duration-300 bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-4">
           <div className="flex items-center gap-4">
@@ -57,18 +52,13 @@ export function PreviewHeader({
           {showFilters && (
             <div className="flex-1 flex flex-col md:flex-row items-center gap-4">
               <div className="relative flex-1 max-w-md w-full">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="search"
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   className="pl-10"
-                  style={{
-                    backgroundColor: colors.background.secondary,
-                    color: colors.font.primary,
-                    borderColor: `${colors.font.secondary}33`
-                  }}
                 />
               </div>
 
@@ -77,14 +67,7 @@ export function PreviewHeader({
                   value={currentSort}
                   onValueChange={onSortChange}
                 >
-                  <SelectTrigger 
-                    className="w-[160px]"
-                    style={{
-                      backgroundColor: colors.background.secondary,
-                      color: colors.font.primary,
-                      borderColor: `${colors.font.secondary}33`
-                    }}
-                  >
+                  <SelectTrigger className="w-[160px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -100,14 +83,7 @@ export function PreviewHeader({
                     value={selectedCategory || "all"}
                     onValueChange={(value) => onCategoryChange(value === "all" ? null : value)}
                   >
-                    <SelectTrigger 
-                      className="w-[160px]"
-                      style={{
-                        backgroundColor: colors.background.secondary,
-                        color: colors.font.primary,
-                        borderColor: `${colors.font.secondary}33`
-                      }}
-                    >
+                    <SelectTrigger className="w-[160px]">
                       <SelectValue placeholder="Category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -127,10 +103,6 @@ export function PreviewHeader({
                     size="icon"
                     onClick={() => onGridChange('small')}
                     className={gridSize === 'small' ? 'bg-accent' : ''}
-                    style={{
-                      backgroundColor: gridSize === 'small' ? colors.background.accent : 'transparent',
-                      color: colors.font.primary
-                    }}
                   >
                     <div className="w-4 h-4 grid grid-cols-3 gap-0.5">
                       {[...Array(9)].map((_, i) => (
@@ -143,10 +115,6 @@ export function PreviewHeader({
                     size="icon"
                     onClick={() => onGridChange('medium')}
                     className={gridSize === 'medium' ? 'bg-accent' : ''}
-                    style={{
-                      backgroundColor: gridSize === 'medium' ? colors.background.accent : 'transparent',
-                      color: colors.font.primary
-                    }}
                   >
                     <div className="w-4 h-4 grid grid-cols-2 gap-0.5">
                       {[...Array(4)].map((_, i) => (
@@ -159,10 +127,6 @@ export function PreviewHeader({
                     size="icon"
                     onClick={() => onGridChange('large')}
                     className={gridSize === 'large' ? 'bg-accent' : ''}
-                    style={{
-                      backgroundColor: gridSize === 'large' ? colors.background.accent : 'transparent',
-                      color: colors.font.primary
-                    }}
                   >
                     <div className="w-4 h-4 grid grid-cols-1 gap-0.5">
                       {[...Array(2)].map((_, i) => (

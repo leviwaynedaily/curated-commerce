@@ -7,10 +7,9 @@ import { PreviewData } from "@/types/preview"
 interface VerificationPromptProps {
   previewData: PreviewData
   onVerify: (password?: string) => void
-  colors: any
 }
 
-export function VerificationPrompt({ previewData, onVerify, colors }: VerificationPromptProps) {
+export function VerificationPrompt({ previewData, onVerify }: VerificationPromptProps) {
   const [password, setPassword] = useState("")
   const [ageConfirmed, setAgeConfirmed] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -33,13 +32,8 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
   }
 
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-    >
-      <div 
-        className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl"
-        style={{ backgroundColor: colors.background.secondary }}
-      >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="relative max-w-md w-full rounded-lg p-8 space-y-6 shadow-xl bg-card">
         {previewData.verification_logo_url && (
           <img 
             src={previewData.verification_logo_url} 
@@ -48,10 +42,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
           />
         )}
         
-        <h2 
-          className="text-2xl font-bold text-center"
-          style={{ color: colors.font.primary }}
-        >
+        <h2 className="text-2xl font-bold text-center">
           Verification Required
         </h2>
 
@@ -67,15 +58,10 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                     setError(null)
                   }}
                   className="h-5 w-5 rounded-sm border cursor-pointer"
-                  style={{
-                    borderColor: colors.background.accent,
-                    backgroundColor: ageConfirmed ? colors.background.accent : 'transparent',
-                  }}
                 />
                 <label 
                   htmlFor="age-verification" 
                   className="text-sm cursor-pointer select-none prose prose-sm [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
-                  style={{ color: colors.font.secondary }}
                   dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
                 />
               </div>
@@ -84,10 +70,7 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
 
           {showPassword && (
             <div className="space-y-2">
-              <label 
-                className="text-sm font-medium"
-                style={{ color: colors.font.primary }}
-              >
+              <label className="text-sm font-medium">
                 Site Password
               </label>
               <Input
@@ -99,30 +82,18 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
                   setError(null)
                 }}
                 className="w-full"
-                style={{
-                  backgroundColor: colors.background.primary,
-                  color: colors.font.primary,
-                  borderColor: `${colors.font.secondary}33`
-                }}
               />
             </div>
           )}
 
           {error && (
-            <p 
-              className="text-destructive text-sm"
-              style={{ color: colors.font.highlight }}
-            >
+            <p className="text-destructive text-sm">
               {error}
             </p>
           )}
 
           <Button 
             className="w-full"
-            style={{
-              backgroundColor: colors.background.accent,
-              color: colors.font.primary
-            }}
             onClick={handleVerification}
           >
             {previewData.enable_instructions ? "Next" : "Enter Site"}
@@ -130,7 +101,6 @@ export function VerificationPrompt({ previewData, onVerify, colors }: Verificati
 
           <div 
             className="text-sm text-center prose prose-sm [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
-            style={{ color: colors.font.secondary }}
             dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
           />
         </div>
