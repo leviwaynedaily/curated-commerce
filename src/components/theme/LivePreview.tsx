@@ -96,49 +96,23 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
   if (!previewData) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
+  // Skip verification in preview mode
+  if (!isVerified) {
+    handleVerification();
+  }
+
   return (
-    <div className="min-h-screen relative bg-background">
-      {/* Always render the content */}
-      <div className={`${!isVerified ? 'filter blur-lg' : ''}`}>
-        <PreviewContent 
-          previewData={previewData} 
-          onReset={handleReset}
-        />
-      </div>
-
-      {/* Overlay verification prompt if not verified */}
-      {!isVerified && previewData.verification_type !== 'none' && (
-        <VerificationPrompt 
-          previewData={previewData}
-          onVerify={handleVerification}
-        />
-      )}
-
-      {/* Show instructions if needed */}
-      {isVerified && !showContent && showInstructions && previewData.enable_instructions && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/40">
-          <div className="absolute inset-0 backdrop-blur-xl" />
-          <div className="relative max-w-md w-full p-6 rounded-lg bg-card">
-            <h2 className="text-xl font-bold mb-4">Instructions</h2>
-            <div 
-              className="prose prose-sm mb-6 max-w-none [&_a]:text-blue-500 [&_a]:underline [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit"
-              dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
-            />
-            <button 
-              className="w-full px-4 py-2 rounded bg-primary text-primary-foreground"
-              onClick={handleContinue}
-            >
-              Continue to Site
-            </button>
-          </div>
-        </div>
-      )}
+    <div className="h-screen overflow-auto bg-background">
+      <PreviewContent 
+        previewData={previewData} 
+        onReset={handleReset}
+      />
     </div>
   );
 }

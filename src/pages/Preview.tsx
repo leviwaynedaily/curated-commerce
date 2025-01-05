@@ -6,11 +6,15 @@ export default function Preview() {
   const storefrontId = searchParams.get('storefrontId');
 
   if (!storefrontId) {
-    return <div className="p-4">No storefront ID provided</div>;
+    return (
+      <div className="flex items-center justify-center h-screen p-4 text-muted-foreground">
+        No storefront ID provided
+      </div>
+    );
   }
 
   return (
-    <div className="w-full h-screen">
+    <div className="w-full h-screen overflow-hidden">
       <LivePreview storefrontId={storefrontId} />
     </div>
   );
