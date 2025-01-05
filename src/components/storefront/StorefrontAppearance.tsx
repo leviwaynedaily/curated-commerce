@@ -46,12 +46,18 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
         Open Preview Window
       </Button>
 
-      <BrowserAssets form={form} storefrontId={storefrontId} />
-      <ColorManagement 
-        form={form} 
-        storefrontId={storefrontId} 
-        logoUrl={form.watch("logo_url")} 
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <BrowserAssets form={form} storefrontId={storefrontId} />
+        </div>
+        <div className="space-y-8">
+          <ColorManagement 
+            form={form} 
+            storefrontId={storefrontId} 
+            logoUrl={form.watch("logo_url")} 
+          />
+        </div>
+      </div>
     </div>
   );
 }
