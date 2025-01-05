@@ -43,7 +43,7 @@ export function MobileHeader({
   return (
     <div className="flex md:hidden items-center justify-between gap-2">
       {/* Left side - Help Icon */}
-      <div className="w-9 flex justify-start">
+      <div className="flex-none">
         {previewData.enable_instructions && (
           <Button
             variant="ghost"
@@ -68,8 +68,8 @@ export function MobileHeader({
         )}
       </div>
 
-      {/* Search and Options */}
-      <div className="flex items-center gap-2">
+      {/* Right side - Search and Options */}
+      <div className="flex-none flex items-center gap-2">
         {/* Search Icon/Input */}
         <div className="relative">
           {showSearch ? (
