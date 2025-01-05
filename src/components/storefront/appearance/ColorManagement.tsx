@@ -32,9 +32,23 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
     }
   };
 
+  const handleColorSelect = (category: string, color: string) => {
+    switch (category) {
+      case 'primary':
+        form.setValue("main_color", color);
+        break;
+      case 'secondary':
+        form.setValue("secondary_color", color);
+        break;
+      case 'accent':
+        form.setValue("font_color", color);
+        break;
+    }
+  };
+
   const openPreviewWindow = () => {
     if (storefrontId) {
-      const newWindow = window.open(
+      window.open(
         `/preview?storefrontId=${storefrontId}`,
         'StorefrontPreview',
         'width=390,height=844,resizable=yes'

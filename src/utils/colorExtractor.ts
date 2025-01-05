@@ -69,25 +69,22 @@ export async function extractColorsFromLogo(logoUrl: string) {
       font: {
         primary: primaryFont,
         secondary: secondaryFont,
-        highlight: '#ee459a', // Keep the original highlight color
+        highlight: '#ee459a',
       },
     });
 
     return {
-      background: {
-        primary: primaryBackground,
-        secondary: secondaryBackground,
-        accent: accentColor,
-      },
-      font: {
-        primary: primaryFont,
-        secondary: secondaryFont,
-        highlight: '#ee459a', // Keep the original highlight color
-      },
+      primary: [primaryBackground, adjustBrightness(primaryBackground, 20), adjustBrightness(primaryBackground, -20)],
+      secondary: [secondaryBackground, adjustBrightness(secondaryBackground, 20), adjustBrightness(secondaryBackground, -20)],
+      accent: [accentColor, adjustBrightness(accentColor, 20), adjustBrightness(accentColor, -20)],
     };
   } catch (error) {
     console.error('Error extracting colors:', error);
-    throw new Error('Failed to extract colors from logo');
+    return {
+      primary: ['#1A1F2C', '#2A2F3C', '#3A3F4C'],
+      secondary: ['#D6BCFA', '#E6CCFA', '#F6DCFA'],
+      accent: ['#EE459A', '#FF559A', '#FF659A'],
+    };
   }
 }
 
@@ -142,3 +139,5 @@ function isLightColor(hex: string): boolean {
   const luminance = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
   return luminance > 0.5;
 }
+
+export const extractColors = extractColorsFromLogo;
