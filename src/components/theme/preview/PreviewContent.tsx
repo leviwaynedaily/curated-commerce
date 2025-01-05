@@ -24,39 +24,36 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   const products = productsData?.products || [];
 
   useEffect(() => {
-    console.log('Initial scroll setup with isScrolled:', isScrolled);
+    console.log('Setting up scroll listener with initial isScrolled:', isScrolled);
     
-    const debouncedSetIsScrolled = debounce((newValue: boolean) => {
-      console.log('Debounced scroll state update:', newValue);
-      setIsScrolled(newValue);
-    }, 50);
-
     const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      console.log('Raw scroll event - position:', scrollPosition);
+      // Using document.documentElement for more consistent cross-browser support
+      const scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      console.log('Current scroll position:', scrollPosition);
       
       if (scrollPosition > 100) {
-        console.log('Scroll threshold exceeded:', scrollPosition);
         if (!isScrolled) {
-          console.log('Triggering header show');
-          debouncedSetIsScrolled(true);
+          console.log('Showing header - scroll position:', scrollPosition);
+          setIsScrolled(true);
         }
       } else {
-        console.log('Below scroll threshold:', scrollPosition);
         if (isScrolled) {
-          console.log('Triggering header hide');
-          debouncedSetIsScrolled(false);
+          console.log('Hiding header - scroll position:', scrollPosition);
+          setIsScrolled(false);
         }
       }
     };
 
-    console.log('Adding scroll listener');
-    window.addEventListener('scroll', handleScroll);
+    // Add passive event listener for better scroll performance
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    console.log('Scroll listener added to document');
+    
+    // Initial check
+    handleScroll();
     
     return () => {
-      console.log('Removing scroll listener and canceling debounce');
-      debouncedSetIsScrolled.cancel();
-      window.removeEventListener('scroll', handleScroll);
+      console.log('Cleaning up scroll listener');
+      document.removeEventListener('scroll', handleScroll);
     };
   }, [isScrolled]);
 
