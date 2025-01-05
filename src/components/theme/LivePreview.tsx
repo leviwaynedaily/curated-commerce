@@ -5,6 +5,7 @@ import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewContent } from "./preview/PreviewContent";
 import { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface LivePreviewProps {
   storefrontId: string;
@@ -17,6 +18,7 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [showContent, setShowContent] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Lock scrolling when verification or instructions prompt is shown
@@ -34,91 +36,67 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
   useEffect(() => {
     const fetchStorefrontData = async () => {
-      console.log("Fetching storefront data for preview:", storefrontId);
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", storefrontId)
-        .single();
+      try {
+        console.log("Fetching storefront data for preview:", storefrontId);
+        const { data, error } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("id", storefrontId)
+          .eq("is_published", true)
+          .single();
 
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        return;
-      }
-
-      console.log("Fetched storefront data:", data);
-      setPreviewData(data);
-
-      // If no verification is required, show instructions or content directly
-      if (data.verification_type === 'none') {
-        setIsVerified(true);
-        if (data.enable_instructions) {
-          setShowInstructions(true);
-        } else {
-          setShowContent(true);
+        if (error) {
+          console.error("Error fetching storefront:", error);
+          setError("This store is not available.");
+          toast.error("This store is not available.");
+          return;
         }
+
+        if (!data) {
+          console.error("No storefront found or not published");
+          setError("This store is not available or has not been published.");
+          toast.error("This store is not available or has not been published.");
+          return;
+        }
+
+        console.log("Fetched storefront data:", data);
+        setPreviewData(data);
+
+        // If no verification is required, show instructions or content directly
+        if (data.verification_type === 'none') {
+          setIsVerified(true);
+          if (data.enable_instructions) {
+            setShowInstructions(true);
+          } else {
+            setShowContent(true);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch storefront:", err);
+        setError("An error occurred while loading the store.");
+        toast.error("An error occurred while loading the store.");
       }
     };
 
     fetchStorefrontData();
-
-    // Subscribe to realtime changes
-    const channel = supabase
-      .channel(`storefront_changes_${storefrontId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'storefronts',
-          filter: `id=eq.${storefrontId}`,
-        },
-        (payload) => {
-          console.log("Received realtime update:", payload);
-          const newData = payload.new as StorefrontRow;
-          setPreviewData(newData);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
   }, [storefrontId]);
 
-  const handleVerification = (password?: string) => {
-    console.log("Handling verification...");
-    if (previewData.verification_type === 'password' || previewData.verification_type === 'both') {
-      if (password !== previewData.verification_password) {
-        return;
-      }
-    }
-    setIsVerified(true);
-    if (previewData.enable_instructions) {
-      console.log("Showing instructions after verification");
-      setShowInstructions(true);
-    } else {
-      console.log("Showing content directly after verification");
-      setShowContent(true);
-    }
-  };
-
-  const handleContinue = () => {
-    console.log("Continuing to content from instructions");
-    setShowInstructions(false);
-    setShowContent(true);
-  };
-
-  const handleReset = () => {
-    console.log("Resetting preview state");
-    setIsVerified(false);
-    setShowContent(false);
-    setShowInstructions(false);
-  };
-
-  if (!previewData) {
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-screen bg-background">
+        <div className="text-center space-y-4 p-4">
+          <h2 className="text-2xl font-semibold text-foreground">{error}</h2>
+          <p className="text-muted-foreground">
+            Please check the URL or contact the store owner.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!previewData || Object.keys(previewData).length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -174,4 +152,35 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
       )}
     </div>
   );
+
+  function handleVerification(password?: string) {
+    console.log("Handling verification...");
+    if (previewData.verification_type === 'password' || previewData.verification_type === 'both') {
+      if (password !== previewData.verification_password) {
+        toast.error("Invalid password");
+        return;
+      }
+    }
+    setIsVerified(true);
+    if (previewData.enable_instructions) {
+      console.log("Showing instructions after verification");
+      setShowInstructions(true);
+    } else {
+      console.log("Showing content directly after verification");
+      setShowContent(true);
+    }
+  }
+
+  function handleContinue() {
+    console.log("Continuing to content from instructions");
+    setShowInstructions(false);
+    setShowContent(true);
+  }
+
+  function handleReset() {
+    console.log("Resetting preview state");
+    setIsVerified(false);
+    setShowContent(false);
+    setShowInstructions(false);
+  }
 }
