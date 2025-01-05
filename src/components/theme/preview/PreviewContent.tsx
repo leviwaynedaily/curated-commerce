@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
@@ -72,6 +72,15 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       return data || [];
     },
   });
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   if (selectedProduct) {
     return (

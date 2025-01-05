@@ -41,10 +41,8 @@ export function PreviewHeader({
 }: PreviewHeaderProps) {
   return (
     <header 
-      className={`w-full transition-all duration-300 ${
-        isScrolled 
-          ? 'fixed top-0 left-0 z-50 right-0 bg-white/80 backdrop-blur-sm shadow-sm transform translate-y-0' 
-          : 'relative bg-transparent transform -translate-y-full pointer-events-none opacity-0'
+      className={`sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300 ${
+        isScrolled ? 'bg-white/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
       }`}
     >
       <div className="w-full py-4 px-4 md:px-8">
@@ -54,7 +52,7 @@ export function PreviewHeader({
               <img 
                 src={previewData.logo_url} 
                 alt={previewData.name}
-                className="h-8 object-contain cursor-pointer"
+                className="h-12 object-contain cursor-pointer"
                 onClick={onLogoClick}
               />
             )}
