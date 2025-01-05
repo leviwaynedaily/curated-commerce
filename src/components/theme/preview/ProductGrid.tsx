@@ -47,7 +47,7 @@ export function ProductGrid({
       case 'large':
         return 'aspect-video'
       case 'list':
-        return 'h-48 md:h-64'
+        return 'min-h-[12rem] md:min-h-[16rem]' // Changed from fixed height to min-height
       default: // medium
         return 'aspect-[4/5]'
     }
@@ -56,7 +56,7 @@ export function ProductGrid({
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-2/3 relative",
+        imageContainer: "h-1/2 relative", // Reduced image height to make more room for text
         textContainer: `p-4`,
         overlay: "hidden"
       }
@@ -112,14 +112,14 @@ export function ProductGrid({
                   )}
                 </div>
                 <h3 
-                  className="font-semibold mb-1"
+                  className="font-semibold mb-1 text-sm sm:text-base" // Reduced font size
                   style={{ color: productTitleTextColor }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p 
-                    className="text-sm line-clamp-2"
+                    className="text-xs sm:text-sm line-clamp-2 mb-2" // Reduced font size and added margin
                     style={{ color: productDescriptionTextColor }}
                   >
                     {product.description}
@@ -127,10 +127,17 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="text-sm font-medium mt-2"
+                className="space-y-1 text-sm" // Added spacing between price elements
                 style={{ color: productPriceColor }}
               >
-                ${product.in_town_price}
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">In Town:</span>
+                  <span>${product.in_town_price}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Ship:</span>
+                  <span>${product.shipping_price}</span>
+                </div>
               </div>
             </div>
           </div>
