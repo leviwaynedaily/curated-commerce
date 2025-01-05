@@ -45,23 +45,11 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-// Helper function to validate ThemeConfig structure
-const isValidThemeConfig = (config: any): config is ThemeConfig => {
-  return (
-    config &&
-    typeof config === 'object' &&
-    'colors' in config &&
-    typeof config.colors === 'object' &&
-    'background' in config.colors &&
-    'font' in config.colors
-  );
-};
-
 const Appearance = () => {
   const { toast } = useToast();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  const { data: storefront, isLoading } = useQuery({
+  const { data: storefront, isLoading, refetch } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
       console.log("Fetching storefront with ID:", currentStorefrontId);
@@ -81,21 +69,8 @@ const Appearance = () => {
         throw error;
       }
 
-      if (!data) {
-        throw new Error("Storefront not found");
-      }
-
       console.log("Fetched storefront:", data);
-      
-      // Validate theme_config structure and use default if invalid
-      const themeConfig = isValidThemeConfig(data.theme_config) 
-        ? data.theme_config 
-        : defaultThemeConfig;
-
-      return {
-        ...data,
-        theme_config: themeConfig,
-      };
+      return data;
     },
     enabled: !!currentStorefrontId,
   });
@@ -107,24 +82,20 @@ const Appearance = () => {
     },
   });
 
-  // Add auto-save functionality
-  const debouncedSave = useMemo(
-    () =>
-      debounce((values: FormValues) => {
-        onSubmit(values);
-      }, 1000),
-    []
-  );
-
+  // Update form values when storefront data is loaded
   useEffect(() => {
-    const subscription = form.watch((values) => {
-      debouncedSave(values as FormValues);
-    });
-    return () => subscription.unsubscribe();
-  }, [form.watch, debouncedSave]);
+    if (storefront?.theme_config) {
+      console.log("Setting form values from storefront theme_config:", storefront.theme_config);
+      form.reset({
+        theme_config: storefront.theme_config,
+      });
+    }
+  }, [storefront, form]);
 
   const onSubmit = async (values: FormValues) => {
     try {
+      console.log("Attempting to save theme_config:", values);
+      
       if (!currentStorefrontId) {
         throw new Error("No storefront selected");
       }
@@ -138,6 +109,8 @@ const Appearance = () => {
 
       if (error) throw error;
 
+      await refetch(); // Refetch the data to ensure we have the latest state
+      
       toast({
         title: "Success",
         description: "Changes saved automatically",
@@ -151,6 +124,26 @@ const Appearance = () => {
       });
     }
   };
+
+  // Add auto-save functionality with debounce
+  const debouncedSave = useMemo(
+    () =>
+      debounce((values: FormValues) => {
+        onSubmit(values);
+      }, 1000),
+    [onSubmit]
+  );
+
+  // Watch for form changes and trigger auto-save
+  useEffect(() => {
+    const subscription = form.watch((values) => {
+      if (storefront) { // Only auto-save if we have initial data
+        console.log("Form values changed:", values);
+        debouncedSave(values as FormValues);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form.watch, debouncedSave, storefront]);
 
   if (isLoading) {
     return (
