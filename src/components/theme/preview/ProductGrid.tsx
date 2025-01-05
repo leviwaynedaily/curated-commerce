@@ -43,21 +43,21 @@ export function ProductGrid({
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'aspect-[3/4]'
+        return 'aspect-[3/5]' // Made taller for small cards
       case 'large':
         return 'aspect-video'
       case 'list':
-        return 'min-h-[16rem] md:min-h-[20rem]' // Increased height
+        return 'min-h-[20rem] md:min-h-[24rem]' // Increased height further
       default: // medium
-        return 'aspect-[3/4]' // Changed from 4/5 to 3/4 for better photo fit
+        return 'aspect-[2/3]' // Changed from 3/4 to 2/3 for more height
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: "h-3/5 relative", // Increased image height
-        textContainer: `p-4`,
+        imageContainer: "h-3/5 relative", // Keep image height ratio
+        textContainer: `p-4 flex flex-col justify-between flex-grow`, // Added flex-grow to ensure text section takes remaining space
         overlay: "hidden"
       }
     } else {
@@ -93,7 +93,7 @@ export function ProductGrid({
             )}
             
             <div 
-              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
+              className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : 'flex flex-col h-2/5'} ${styles.textContainer}`}
             >
               <div>
                 <div className="flex gap-2 flex-wrap mb-2">
@@ -112,14 +112,14 @@ export function ProductGrid({
                   )}
                 </div>
                 <h3 
-                  className="font-dancing font-bold mb-1 text-base sm:text-lg" // Changed font and adjusted size
+                  className="font-dancing font-bold mb-1 text-base sm:text-lg line-clamp-2"
                   style={{ color: productTitleTextColor }}
                 >
                   {product.name}
                 </h3>
                 {product.description && (
                   <p 
-                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2" // Changed font and reduced size
+                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
                     style={{ color: productDescriptionTextColor }}
                   >
                     {product.description}
@@ -127,7 +127,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans" // Added Open Sans to prices
+                className="space-y-1 text-sm font-open-sans mt-auto" // Added mt-auto to push prices to bottom
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-2">
