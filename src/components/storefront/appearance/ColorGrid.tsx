@@ -5,15 +5,17 @@ interface ColorGridProps {
 
 export function ColorGrid({ colors, onColorClick }: ColorGridProps) {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
       {colors.map((colorObj, index) => (
-        <div key={index} className="space-y-2">
+        <div key={index} className="flex flex-col items-center space-y-2">
           <div
-            className="w-12 h-12 rounded-lg border cursor-pointer hover:ring-2 hover:ring-offset-2"
+            className="w-16 h-16 rounded-lg border cursor-pointer hover:ring-2 hover:ring-offset-2 transition-all"
             style={{ backgroundColor: colorObj.color }}
             onClick={() => onColorClick?.(colorObj.color)}
           />
-          <p className="text-xs text-center font-mono">{colorObj.label || colorObj.color}</p>
+          <p className="text-[11px] text-center font-mono truncate max-w-[90%]">
+            {colorObj.label || colorObj.color}
+          </p>
         </div>
       ))}
     </div>
