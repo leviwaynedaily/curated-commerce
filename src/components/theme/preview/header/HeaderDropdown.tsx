@@ -50,9 +50,11 @@ export function HeaderDropdown({
         className="w-56 bg-white/95 backdrop-blur-sm" 
         onCloseAutoFocus={(e) => e.preventDefault()}
         onInteractOutside={(e) => {
+          const target = e.target as Node;
+          const currentTarget = e.currentTarget as HTMLElement;
           // Only close when clicking outside, not when selecting options
-          if (e.target instanceof Node && !e.currentTarget.contains(e.target)) {
-            e.currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
+          if (!currentTarget.contains(target)) {
+            currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
           }
         }}
       >
