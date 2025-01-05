@@ -18,7 +18,7 @@ import { Loader2 } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(1, "Site name is required"),
   logo_url: z.string().nullable(),
-  description: z.string().nullable(),
+  description: z.string().nullable().optional(),  // Updated to handle null/undefined values
   show_description: z.boolean().default(false),
   verification_type: z.enum(["none", "age", "password", "both"]).default("none"),
   verification_logo_url: z.string().nullable(),
@@ -36,7 +36,7 @@ type FormValues = z.infer<typeof formSchema>;
 const DEFAULT_VALUES: FormValues = {
   name: "",
   logo_url: null,
-  description: "",
+  description: "",  // Initialize with empty string
   show_description: false,
   verification_type: "none" as const,
   verification_logo_url: null,
@@ -133,7 +133,7 @@ const StorefrontInformation = () => {
         .update({
           name: values.name,
           logo_url: values.logo_url,
-          description: values.description,
+          description: values.description || null,  // Handle empty string as null
           show_description: values.show_description,
           verification_type: values.verification_type,
           verification_logo_url: values.verification_logo_url,

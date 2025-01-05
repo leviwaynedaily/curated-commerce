@@ -75,7 +75,13 @@ export function StorefrontBasicInfo({ form }: StorefrontBasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <RichTextEditor value={field.value || ''} onChange={field.onChange} />
+                <RichTextEditor 
+                  value={field.value || ''} 
+                  onChange={(value) => {
+                    console.log("Description changed to:", value);
+                    field.onChange(value);
+                  }} 
+                />
               </FormControl>
             </FormItem>
           )}
