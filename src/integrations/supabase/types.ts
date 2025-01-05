@@ -224,12 +224,15 @@ export type Database = {
           description: string | null
           enable_instructions: boolean | null
           favicon_url: string | null
+          font_color: string | null
           id: string
           instructions_text: string | null
           is_published: boolean | null
           logo_url: string | null
+          main_color: string | null
           name: string
           page_title: string | null
+          secondary_color: string | null
           show_description: boolean | null
           slug: string
           updated_at: string | null
@@ -254,12 +257,15 @@ export type Database = {
           description?: string | null
           enable_instructions?: boolean | null
           favicon_url?: string | null
+          font_color?: string | null
           id?: string
           instructions_text?: string | null
           is_published?: boolean | null
           logo_url?: string | null
+          main_color?: string | null
           name: string
           page_title?: string | null
+          secondary_color?: string | null
           show_description?: boolean | null
           slug: string
           updated_at?: string | null
@@ -284,12 +290,15 @@ export type Database = {
           description?: string | null
           enable_instructions?: boolean | null
           favicon_url?: string | null
+          font_color?: string | null
           id?: string
           instructions_text?: string | null
           is_published?: boolean | null
           logo_url?: string | null
+          main_color?: string | null
           name?: string
           page_title?: string | null
+          secondary_color?: string | null
           show_description?: boolean | null
           slug?: string
           updated_at?: string | null
