@@ -1,11 +1,4 @@
-import { Filter, ArrowUpDown } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 import { ViewOptionsDropdown } from "./ViewOptionsDropdown"
 import { PreviewData } from "@/types/preview"
 
@@ -35,65 +28,50 @@ export function MobileHeaderIcons({
   previewData,
 }: MobileHeaderIconsProps) {
   return (
-    <div className="flex justify-center items-center gap-4 px-2">
-      <TooltipProvider>
-        {/* Categories Filter */}
-        <Select
-          value={selectedCategory || "all"}
-          onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
-        >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <SelectTrigger className="w-12 h-12 p-0 border-none bg-transparent hover:bg-accent/20 rounded-full flex items-center justify-center">
-                <Filter className="h-6 w-6" />
-              </SelectTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Categories</p>
-            </TooltipContent>
-          </Tooltip>
-          <SelectContent>
-            <SelectItem value="all">All Categories</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category} value={category}>
-                {category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="grid grid-cols-3 gap-2 w-full">
+      {/* Categories Filter */}
+      <Select
+        value={selectedCategory || "all"}
+        onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
+      >
+        <SelectTrigger className="w-full h-10 text-sm bg-white/80 backdrop-blur-sm">
+          Filter
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Items</SelectItem>
+          {categories.map((category) => (
+            <SelectItem key={category} value={category}>
+              {category}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        {/* Sort Button */}
-        <Select
-          value={currentSort}
-          onValueChange={(value) => onSortChange?.(value)}
-        >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <SelectTrigger className="w-12 h-12 p-0 border-none bg-transparent hover:bg-accent/20 rounded-full flex items-center justify-center">
-                <ArrowUpDown className="h-6 w-6" />
-              </SelectTrigger>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Sort</p>
-            </TooltipContent>
-          </Tooltip>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="price-asc">Price: Low to High</SelectItem>
-            <SelectItem value="price-desc">Price: High to Low</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Sort Button */}
+      <Select
+        value={currentSort}
+        onValueChange={(value) => onSortChange?.(value)}
+      >
+        <SelectTrigger className="w-full h-10 text-sm bg-white/80 backdrop-blur-sm">
+          Sort
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="newest">Newest</SelectItem>
+          <SelectItem value="oldest">Oldest</SelectItem>
+          <SelectItem value="price-asc">Price ↑</SelectItem>
+          <SelectItem value="price-desc">Price ↓</SelectItem>
+        </SelectContent>
+      </Select>
 
-        {/* View Options */}
-        <ViewOptionsDropdown
-          layout={layout}
-          textPlacement={textPlacement}
-          mainColor={previewData.main_color || "#000000"}
-          onLayoutChange={onLayoutChange}
-          onTextPlacementChange={onTextPlacementChange}
-        />
-      </TooltipProvider>
+      {/* View Options */}
+      <ViewOptionsDropdown
+        layout={layout}
+        textPlacement={textPlacement}
+        mainColor={previewData.main_color || "#000000"}
+        onLayoutChange={onLayoutChange}
+        onTextPlacementChange={onTextPlacementChange}
+        className="w-full h-10 text-sm bg-white/80 backdrop-blur-sm"
+      />
     </div>
   )
 }

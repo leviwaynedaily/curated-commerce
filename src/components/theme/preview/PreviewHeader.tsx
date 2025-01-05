@@ -60,7 +60,19 @@ export function PreviewHeader({
             )}
           </div>
 
-          {/* Icons Row */}
+          {/* Search Row */}
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-10 bg-white/80 backdrop-blur-sm h-12 w-full"
+            />
+          </div>
+
+          {/* Controls Row */}
           <MobileHeaderIcons
             categories={categories}
             selectedCategory={selectedCategory || null}
@@ -73,18 +85,6 @@ export function PreviewHeader({
             onTextPlacementChange={onTextPlacementChange}
             previewData={previewData}
           />
-
-          {/* Search Row */}
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search products..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-white/80 backdrop-blur-sm h-12 w-full"
-            />
-          </div>
         </div>
 
         {/* Desktop Layout */}
