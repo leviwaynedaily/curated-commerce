@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, Lock } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -37,6 +37,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           >
             <Menu className="h-5 w-5" />
           </Button>
+          
+          {/* Curately branding */}
+          <div className="flex items-center gap-2">
+            <Lock className="h-5 w-5 text-primary" />
+            <span className="text-xl font-semibold">Curately</span>
+          </div>
+
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
             <UserButton />
