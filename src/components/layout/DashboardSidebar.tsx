@@ -76,10 +76,10 @@ export function DashboardSidebar({
   ];
 
   return (
-    <div className={cn("h-full bg-background w-52", className)}>
+    <div className={cn("h-full bg-background min-w-fit", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h1 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <h1 className="text-xl font-semibold mb-4 flex items-center gap-2 whitespace-nowrap">
             <Lock className="h-5 w-5" />
             Curately
           </h1>
@@ -93,11 +93,11 @@ export function DashboardSidebar({
               <Button
                 key={route.href}
                 variant={route.active ? "secondary" : "ghost"}
-                className="w-full justify-start"
+                className="w-full justify-start whitespace-nowrap"
                 asChild
               >
                 <Link to={route.href}>
-                  <route.icon className="mr-2 h-4 w-4" />
+                  <route.icon className="mr-2 h-4 w-4 shrink-0" />
                   {route.label}
                 </Link>
               </Button>
