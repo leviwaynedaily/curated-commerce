@@ -3,26 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { ThemeConfig } from "@/types/theme";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PreviewData } from "@/types/preview";
 
 interface LivePreviewProps {
   storefrontId: string;
 }
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
-  const [previewData, setPreviewData] = useState<{
-    name?: string;
-    description?: string;
-    logo_url?: string;
-    theme_config?: ThemeConfig;
-    verification_type?: 'none' | 'age' | 'password' | 'both';
-    verification_age_text?: string;
-    verification_legal_text?: string;
-    verification_logo_url?: string;
-    verification_password?: string;
-    enable_instructions?: boolean;
-    instructions_text?: string;
-  }>({});
-
+  const [previewData, setPreviewData] = useState<PreviewData>({});
   const [showContent, setShowContent] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [password, setPassword] = useState("");
@@ -44,8 +32,14 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         return;
       }
 
-      console.log("Parsed theme config:", data.theme_config);
-      setPreviewData(data);
+      // Safely cast theme_config to ThemeConfig
+      const parsedData: PreviewData = {
+        ...data,
+        theme_config: data.theme_config as unknown as ThemeConfig
+      };
+      
+      console.log("Parsed theme config:", parsedData.theme_config);
+      setPreviewData(parsedData);
     };
 
     fetchStorefrontData();
@@ -62,7 +56,11 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         },
         (payload) => {
           console.log("Received realtime update:", payload);
-          setPreviewData(payload.new);
+          const updatedData = payload.new;
+          setPreviewData({
+            ...updatedData,
+            theme_config: updatedData.theme_config as unknown as ThemeConfig
+          });
         }
       )
       .subscribe();
