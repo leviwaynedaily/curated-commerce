@@ -30,8 +30,8 @@ export default {
           hover: "#8a74f3",
         },
         secondary: {
-          DEFAULT: "#F2FCE2",
-          foreground: "#1a1a1a",
+          DEFAULT: "#7E69AB",
+          foreground: "#ffffff",
         },
         success: {
           DEFAULT: "#4CAF50",
@@ -42,12 +42,12 @@ export default {
           foreground: "#ffffff",
         },
         muted: {
-          DEFAULT: "#f3f4f6",
-          foreground: "#6b7280",
+          DEFAULT: "#F1F0FB",
+          foreground: "#8E9196",
         },
         accent: {
-          DEFAULT: "#F2FCE2",
-          foreground: "#1a1a1a",
+          DEFAULT: "#D6BCFA",
+          foreground: "#1A1F2C",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
