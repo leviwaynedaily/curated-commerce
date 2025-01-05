@@ -30,26 +30,26 @@ export function ProductGrid({
   const getGridColumns = () => {
     switch (layout) {
       case 'small':
-        return 'grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
       case 'large':
         return 'grid-cols-1 md:grid-cols-2'
       case 'list':
         return 'grid-cols-1'
       default: // medium
-        return 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
     }
   }
 
   const getCardSize = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[24rem] sm:aspect-[3/5]'
+        return 'min-h-[16rem] sm:aspect-[3/5]'
       case 'large':
         return 'min-h-[24rem] md:aspect-video'
       case 'list':
         return 'min-h-[24rem]'
       default: // medium
-        return 'min-h-[24rem] sm:aspect-[2/3]'
+        return 'min-h-[20rem] sm:aspect-[2/3]'
     }
   }
 
@@ -70,7 +70,7 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-4`}>
+    <div className={`grid ${getGridColumns()} gap-3`}>
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
