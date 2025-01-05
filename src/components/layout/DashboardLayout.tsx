@@ -28,7 +28,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
         {/* Mobile Sidebar */}
         <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-0 md:hidden">
+          <SheetContent side="left" className="p-0 w-64">
             <DashboardSidebar
               mobileOpen={mobileSidebarOpen}
               onMobileOpenChange={setMobileSidebarOpen}

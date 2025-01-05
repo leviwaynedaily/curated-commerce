@@ -43,7 +43,7 @@ export function Dashboard({ storefront }: { storefront: any }) {
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there'
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 md:space-y-8 fade-in">
+    <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Dashboard for {storefront.name}
@@ -55,7 +55,7 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
       <Stats products={products || []} />
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <QuickActions />
       </div>
     </div>
