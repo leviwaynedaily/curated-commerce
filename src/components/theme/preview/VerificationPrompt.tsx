@@ -32,9 +32,9 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
   }
 
   return (
-    <div className="absolute inset-4 z-50 flex items-start justify-end pointer-events-none">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
       <div 
-        className="w-[280px] rounded-lg shadow-xl bg-card pointer-events-auto animate-fadeIn"
+        className="w-[280px] rounded-lg shadow-xl bg-card animate-fadeIn"
         style={{ 
           color: previewData.verification_text_color,
           backgroundColor: 'rgba(255, 255, 255, 0.95)'
