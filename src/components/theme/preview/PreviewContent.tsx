@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { PreviewHeader } from "./PreviewHeader";
-import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import debounce from "lodash.debounce";
-import { Badge } from "@/components/ui/badge";
-import { PreviewPagination } from "./PreviewPagination";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { ProductDetailView } from "./ProductDetailView";
+import { ProductGrid } from "./ProductGrid";
+import { ProductFilters } from "./ProductFilters";
+import { PreviewPagination } from "./PreviewPagination";
 
 interface PreviewContentProps {
   previewData: any;
@@ -26,7 +25,7 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
 
   useEffect(() => {
     const handleScroll = debounce(() => {
-      const shouldBeScrolled = window.scrollY > 50;
+      const shouldBeScrolled = window.scrollY > 300;
       if (isScrolled !== shouldBeScrolled) {
         setIsScrolled(shouldBeScrolled);
       }
@@ -72,28 +71,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
       }
     });
 
-  const getGridColumns = () => {
-    switch (gridSize) {
-      case 'small':
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6';
-      case 'large':
-        return 'grid-cols-1';
-      default: // medium
-        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4';
-    }
-  };
-
-  const getCardSize = () => {
-    switch (gridSize) {
-      case 'small':
-        return 'aspect-[3/4]';
-      case 'large':
-        return 'aspect-square max-w-3xl mx-auto';
-      default: // medium
-        return 'aspect-[4/5]';
-    }
-  };
-
   // Function to strip HTML tags from rich text
   const stripHtml = (html: string) => {
     const tmp = document.createElement('div');
@@ -112,23 +89,43 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <PreviewHeader
-        logo_url={isScrolled ? previewData.logo_url : undefined}
-        name={previewData.name}
-        onGridChange={setGridSize}
-        onSearchChange={setSearchQuery}
-        onSortChange={setCurrentSort}
-        onCategoryChange={setSelectedCategory}
-        searchQuery={searchQuery}
-        gridSize={gridSize}
-        categories={categories}
-        selectedCategory={selectedCategory}
-        currentSort={currentSort}
-        onLogoClick={onReset}
-        showFilters={isScrolled}
-      />
+      <div 
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-sm' : 'bg-transparent'
+        }`}
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex items-center h-16">
+            {previewData.logo_url && (
+              <img 
+                src={previewData.logo_url} 
+                alt={previewData.name} 
+                className={`h-8 object-contain cursor-pointer transition-opacity duration-300 ${
+                  isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                }`}
+                onClick={onReset}
+              />
+            )}
+            <div className={`flex-1 transition-opacity duration-300 ${
+              isScrolled ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}>
+              <ProductFilters
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                currentSort={currentSort}
+                onSortChange={setCurrentSort}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                categories={categories}
+                gridSize={gridSize}
+                onGridChange={setGridSize}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div className="container mx-auto px-4 flex-1">
+      <div className="container mx-auto px-4 pt-16">
         <div 
           className={`flex flex-col items-center mb-8 transition-all duration-500 ease-in-out ${
             isScrolled ? 'opacity-0 -translate-y-4 pointer-events-none h-0 overflow-hidden' : 'opacity-100 translate-y-0'
@@ -153,51 +150,25 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           )}
         </div>
 
-        <div className={`grid ${getGridColumns()} gap-4`}>
-          {filteredAndSortedProducts?.map((product) => (
-            <div 
-              key={product.id}
-              className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} bg-card cursor-pointer`}
-              onClick={() => setSelectedProduct(product)}
-            >
-              {product.images?.[0] && (
-                <div className="relative h-full">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
-                    <div className="flex gap-2 flex-wrap mb-2">
-                      {product.category && (
-                        <Badge
-                          style={{
-                            backgroundColor: 'inherit',
-                            color: 'inherit'
-                          }}
-                        >
-                          {product.category}
-                        </Badge>
-                      )}
-                    </div>
-                    <h3 className="font-semibold text-white mb-1">
-                      {product.name}
-                    </h3>
-                    {product.description && (
-                      <p className="text-sm text-white/80 line-clamp-2">
-                        {product.description}
-                      </p>
-                    )}
-                    <div className="text-sm font-medium mt-2 text-white">
-                      ${product.in_town_price}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+        <div className={`mb-8 ${isScrolled ? 'hidden' : 'block'}`}>
+          <ProductFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            currentSort={currentSort}
+            onSortChange={setCurrentSort}
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            categories={categories}
+            gridSize={gridSize}
+            onGridChange={setGridSize}
+          />
         </div>
+
+        <ProductGrid
+          products={filteredAndSortedProducts}
+          gridSize={gridSize}
+          onProductClick={setSelectedProduct}
+        />
 
         <PreviewPagination
           currentPage={currentPage}
@@ -205,10 +176,6 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           onPageChange={setCurrentPage}
         />
       </div>
-
-      <PreviewLegalFooter 
-        businessName={previewData.name}
-      />
     </div>
   );
 }
