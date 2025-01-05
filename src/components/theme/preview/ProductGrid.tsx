@@ -77,7 +77,7 @@ export function ProductGrid({
         return (
           <div 
             key={product.id}
-            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-xl shadow-lg transform hover:scale-105 ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
+            className={`group relative rounded-lg overflow-hidden transition-all duration-500 hover:shadow-2xl shadow-xl transform hover:scale-[1.03] ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
             onClick={() => onProductClick(product)}
             style={{ backgroundColor: productCardBackgroundColor }}
           >
@@ -127,7 +127,7 @@ export function ProductGrid({
                 )}
               </div>
               <div 
-                className="space-y-1 text-sm font-open-sans mt-auto" // Added mt-auto to push prices to bottom
+                className="space-y-1 text-sm font-open-sans mt-auto"
                 style={{ color: productPriceColor }}
               >
                 <div className="flex items-center gap-2">
