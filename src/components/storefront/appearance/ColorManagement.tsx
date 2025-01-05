@@ -35,7 +35,8 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
     loadColors();
   }, [logoUrl]);
 
-  const handleSuggestColors = async () => {
+  const handleSuggestColors = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault(); // Prevent form submission
     if (logoUrl) {
       console.log('Suggesting colors from logo:', logoUrl);
       const colors = await extractColors(logoUrl);
@@ -53,6 +54,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
             variant="outline"
             onClick={handleSuggestColors}
             disabled={!logoUrl}
+            type="button" // Explicitly set type to button
           >
             Suggest Colors from Logo
           </Button>
