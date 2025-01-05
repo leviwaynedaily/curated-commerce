@@ -17,13 +17,16 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
   const showPassword = previewData.verification_type === 'password' || showBothPrompts
   const showAge = previewData.verification_type === 'age' || showBothPrompts
 
-  console.log("Verification colors from database:", {
-    buttonColor: previewData.verification_button_color,
-    buttonTextColor: previewData.verification_button_text_color,
-    textColor: previewData.verification_text_color,
-    checkboxColor: previewData.verification_checkbox_color,
-    inputBorderColor: previewData.verification_input_border_color
-  });
+  // Default colors if not set in database
+  const colors = {
+    button: previewData.verification_button_color || '#D946EF',
+    buttonText: previewData.verification_button_text_color || '#FFFFFF',
+    text: previewData.verification_text_color || '#1A1F2C',
+    checkbox: previewData.verification_checkbox_color || '#D946EF',
+    inputBorder: previewData.verification_input_border_color || '#E5E7EB'
+  }
+
+  console.log("Verification colors being used:", colors);
 
   const handleVerification = () => {
     if (showAge && !ageConfirmed) {
@@ -39,6 +42,11 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
     onVerify(password)
   }
 
+  // Don't render until we have the necessary data
+  if (!previewData || !previewData.verification_type) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
       <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
@@ -46,13 +54,13 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
           <img 
             src={previewData.verification_logo_url} 
             alt="Verification" 
-            className="h-24 mx-auto object-contain" // Increased from h-16 to h-24
+            className="h-24 mx-auto object-contain"
           />
         )}
         
         <h2 
           className="text-xl font-semibold text-center" 
-          style={{ color: previewData.verification_text_color }}
+          style={{ color: colors.text }}
         >
           Verification Required
         </h2>
@@ -69,14 +77,14 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                 }}
                 className="mt-1"
                 style={{ 
-                  backgroundColor: ageConfirmed ? previewData.verification_checkbox_color : 'transparent',
-                  borderColor: previewData.verification_checkbox_color 
+                  backgroundColor: ageConfirmed ? colors.checkbox : 'transparent',
+                  borderColor: colors.checkbox 
                 }}
               />
               <label 
                 htmlFor="age-verification" 
                 className="text-sm cursor-pointer select-none"
-                style={{ color: previewData.verification_text_color }}
+                style={{ color: colors.text }}
                 dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
               />
             </div>
@@ -86,7 +94,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
             <div className="space-y-2">
               <label 
                 className="text-sm font-medium block"
-                style={{ color: previewData.verification_text_color }}
+                style={{ color: colors.text }}
               >
                 Site Password
               </label>
@@ -100,8 +108,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                 }}
                 className="w-full"
                 style={{ 
-                  borderColor: previewData.verification_input_border_color,
-                  color: previewData.verification_text_color
+                  borderColor: colors.inputBorder,
+                  color: colors.text
                 }}
               />
             </div>
@@ -117,8 +125,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
             className="w-full"
             onClick={handleVerification}
             style={{ 
-              backgroundColor: previewData.verification_button_color,
-              color: previewData.verification_button_text_color,
+              backgroundColor: colors.button,
+              color: colors.buttonText,
               border: 'none'
             }}
           >
@@ -127,7 +135,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
           <div 
             className="text-xs text-center"
-            style={{ color: previewData.verification_text_color }}
+            style={{ color: colors.text }}
             dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
           />
         </div>
