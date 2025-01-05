@@ -232,9 +232,14 @@ export type Database = {
           main_color: string | null
           name: string
           page_title: string | null
+          product_card_background_color: string | null
+          product_description_text_color: string | null
+          product_price_color: string | null
+          product_title_text_color: string | null
           secondary_color: string | null
           show_description: boolean | null
           slug: string
+          storefront_background_color: string | null
           updated_at: string | null
           verification_age: number | null
           verification_age_text: string | null
@@ -266,9 +271,14 @@ export type Database = {
           main_color?: string | null
           name: string
           page_title?: string | null
+          product_card_background_color?: string | null
+          product_description_text_color?: string | null
+          product_price_color?: string | null
+          product_title_text_color?: string | null
           secondary_color?: string | null
           show_description?: boolean | null
           slug: string
+          storefront_background_color?: string | null
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null
@@ -300,9 +310,14 @@ export type Database = {
           main_color?: string | null
           name?: string
           page_title?: string | null
+          product_card_background_color?: string | null
+          product_description_text_color?: string | null
+          product_price_color?: string | null
+          product_title_text_color?: string | null
           secondary_color?: string | null
           show_description?: boolean | null
           slug?: string
+          storefront_background_color?: string | null
           updated_at?: string | null
           verification_age?: number | null
           verification_age_text?: string | null

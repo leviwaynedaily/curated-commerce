@@ -7,6 +7,10 @@ interface ProductGridProps {
   onProductClick: (product: any) => void
   mainColor: string
   fontColor: string
+  productCardBackgroundColor: string
+  productTitleTextColor: string
+  productDescriptionTextColor: string
+  productPriceColor: string
 }
 
 export function ProductGrid({ 
@@ -14,8 +18,10 @@ export function ProductGrid({
   layout, 
   textPlacement,
   onProductClick,
-  mainColor,
-  fontColor
+  productCardBackgroundColor,
+  productTitleTextColor,
+  productDescriptionTextColor,
+  productPriceColor
 }: ProductGridProps) {
   const getGridColumns = () => {
     switch (layout) {
@@ -47,7 +53,7 @@ export function ProductGrid({
     if (textPlacement === 'below') {
       return {
         imageContainer: "h-2/3 relative",
-        textContainer: "p-4 bg-white",
+        textContainer: `p-4`,
         overlay: "hidden"
       }
     } else {
@@ -67,8 +73,9 @@ export function ProductGrid({
         return (
           <div 
             key={product.id}
-            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} ${layout === 'list' ? 'flex' : ''} bg-card cursor-pointer`}
+            className={`group relative rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
             onClick={() => onProductClick(product)}
+            style={{ backgroundColor: productCardBackgroundColor }}
           >
             {product.images?.[0] && (
               <div className={`${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer}`}>
@@ -83,10 +90,6 @@ export function ProductGrid({
             
             <div 
               className={`${layout === 'list' ? 'flex-1 flex flex-col justify-between' : ''} ${styles.textContainer}`}
-              style={{
-                color: textPlacement === 'overlay' ? fontColor : mainColor,
-                backgroundColor: textPlacement === 'below' ? 'white' : 'transparent'
-              }}
             >
               <div>
                 <div className="flex gap-2 flex-wrap mb-2">
@@ -99,16 +102,25 @@ export function ProductGrid({
                     </Badge>
                   )}
                 </div>
-                <h3 className="font-semibold mb-1">
+                <h3 
+                  className="font-semibold mb-1"
+                  style={{ color: productTitleTextColor }}
+                >
                   {product.name}
                 </h3>
                 {product.description && (
-                  <p className={`text-sm ${textPlacement === 'overlay' ? 'text-white/80' : 'text-muted-foreground'} line-clamp-2`}>
+                  <p 
+                    className="text-sm line-clamp-2"
+                    style={{ color: productDescriptionTextColor }}
+                  >
                     {product.description}
                   </p>
                 )}
               </div>
-              <div className="text-sm font-medium mt-2">
+              <div 
+                className="text-sm font-medium mt-2"
+                style={{ color: productPriceColor }}
+              >
                 ${product.in_town_price}
               </div>
             </div>

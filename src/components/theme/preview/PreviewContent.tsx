@@ -124,7 +124,10 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
   }
 
   return (
-    <div className="preview-container h-screen overflow-y-auto bg-background">
+    <div 
+      className="preview-container h-screen overflow-y-auto"
+      style={{ backgroundColor: previewData.storefront_background_color }}
+    >
       <div className="w-full bg-background py-4">
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center justify-center space-y-3">
@@ -166,8 +169,8 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           onLogoClick={handleLogoClick}
           layout={layout}
           textPlacement={textPlacement}
-          onLayoutChange={handleLayoutChange}
-          onTextPlacementChange={handleTextPlacementChange}
+          onLayoutChange={setLayout}
+          onTextPlacementChange={setTextPlacement}
         />
       </div>
 
@@ -179,6 +182,10 @@ export function PreviewContent({ previewData, onReset }: PreviewContentProps) {
           onProductClick={setSelectedProduct}
           mainColor={previewData.main_color}
           fontColor={previewData.font_color}
+          productCardBackgroundColor={previewData.product_card_background_color}
+          productTitleTextColor={previewData.product_title_text_color}
+          productDescriptionTextColor={previewData.product_description_text_color}
+          productPriceColor={previewData.product_price_color}
         />
 
         <PreviewPagination
