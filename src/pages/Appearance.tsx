@@ -69,8 +69,14 @@ const Appearance = () => {
         throw error;
       }
 
+      // Ensure the theme_config matches our expected structure
+      const themeConfig = data?.theme_config as ThemeConfig;
+      if (!themeConfig) {
+        return { theme_config: defaultThemeConfig };
+      }
+
       console.log("Fetched storefront:", data);
-      return data;
+      return { theme_config: themeConfig };
     },
     enabled: !!currentStorefrontId,
   });

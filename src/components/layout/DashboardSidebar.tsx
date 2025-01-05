@@ -15,9 +15,20 @@ import {
   Globe
 } from "lucide-react";
 
-interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
+interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {
+  open?: boolean;
+  mobileOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onMobileOpenChange?: (open: boolean) => void;
+}
 
-export function DashboardSidebar({ className }: DashboardSidebarProps) {
+export function DashboardSidebar({ 
+  className,
+  open,
+  mobileOpen,
+  onOpenChange,
+  onMobileOpenChange 
+}: DashboardSidebarProps) {
   const location = useLocation();
 
   const routes = [
