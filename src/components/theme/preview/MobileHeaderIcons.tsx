@@ -35,7 +35,7 @@ export function MobileHeaderIcons({
   previewData,
 }: MobileHeaderIconsProps) {
   return (
-    <div className="flex justify-between items-center px-2">
+    <div className="flex justify-center items-center gap-4 px-2">
       <TooltipProvider>
         {/* Categories Filter */}
         <Select
