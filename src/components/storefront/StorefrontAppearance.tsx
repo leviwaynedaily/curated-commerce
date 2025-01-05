@@ -13,7 +13,12 @@ export function StorefrontAppearance({ form }: StorefrontAppearanceProps) {
 
   const handleOpenPreview = () => {
     if (storefrontId) {
-      window.open(`/preview?storefrontId=${storefrontId}`, '_blank');
+      // Get the current origin (protocol + hostname + port)
+      const origin = window.location.origin;
+      // Construct the full preview URL
+      const previewUrl = `${origin}/preview?storefrontId=${storefrontId}`;
+      console.log("Opening preview window with URL:", previewUrl);
+      window.open(previewUrl, '_blank');
     }
   };
 
