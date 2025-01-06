@@ -31,11 +31,8 @@ serve(async (req) => {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`)
     }
 
-    // Convert the response to an ArrayBuffer first
-    const imageBuffer = await imageResponse.arrayBuffer()
-    const imageBlob = new Blob([imageBuffer], { type: 'image/png' })
-
-    // Create image bitmap from blob
+    // Create a temporary image element to load the image
+    const imageBlob = await imageResponse.blob()
     const originalImage = await createImageBitmap(imageBlob)
 
     // Initialize Supabase client
@@ -54,27 +51,26 @@ serve(async (req) => {
 
       // Create canvas with target size
       const canvas = new OffscreenCanvas(size, size)
-      const ctx = canvas.getContext('2d', { 
-        willReadFrequently: true,
-        alpha: true // Enable alpha channel for PNG support
-      })
+      const ctx = canvas.getContext('2d')
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
       }
 
-      // Clear canvas with white background
+      // Clear canvas and set white background
       ctx.fillStyle = '#FFFFFF'
       ctx.fillRect(0, 0, size, size)
+
+      // Calculate scaling to maintain aspect ratio
+      const scale = Math.min(size / originalImage.width, size / originalImage.height)
+      const x = (size - originalImage.width * scale) / 2
+      const y = (size - originalImage.height * scale) / 2
 
       // Configure image rendering
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = 'high'
 
-      // Draw the image maintaining aspect ratio
-      const scale = Math.min(size / originalImage.width, size / originalImage.height)
-      const x = (size - originalImage.width * scale) / 2
-      const y = (size - originalImage.height * scale) / 2
+      // Draw the image
       ctx.drawImage(
         originalImage,
         x, y,
@@ -83,10 +79,20 @@ serve(async (req) => {
       )
 
       try {
+        // Get image data and create new canvas for RGBA
+        const imageData = ctx.getImageData(0, 0, size, size)
+        const rgbaCanvas = new OffscreenCanvas(size, size)
+        const rgbaCtx = rgbaCanvas.getContext('2d')
+        
+        if (!rgbaCtx) {
+          throw new Error('Failed to get RGBA canvas context')
+        }
+
+        rgbaCtx.putImageData(imageData, 0, 0)
+
         // Convert to PNG blob
-        const resizedBlob = await canvas.convertToBlob({
-          type: 'image/png',
-          quality: 1
+        const resizedBlob = await rgbaCanvas.convertToBlob({
+          type: 'image/png'
         })
 
         const timestamp = Date.now()
