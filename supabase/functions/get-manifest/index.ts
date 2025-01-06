@@ -1,4 +1,3 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
@@ -19,6 +18,7 @@ serve(async (req) => {
     const storefrontId = url.searchParams.get('storefrontId');
 
     if (!storefrontId) {
+      console.error('Missing storefrontId parameter');
       return new Response(
         JSON.stringify({ error: 'Storefront ID is required' }),
         { status: 400, headers: corsHeaders }
@@ -48,6 +48,7 @@ serve(async (req) => {
     }
 
     if (!pwaSettings) {
+      console.error('PWA settings not found');
       return new Response(
         JSON.stringify({ error: 'PWA settings not found' }),
         { status: 404, headers: corsHeaders }
@@ -110,7 +111,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in get-manifest function:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: corsHeaders }
     );
   }
