@@ -56,29 +56,39 @@ serve(async (req) => {
       const canvas = new OffscreenCanvas(size, size)
       const ctx = canvas.getContext('2d', { 
         willReadFrequently: true,
-        alpha: false // Disable alpha channel to ensure RGB color space
+        alpha: true // Enable alpha channel for PNG support
       })
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
       }
 
-      // Set background to white first to ensure proper color space
+      // Clear canvas with white background
       ctx.fillStyle = '#FFFFFF'
       ctx.fillRect(0, 0, size, size)
 
-      // Draw resized image with proper image smoothing
+      // Configure image rendering
       ctx.imageSmoothingEnabled = true
       ctx.imageSmoothingQuality = 'high'
-      ctx.drawImage(originalImage, 0, 0, size, size)
+
+      // Draw the image maintaining aspect ratio
+      const scale = Math.min(size / originalImage.width, size / originalImage.height)
+      const x = (size - originalImage.width * scale) / 2
+      const y = (size - originalImage.height * scale) / 2
+      ctx.drawImage(
+        originalImage,
+        x, y,
+        originalImage.width * scale,
+        originalImage.height * scale
+      )
 
       try {
-        // Convert to blob with explicit PNG format
+        // Convert to PNG blob
         const resizedBlob = await canvas.convertToBlob({
           type: 'image/png',
+          quality: 1
         })
 
-        // Upload to Supabase Storage with timestamp for unique filename
         const timestamp = Date.now()
         const filePath = `${storefrontId}/pwa/icons/${size}x${size}/${timestamp}.png`
         
