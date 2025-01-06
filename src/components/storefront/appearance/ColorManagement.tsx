@@ -8,6 +8,7 @@ import { SuggestedColorPalette } from "./SuggestedColorPalette";
 import { BrandColors } from "./BrandColors";
 import { VerificationColors } from "./VerificationColors";
 import { ProductCardColors } from "./ProductCardColors";
+import { ThemeConfig } from "@/types/theme";
 
 interface ColorManagementProps {
   form: UseFormReturn<any>;
@@ -34,7 +35,12 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       if (logoUrl) {
         console.log('Initial color extraction from logo URL:', logoUrl);
         const colors = await extractColors(logoUrl);
-        setPredefinedColors(colors);
+        // Convert ThemeConfig colors to ColorPalette format
+        setPredefinedColors({
+          primary: [colors.background.primary, colors.font.primary],
+          secondary: [colors.background.secondary, colors.font.secondary],
+          accent: [colors.background.accent, colors.font.highlight],
+        });
       }
     };
     loadColors();
@@ -45,18 +51,23 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
     if (logoUrl) {
       console.log('Suggesting colors from logo URL:', logoUrl);
       const colors = await extractColors(logoUrl);
-      console.log('Generated color palette:', colors);
-      setPredefinedColors(colors);
+      // Convert ThemeConfig colors to ColorPalette format
+      const palette = {
+        primary: [colors.background.primary, colors.font.primary],
+        secondary: [colors.background.secondary, colors.font.secondary],
+        accent: [colors.background.accent, colors.font.highlight],
+      };
+      setPredefinedColors(palette);
       
       // Set some suggested colors from the palette
-      if (colors.primary.length > 0) {
-        form.setValue('main_color', colors.primary[0]);
+      if (palette.primary.length > 0) {
+        form.setValue('main_color', palette.primary[0]);
       }
-      if (colors.secondary.length > 0) {
-        form.setValue('secondary_color', colors.secondary[0]);
+      if (palette.secondary.length > 0) {
+        form.setValue('secondary_color', palette.secondary[0]);
       }
-      if (colors.accent.length > 0) {
-        form.setValue('font_color', colors.accent[0]);
+      if (palette.accent.length > 0) {
+        form.setValue('font_color', palette.accent[0]);
       }
       
       toast({
