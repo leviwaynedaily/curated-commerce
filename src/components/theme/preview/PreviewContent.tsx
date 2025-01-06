@@ -10,12 +10,19 @@ interface PreviewContentProps {
   previewData: PreviewData;
   onReset?: () => void;
   onLogoClick?: () => void;
+  showInstructions?: boolean;
+  onCloseInstructions?: () => void;
 }
 
-export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
+export function PreviewContent({ 
+  previewData, 
+  onReset, 
+  onLogoClick,
+  showInstructions = false,
+  onCloseInstructions = () => {}
+}: PreviewContentProps) {
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
   
   const { searchQuery, handleSearchChange } = useSearchState();
 
@@ -73,7 +80,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       {showInstructions && (
         <PreviewInstructions 
           previewData={previewData} 
-          onContinue={() => setShowInstructions(false)} 
+          onContinue={onCloseInstructions} 
         />
       )}
 
