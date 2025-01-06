@@ -51,19 +51,27 @@ serve(async (req) => {
 
       // Create canvas with target size
       const canvas = new OffscreenCanvas(size, size)
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', {
+        alpha: true,
+        willReadFrequently: true,
+        colorSpace: 'srgb'
+      })
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
       }
 
-      // Clear canvas
+      // Clear canvas with transparent background
       ctx.clearRect(0, 0, size, size)
 
       // Calculate scaling to maintain aspect ratio
       const scale = Math.min(size / originalImage.width, size / originalImage.height)
       const x = (size - originalImage.width * scale) / 2
       const y = (size - originalImage.height * scale) / 2
+
+      // Configure image rendering
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
 
       // Draw the image
       ctx.drawImage(
@@ -74,9 +82,9 @@ serve(async (req) => {
       )
 
       try {
-        // Convert to PNG blob
+        // Convert to PNG blob with explicit color space handling
         const resizedBlob = await canvas.convertToBlob({
-          type: 'image/png'
+          type: 'image/png',
         })
 
         const timestamp = Date.now()
