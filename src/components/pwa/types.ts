@@ -16,7 +16,7 @@ export const pwaFormSchema = z.object({
   icon_152x152: z.string().optional(),
   icon_192x192: z.string().min(1, "A 192x192 icon is required for PWA"),
   icon_384x384: z.string().optional(),
-  icon_512x512: z.string().optional(),
+  icon_512x512: z.string().min(1, "A 512x512 icon is required for PWA"),
   screenshot_mobile: z.string().optional(),
   screenshot_desktop: z.string().optional(),
 });

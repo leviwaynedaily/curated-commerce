@@ -206,6 +206,7 @@ export function PWASettingsForm() {
     !form.watch("name") && "App name",
     !form.watch("short_name") && "Short name",
     !form.watch("icon_192x192") && "192x192 icon",
+    !form.watch("icon_512x512") && "512x512 icon",
   ].filter(Boolean);
 
   return (
