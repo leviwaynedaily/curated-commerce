@@ -46,13 +46,13 @@ export function ProductGrid({
   const getCardDimensions = () => {
     switch (layout) {
       case 'small':
-        return 'w-full h-[360px]'
+        return 'w-full h-[320px]' // Reduced from 360px
       case 'large':
-        return 'w-full h-[480px]'
+        return 'w-full h-[440px]' // Reduced from 480px
       case 'list':
-        return 'w-full h-[200px] flex'
+        return 'w-full h-[180px] flex' // Reduced from 200px
       default: // medium
-        return 'w-full h-[420px]'
+        return 'w-full h-[380px]' // Reduced from 420px
     }
   }
 
@@ -143,7 +143,7 @@ export function ProductGrid({
 
             {product.description && (
               <p 
-                className="text-xs line-clamp-2 group-hover:line-clamp-3 transition-all duration-300"
+                className="text-xs line-clamp-1 transition-all duration-300" // Changed from line-clamp-2 to line-clamp-1
                 style={{ 
                   color: productDescriptionTextColor,
                   opacity: 0.85
