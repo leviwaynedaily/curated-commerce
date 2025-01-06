@@ -5,6 +5,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,8 +38,11 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Name</FormLabel>
+              <FormDescription>
+                The full name of your app as it appears on the user's device
+              </FormDescription>
               <FormControl>
-                <Input placeholder="Full name of your PWA" {...field} />
+                <Input placeholder="My Awesome Store" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -51,8 +55,11 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Short Name</FormLabel>
+              <FormDescription>
+                A shorter name used when space is limited (e.g., under the app icon)
+              </FormDescription>
               <FormControl>
-                <Input placeholder="Short version for home screen" {...field} />
+                <Input placeholder="My Store" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -65,9 +72,12 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem className="md:col-span-2">
               <FormLabel>Description</FormLabel>
+              <FormDescription>
+                A detailed description of your app that appears in app stores and search results
+              </FormDescription>
               <FormControl>
                 <Textarea
-                  placeholder="Brief description of your PWA"
+                  placeholder="Your store's complete description that will appear in app stores and search results"
                   {...field}
                 />
               </FormControl>
@@ -82,6 +92,9 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Start URL</FormLabel>
+              <FormDescription>
+                The page that opens when users launch your app (usually "/" for homepage)
+              </FormDescription>
               <FormControl>
                 <Input placeholder="/" {...field} />
               </FormControl>
@@ -96,6 +109,9 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Display Mode</FormLabel>
+              <FormDescription>
+                How your app appears on the user's device when launched
+              </FormDescription>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -103,7 +119,7 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="standalone">Standalone</SelectItem>
+                  <SelectItem value="standalone">Standalone (Recommended)</SelectItem>
                   <SelectItem value="fullscreen">Fullscreen</SelectItem>
                   <SelectItem value="minimal-ui">Minimal UI</SelectItem>
                   <SelectItem value="browser">Browser</SelectItem>
@@ -120,6 +136,9 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Orientation</FormLabel>
+              <FormDescription>
+                The preferred screen orientation for your app
+              </FormDescription>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -127,7 +146,7 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="any">Any</SelectItem>
+                  <SelectItem value="any">Any (Recommended)</SelectItem>
                   <SelectItem value="portrait">Portrait</SelectItem>
                   <SelectItem value="landscape">Landscape</SelectItem>
                 </SelectContent>
@@ -143,6 +162,9 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Theme Color</FormLabel>
+              <FormDescription>
+                The color of the browser UI elements (e.g., address bar) when your app is open
+              </FormDescription>
               <FormControl>
                 <Input type="color" {...field} />
               </FormControl>
@@ -157,6 +179,9 @@ export function PWABasicInfo({ form }: PWABasicInfoProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Background Color</FormLabel>
+              <FormDescription>
+                The background color shown while your app is loading
+              </FormDescription>
               <FormControl>
                 <Input type="color" {...field} />
               </FormControl>

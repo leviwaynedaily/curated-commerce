@@ -34,6 +34,8 @@ const pwaFormSchema = z.object({
   screenshot_desktop: z.string().optional(),
 });
 
+type PWAFormValues = z.infer<typeof pwaFormSchema>;
+
 export function PWASettingsForm() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
