@@ -35,28 +35,43 @@ self.addEventListener('activate', (event) => {
 // Handle manifest requests
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/pwa-settings/')) {
-    console.log('Service Worker: Handling manifest request:', event.request.url);
+    console.log('Service Worker: Intercepted manifest request:', event.request.url);
     event.respondWith(
       fetch(event.request)
-        .then(response => {
+        .then(async response => {
           if (!response.ok) {
-            throw new Error('Manifest fetch failed');
+            throw new Error(`Manifest fetch failed: ${response.status} ${response.statusText}`);
           }
           console.log('Service Worker: Manifest fetched successfully');
-          return response.clone();
+          
+          // Log the response content for debugging
+          const clone = response.clone();
+          const text = await clone.text();
+          console.log('Service Worker: Manifest content:', text);
+          
+          return response;
         })
         .then(response => {
           // Cache the manifest response
-          caches.open('manifest-cache').then(cache => {
-            cache.put(event.request, response.clone());
-            console.log('Service Worker: Manifest cached successfully');
+          return caches.open('manifest-cache').then(cache => {
+            console.log('Service Worker: Caching manifest response');
+            return cache.put(event.request, response.clone()).then(() => {
+              console.log('Service Worker: Manifest cached successfully');
+              return response;
+            });
           });
-          return response;
         })
         .catch(error => {
-          console.error('Service Worker: Error fetching manifest:', error);
-          // Try to serve from cache if fetch fails
-          return caches.match(event.request);
+          console.error('Service Worker: Error handling manifest:', error);
+          console.log('Service Worker: Attempting to serve manifest from cache');
+          return caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+              console.log('Service Worker: Serving manifest from cache');
+              return cachedResponse;
+            }
+            console.error('Service Worker: No cached manifest available');
+            throw error;
+          });
         })
     );
   }
