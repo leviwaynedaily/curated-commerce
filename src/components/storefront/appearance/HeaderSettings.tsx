@@ -8,26 +8,23 @@ interface HeaderSettingsProps {
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
-  console.log("HeaderSettings - Raw form values:", form.getValues());
-  
-  const headerColor = form.watch("header_color");
-  const headerOpacity = form.watch("header_opacity");
-  
-  console.log("HeaderSettings - Direct header_color value:", headerColor);
-  console.log("HeaderSettings - Direct header_opacity value:", headerOpacity);
+  // Get the values directly from the form
+  const headerColor = form.getValues("header_color");
+  const headerOpacity = form.getValues("header_opacity");
+
+  console.log("HeaderSettings - Form values:", {
+    headerColor,
+    headerOpacity,
+    allValues: form.getValues()
+  });
 
   const headerSettings = [
     { 
       field: "header_color", 
       label: "Header Color", 
-      color: headerColor
+      color: headerColor || "#FFFFFF" // Ensure we always have a valid hex color
     }
   ];
-
-  const handleColorChange = (color: string, field: string) => {
-    console.log(`HeaderSettings - Setting ${field} to:`, color);
-    form.setValue(field, color);
-  };
 
   return (
     <div className="space-y-4">
@@ -36,7 +33,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
         <FormField
           control={form.control}
           name="header_opacity"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormControl>
                 <div className="flex items-center gap-4">
@@ -44,16 +41,18 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                     type="number"
                     min={0}
                     max={100}
-                    value={headerOpacity}
+                    value={field.value ?? 30} // Default to 30 if undefined
                     onChange={(e) => {
                       const numValue = Math.min(Math.max(Number(e.target.value), 0), 100);
                       console.log("HeaderSettings - Setting opacity to:", numValue);
-                      form.setValue("header_opacity", numValue);
+                      form.setValue("header_opacity", numValue, { 
+                        shouldDirty: true 
+                      });
                     }}
                     className="w-24"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {headerOpacity}%
+                    {field.value ?? 30}%
                   </span>
                 </div>
               </FormControl>
@@ -66,24 +65,13 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
             colors={headerSettings}
             onColorClick={(color, field) => {
               if (field) {
-                const inputElement = document.getElementById(field);
-                if (inputElement) {
-                  console.log(`Triggering click on input for field: ${field}`);
-                  inputElement.click();
-                }
+                console.log(`HeaderSettings - Color clicked: ${color} for field: ${field}`);
+                form.setValue(field, color, { 
+                  shouldDirty: true 
+                });
               }
             }}
           />
-          {headerSettings.map(({ field, color }) => (
-            <Input
-              key={field}
-              id={field}
-              type="color"
-              value={color}
-              onChange={(e) => handleColorChange(e.target.value, field)}
-              className="sr-only"
-            />
-          ))}
         </div>
       </div>
     </div>
