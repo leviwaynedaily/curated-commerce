@@ -99,8 +99,7 @@ export function MobileHeader({
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-9 h-8 bg-white/80 border"
-                  style={{ borderColor: previewData.main_color }}
+                  className="pl-9 h-8 bg-white/80 focus:ring-0 focus-visible:ring-1 focus-visible:ring-black/10 focus-visible:ring-offset-0"
                   autoFocus
                   onBlur={() => {
                     if (!searchQuery) {
