@@ -1,7 +1,7 @@
 import { PreviewData } from "@/types/preview";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowDownUp, CircleHelp } from "lucide-react";
+import { Search, CircleHelp } from "lucide-react";
 import { HeaderDropdown } from "./HeaderDropdown";
 import { useState } from "react";
 
@@ -60,6 +60,9 @@ export function DesktopHeader({
                   if (!searchQuery) {
                     setShowSearch(false);
                   }
+                }}
+                style={{
+                  borderColor: previewData.main_color,
                 }}
               />
               <Search 

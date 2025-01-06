@@ -1,7 +1,7 @@
 import { PreviewData } from "@/types/preview";
 import { HeaderDropdown } from "./HeaderDropdown";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp, Search, CircleHelp } from "lucide-react";
+import { Search, CircleHelp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
@@ -62,6 +62,9 @@ export function MobileHeader({
                   if (!searchQuery) {
                     setShowSearch(false);
                   }
+                }}
+                style={{
+                  borderColor: previewData.main_color,
                 }}
               />
               <Search 
