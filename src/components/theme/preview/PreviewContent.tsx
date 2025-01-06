@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { PreviewData } from "@/types/preview";
@@ -22,13 +22,15 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   const { searchQuery, handleSearchChange } = useSearchState();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentSort, setCurrentSort] = useState("newest");
+  const modalRef = useRef<HTMLDivElement>(null);
 
   const { 
     data,
     isLoading 
   } = useStorefrontProducts(previewData.id || '');
 
-  const allProducts = data?.pages[0]?.products || [];
+  // Get products from the data directly since it's not paginated anymore
+  const allProducts = data?.products || [];
   
   // Filter products based on search and category
   const filteredProducts = allProducts.filter(product => {
@@ -111,6 +113,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
         <InstructionsModal
           previewData={previewData}
           onClose={() => setShowInstructions(false)}
+          modalRef={modalRef}
         />
       )}
     </div>
