@@ -8,14 +8,23 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('get-manifest function called with request:', {
+    method: req.method,
+    url: req.url,
+    headers: Object.fromEntries(req.headers.entries())
+  });
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling CORS preflight request');
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const url = new URL(req.url);
     const storefrontId = url.searchParams.get('storefrontId');
+
+    console.log('Processing request for storefrontId:', storefrontId);
 
     if (!storefrontId) {
       console.error('Missing storefrontId parameter');
@@ -25,14 +34,23 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fetching PWA settings for storefront:', storefrontId);
-
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing Supabase environment variables');
+      return new Response(
+        JSON.stringify({ error: 'Server configuration error' }),
+        { status: 500, headers: corsHeaders }
+      );
+    }
+
+    console.log('Initializing Supabase client with URL:', supabaseUrl);
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Fetch PWA settings
+    console.log('Fetching PWA settings for storefront:', storefrontId);
     const { data: pwaSettings, error } = await supabase
       .from('pwa_settings')
       .select('*')
@@ -48,7 +66,7 @@ serve(async (req) => {
     }
 
     if (!pwaSettings) {
-      console.error('PWA settings not found');
+      console.error('PWA settings not found for storefront:', storefrontId);
       return new Response(
         JSON.stringify({ error: 'PWA settings not found' }),
         { status: 404, headers: corsHeaders }

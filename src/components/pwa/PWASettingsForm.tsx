@@ -224,23 +224,17 @@ export function PWASettingsForm() {
       }
 
       console.log("PWA settings saved, generating manifest...");
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const response = await fetch(`${supabaseUrl}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const { data: manifestData, error: manifestError } = await supabase.functions.invoke('get-manifest', {
+        body: { storefrontId: currentStorefrontId }
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Manifest generation failed:", errorText);
-        throw new Error(`Failed to generate manifest: ${response.statusText}. Details: ${errorText}`);
+      if (manifestError) {
+        console.error("Manifest generation failed:", manifestError);
+        throw new Error(`Failed to generate manifest: ${manifestError.message}`);
       }
 
-      const manifest = await response.json();
-      console.log("Generated manifest:", manifest);
-      setManifestJson(JSON.stringify(manifest, null, 2));
+      console.log("Generated manifest:", manifestData);
+      setManifestJson(JSON.stringify(manifestData, null, 2));
 
       toast({
         title: "Success",
