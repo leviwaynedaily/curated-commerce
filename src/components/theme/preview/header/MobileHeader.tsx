@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HeaderDropdown } from "./HeaderDropdown";
 import { PreviewData } from "@/types/preview";
-import { ProductCount } from "../ProductCount";
 import {
   Tooltip,
   TooltipContent,
@@ -27,11 +26,6 @@ interface MobileHeaderProps {
   onTextPlacementChange?: (placement: string) => void;
   onLogoClick?: () => void;
   onShowInstructions?: () => void;
-  totalCount?: number;
-  currentCount?: number;
-  isFetchingNextPage?: boolean;
-  startIndex?: number;
-  endIndex?: number;
 }
 
 export function MobileHeader({
@@ -49,11 +43,6 @@ export function MobileHeader({
   onTextPlacementChange,
   onLogoClick,
   onShowInstructions,
-  totalCount = 0,
-  currentCount = 0,
-  isFetchingNextPage = false,
-  startIndex = 0,
-  endIndex = 0,
 }: MobileHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
@@ -150,17 +139,6 @@ export function MobileHeader({
               </TooltipContent>
             </Tooltip>
           )}
-
-          {/* Product Count */}
-          <div className="ml-2">
-            <ProductCount
-              currentCount={currentCount}
-              totalCount={totalCount}
-              isFetchingNextPage={isFetchingNextPage}
-              startIndex={startIndex}
-              endIndex={endIndex}
-            />
-          </div>
         </div>
       </div>
     </TooltipProvider>
