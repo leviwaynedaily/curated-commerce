@@ -13,7 +13,32 @@ interface ProductImageUploadProps {
 
 export function ProductImageUpload({ form, isUploading, onUpload }: ProductImageUploadProps) {
   const isVideo = (url: string) => {
-    return url.toLowerCase().match(/\.(mp4|webm|ogg)$/i);
+    return url.toLowerCase().match(/\.(mp4|webm|ogg|mov)$/i);
+  };
+
+  const renderMediaPreview = (url: string, index: number) => {
+    if (isVideo(url)) {
+      return (
+        <div key={index} className="relative w-full h-32">
+          <video
+            src={url}
+            className="w-full h-full object-cover rounded-md"
+            controls
+          >
+            Your browser does not support the video element.
+          </video>
+        </div>
+      );
+    }
+    return (
+      <div key={index} className="relative w-full h-32">
+        <img
+          src={url}
+          alt={`Product media ${index + 1}`}
+          className="w-full h-full object-cover rounded-md"
+        />
+      </div>
+    );
   };
 
   return (
@@ -50,23 +75,7 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
             </div>
           </FormControl>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {form.watch("images")?.map((url, index) => (
-              isVideo(url) ? (
-                <video
-                  key={index}
-                  src={url}
-                  className="w-full h-32 object-cover rounded-md"
-                  controls
-                />
-              ) : (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Product media ${index + 1}`}
-                  className="w-full h-32 object-cover rounded-md"
-                />
-              )
-            ))}
+            {form.watch("images")?.map((url, index) => renderMediaPreview(url, index))}
           </div>
           <FormMessage />
         </FormItem>
