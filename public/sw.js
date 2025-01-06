@@ -29,24 +29,29 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/pwa-settings/')) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      })
         .then(async response => {
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
           }
           
-          return caches.open('manifest-cache').then(cache => {
-            cache.put(event.request, response.clone());
-            return response;
-          });
+          const cache = await caches.open('manifest-cache');
+          cache.put(event.request, response.clone());
+          return response;
         })
         .catch(error => {
-          return caches.match(event.request).then(cachedResponse => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            throw error;
-          });
+          return caches.match(event.request)
+            .then(cachedResponse => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              throw error;
+            });
         })
     );
   } else {

@@ -5,37 +5,29 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Content-Type': 'application/json',
+  'Cache-Control': 'no-cache'
 };
 
 serve(async (req) => {
-  console.log('serve-manifest function called');
-
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get storefront slug from URL
     const url = new URL(req.url);
     const slug = url.searchParams.get('slug');
 
     if (!slug) {
-      console.error('No slug provided in request');
       return new Response(
         JSON.stringify({ error: 'Storefront slug is required' }),
         { status: 400, headers: corsHeaders }
       );
     }
 
-    console.log('Fetching manifest for storefront with slug:', slug);
-
-    // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!supabaseUrl || !supabaseKey) {
-      console.error('Missing Supabase environment variables');
       return new Response(
         JSON.stringify({ error: 'Server configuration error' }),
         { status: 500, headers: corsHeaders }
@@ -44,7 +36,6 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // First get the storefront id from the slug
     const { data: storefront, error: storefrontError } = await supabase
       .from('storefronts')
       .select('id')
@@ -52,14 +43,12 @@ serve(async (req) => {
       .single();
 
     if (storefrontError || !storefront) {
-      console.error('Error fetching storefront:', storefrontError);
       return new Response(
         JSON.stringify({ error: 'Storefront not found' }),
         { status: 404, headers: corsHeaders }
       );
     }
 
-    // Then get the PWA settings
     const { data: pwaSettings, error: pwaError } = await supabase
       .from('pwa_settings')
       .select('*')
@@ -67,26 +56,23 @@ serve(async (req) => {
       .single();
 
     if (pwaError || !pwaSettings) {
-      console.error('Error fetching PWA settings:', pwaError);
       return new Response(
         JSON.stringify({ error: 'PWA settings not found' }),
         { status: 404, headers: corsHeaders }
       );
     }
 
-    // Construct icons array
     const icons = [
-      { src: pwaSettings.icon_72x72, sizes: '72x72', type: 'image/png' },
-      { src: pwaSettings.icon_96x96, sizes: '96x96', type: 'image/png' },
-      { src: pwaSettings.icon_128x128, sizes: '128x128', type: 'image/png' },
-      { src: pwaSettings.icon_144x144, sizes: '144x144', type: 'image/png' },
-      { src: pwaSettings.icon_152x152, sizes: '152x152', type: 'image/png' },
-      { src: pwaSettings.icon_192x192, sizes: '192x192', type: 'image/png' },
-      { src: pwaSettings.icon_384x384, sizes: '384x384', type: 'image/png' },
-      { src: pwaSettings.icon_512x512, sizes: '512x512', type: 'image/png' },
-    ].filter(icon => icon.src);
+      pwaSettings.icon_72x72 && { src: pwaSettings.icon_72x72, sizes: '72x72', type: 'image/png' },
+      pwaSettings.icon_96x96 && { src: pwaSettings.icon_96x96, sizes: '96x96', type: 'image/png' },
+      pwaSettings.icon_128x128 && { src: pwaSettings.icon_128x128, sizes: '128x128', type: 'image/png' },
+      pwaSettings.icon_144x144 && { src: pwaSettings.icon_144x144, sizes: '144x144', type: 'image/png' },
+      pwaSettings.icon_152x152 && { src: pwaSettings.icon_152x152, sizes: '152x152', type: 'image/png' },
+      pwaSettings.icon_192x192 && { src: pwaSettings.icon_192x192, sizes: '192x192', type: 'image/png' },
+      pwaSettings.icon_384x384 && { src: pwaSettings.icon_384x384, sizes: '384x384', type: 'image/png' },
+      pwaSettings.icon_512x512 && { src: pwaSettings.icon_512x512, sizes: '512x512', type: 'image/png' },
+    ].filter(Boolean);
 
-    // Construct screenshots array
     const screenshots = [];
     if (pwaSettings.screenshot_mobile) {
       screenshots.push({
@@ -105,7 +91,6 @@ serve(async (req) => {
       });
     }
 
-    // Construct the manifest
     const manifest = {
       name: pwaSettings.name,
       short_name: pwaSettings.short_name,
@@ -119,19 +104,11 @@ serve(async (req) => {
       screenshots: screenshots.length > 0 ? screenshots : undefined,
     };
 
-    console.log('Generated manifest:', manifest);
-
     return new Response(
       JSON.stringify(manifest),
-      { 
-        headers: {
-          ...corsHeaders,
-          'Cache-Control': 'public, max-age=0'  // Ensure fresh manifest is always served
-        }
-      }
+      { headers: corsHeaders }
     );
   } catch (error) {
-    console.error('Error in serve-manifest function:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error', details: error.message }),
       { status: 500, headers: corsHeaders }
