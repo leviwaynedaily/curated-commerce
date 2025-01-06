@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 interface ProductMediaCarouselProps {
   images: string[];
@@ -21,6 +21,13 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
+  // Re-initialize carousel when images change
+  useEffect(() => {
+    if (emblaApi) {
+      emblaApi.reInit();
+    }
+  }, [emblaApi, images]);
+
   const isVideo = (url: string) => {
     const extension = url.split('.').pop()?.toLowerCase();
     return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
@@ -30,35 +37,38 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
     <div className="space-y-4">
       <div className="relative overflow-hidden" ref={emblaRef}>
         <div className="flex">
-          {images?.[0] && (
-            <div className="aspect-square relative rounded-lg overflow-hidden min-w-full">
-              {isVideo(images[0]) ? (
-                <video
-                  src={images[0]}
-                  controls
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              ) : (
-                <img
-                  src={images[0]}
-                  alt={productName}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
-              <Button
-                variant="secondary"
-                size="icon"
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => onDownload(images[0])}
-                style={{ backgroundColor: previewData.product_category_background_color }}
-              >
-                <Download 
-                  className="h-4 w-4"
-                  style={{ color: previewData.product_category_text_color }}
-                />
-              </Button>
+          {images.map((media, index) => (
+            <div key={index} className="relative min-w-full flex-shrink-0">
+              <div className="aspect-square relative rounded-lg overflow-hidden">
+                {isVideo(media) ? (
+                  <video
+                    src={media}
+                    controls
+                    className="absolute inset-0 w-full h-full object-cover"
+                    playsInline
+                  />
+                ) : (
+                  <img
+                    src={media}
+                    alt={`${productName} ${index + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+                )}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => onDownload(media)}
+                  style={{ backgroundColor: previewData.product_category_background_color }}
+                >
+                  <Download 
+                    className="h-4 w-4"
+                    style={{ color: previewData.product_category_text_color }}
+                  />
+                </Button>
+              </div>
             </div>
-          )}
+          ))}
         </div>
         {images.length > 1 && (
           <>
@@ -82,20 +92,23 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
         )}
       </div>
       <div className="grid grid-cols-4 gap-2">
-        {images?.slice(1).map((image: string, index: number) => (
+        {images.map((media, index) => (
           <div
             key={index}
-            className="aspect-square relative rounded-lg overflow-hidden group"
+            className="aspect-square relative rounded-lg overflow-hidden group cursor-pointer"
+            onClick={() => emblaApi?.scrollTo(index)}
           >
-            {isVideo(image) ? (
+            {isVideo(media) ? (
               <video
-                src={image}
+                src={media}
                 className="absolute inset-0 w-full h-full object-cover"
+                muted
+                playsInline
               />
             ) : (
               <img
-                src={image}
-                alt={`${productName} ${index + 2}`}
+                src={media}
+                alt={`${productName} ${index + 1}`}
                 className="absolute inset-0 w-full h-full object-cover"
               />
             )}
@@ -103,7 +116,10 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
               variant="secondary"
               size="icon"
               className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => onDownload(image)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDownload(media);
+              }}
               style={{ backgroundColor: previewData.product_category_background_color }}
             >
               <Download 
