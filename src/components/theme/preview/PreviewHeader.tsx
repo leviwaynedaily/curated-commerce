@@ -43,7 +43,7 @@ export function PreviewHeader({
         backgroundColor: `${previewData.storefront_background_color}10`,
       }}
     >
-      <div className="w-full py-2 px-4 md:px-8 backdrop-blur-md bg-white/5">
+      <div className="w-full py-2 px-4 md:px-8 backdrop-blur-md bg-white/40">
         <MobileHeader 
           previewData={previewData}
           searchQuery={searchQuery}
