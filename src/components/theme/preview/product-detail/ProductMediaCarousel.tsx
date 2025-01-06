@@ -24,13 +24,18 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
   // Re-initialize carousel when images change
   useEffect(() => {
     if (emblaApi) {
+      console.log("Reinitializing carousel with images:", images);
       emblaApi.reInit();
     }
   }, [emblaApi, images]);
 
   const isVideo = (url: string) => {
+    console.log("Checking if media is video:", url);
     const extension = url.split('.').pop()?.toLowerCase();
-    return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
+    const videoExtensions = ['mp4', 'webm', 'ogg', 'mov'];
+    const isVideoFile = videoExtensions.includes(extension || '');
+    console.log("Is video file:", isVideoFile, "Extension:", extension);
+    return isVideoFile;
   };
 
   return (
@@ -42,10 +47,12 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
               <div className="aspect-square relative rounded-lg overflow-hidden">
                 {isVideo(media) ? (
                   <video
+                    key={media}
                     src={media}
                     controls
-                    className="absolute inset-0 w-full h-full object-cover"
                     playsInline
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => console.error("Video error:", e)}
                   />
                 ) : (
                   <img
@@ -58,7 +65,10 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
                   variant="secondary"
                   size="icon"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                  onClick={() => onDownload(media)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDownload(media);
+                  }}
                   style={{ backgroundColor: previewData.product_category_background_color }}
                 >
                   <Download 
