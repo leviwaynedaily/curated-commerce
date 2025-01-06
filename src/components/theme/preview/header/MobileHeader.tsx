@@ -19,8 +19,6 @@ interface MobileHeaderProps {
 
 export function MobileHeader({
   previewData,
-  searchQuery = "",
-  onSearchChange = () => {},
   onSortChange,
   onCategoryChange,
   categories = [],
@@ -52,16 +50,14 @@ export function MobileHeader({
         />
         
         <HeaderDropdown
-          searchQuery={searchQuery}
-          onSearchChange={onSearchChange}
-          onSortChange={onSortChange}
-          onCategoryChange={onCategoryChange}
           categories={categories}
           selectedCategory={selectedCategory}
+          onCategoryChange={onCategoryChange}
           currentSort={currentSort}
+          onSortChange={onSortChange}
+          textPlacement={textPlacement}
+          onTextPlacementChange={onTextPlacementChange}
           mainColor={previewData.main_color || "#000000"}
-          onShowInstructions={onShowInstructions}
-          showInstructions={previewData.enable_instructions}
         />
       </div>
     </div>

@@ -28,9 +28,7 @@ interface ProductGridProps {
 }
 
 export function ProductGrid({ 
-  products, 
-  layout, 
-  textPlacement,
+  products,
   onProductClick,
   productCardBackgroundColor,
   productTitleTextColor,
@@ -58,28 +56,12 @@ export function ProductGrid({
     }
   }, [products.length, totalCount]);
 
-  // Memoize the ref to prevent unnecessary re-renders
   const { ref: infiniteScrollRef, inView } = useInView({
     threshold: 0,
     rootMargin: '100px',
     skip: !hasNextPage || isFetchingNextPage || isDesktop,
   });
 
-  // Memoize grid styles
-  const gridStyles = useMemo(() => {
-    switch (layout) {
-      case 'small':
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3'
-      case 'large':
-        return 'grid-cols-1 md:grid-cols-2 gap-4'
-      case 'list':
-        return 'grid-cols-1 gap-4'
-      default: // medium
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
-    }
-  }, [layout]);
-
-  // Debounced scroll handler using useCallback
   const handleScroll = useCallback(() => {
     if (inView && hasNextPage && !isDesktop && !isFetchingNextPage) {
       console.log("Infinite scroll trigger reached, loading more products");
@@ -87,18 +69,15 @@ export function ProductGrid({
     }
   }, [inView, hasNextPage, isDesktop, isFetchingNextPage, fetchNextPage]);
 
-  // Optimize scroll event listener
   useEffect(() => {
     handleScroll();
   }, [handleScroll]);
 
-  // Memoize the product cards to prevent unnecessary re-renders
   const productCards = useMemo(() => {
     return products?.map((product) => (
       <div key={product.id}>
         <ProductCard
           product={product}
-          layout={layout}
           productCardBackgroundColor={productCardBackgroundColor}
           productTitleTextColor={productTitleTextColor}
           productDescriptionTextColor={productDescriptionTextColor}
@@ -112,7 +91,6 @@ export function ProductGrid({
     ));
   }, [
     products,
-    layout,
     productCardBackgroundColor,
     productTitleTextColor,
     productDescriptionTextColor,
@@ -133,7 +111,7 @@ export function ProductGrid({
         endIndex={Math.min(visibleRange.end, currentCount - 1)}
       />
 
-      <div className={`grid ${gridStyles} auto-rows-auto mt-1`}>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mt-1">
         {productCards}
       </div>
 

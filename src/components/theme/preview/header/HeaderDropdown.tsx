@@ -22,8 +22,6 @@ interface HeaderDropdownProps {
   onCategoryChange?: (category: string | null) => void;
   currentSort?: string;
   onSortChange?: (sort: string) => void;
-  layout?: string;
-  onLayoutChange?: (layout: string) => void;
   textPlacement?: string;
   onTextPlacementChange?: (placement: string) => void;
   mainColor?: string;
@@ -35,8 +33,6 @@ export function HeaderDropdown({
   onCategoryChange,
   currentSort,
   onSortChange,
-  layout,
-  onLayoutChange,
   textPlacement,
   onTextPlacementChange,
   mainColor,
@@ -98,19 +94,6 @@ export function HeaderDropdown({
             <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="price-asc">Price: Low to High</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="price-desc">Price: High to Low</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">View</DropdownMenuLabel>
-          <DropdownMenuRadioGroup 
-            value={layout} 
-            onValueChange={onLayoutChange}
-          >
-            <DropdownMenuRadioItem value="list">List View</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="small">Small Grid</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="medium">Medium Grid</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="large">Large Grid</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
 
           <DropdownMenuSeparator />
