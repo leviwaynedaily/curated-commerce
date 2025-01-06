@@ -41,4 +41,8 @@ export const router = createBrowserRouter([
     path: "/preview",
     element: <Preview />,
   },
+  {
+    path: "/:slug",
+    element: <Preview />,
+  }
 ]);
