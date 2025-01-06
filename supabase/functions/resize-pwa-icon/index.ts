@@ -51,15 +51,14 @@ serve(async (req) => {
 
       // Create canvas with target size
       const canvas = new OffscreenCanvas(size, size)
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { alpha: true })
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
       }
 
-      // Clear canvas and set white background
-      ctx.fillStyle = '#FFFFFF'
-      ctx.fillRect(0, 0, size, size)
+      // Clear canvas with transparent background
+      ctx.clearRect(0, 0, size, size)
 
       // Calculate scaling to maintain aspect ratio
       const scale = Math.min(size / originalImage.width, size / originalImage.height)
@@ -79,19 +78,8 @@ serve(async (req) => {
       )
 
       try {
-        // Get image data and create new canvas for RGBA
-        const imageData = ctx.getImageData(0, 0, size, size)
-        const rgbaCanvas = new OffscreenCanvas(size, size)
-        const rgbaCtx = rgbaCanvas.getContext('2d')
-        
-        if (!rgbaCtx) {
-          throw new Error('Failed to get RGBA canvas context')
-        }
-
-        rgbaCtx.putImageData(imageData, 0, 0)
-
-        // Convert to PNG blob
-        const resizedBlob = await rgbaCanvas.convertToBlob({
+        // Convert directly to PNG blob with alpha channel
+        const resizedBlob = await canvas.convertToBlob({
           type: 'image/png'
         })
 
