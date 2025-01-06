@@ -14,7 +14,6 @@ interface ProductGridProps {
   productPriceButtonColor: string
   productCategoryBackgroundColor: string
   productCategoryTextColor: string
-  productPriceButtonColor: string
 }
 
 export function ProductGrid({ 
