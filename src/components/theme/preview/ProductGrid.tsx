@@ -27,42 +27,43 @@ export function ProductGrid({
   productCategoryBackgroundColor,
   productCategoryTextColor
 }: ProductGridProps) {
-  const getGridColumns = () => {
+  // Define fixed card dimensions based on layout type
+  const getGridStyles = () => {
     switch (layout) {
       case 'small':
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
       case 'large':
-        return 'grid-cols-1 md:grid-cols-2'
+        return 'grid-cols-1 md:grid-cols-2 gap-6'
       case 'list':
-        return 'grid-cols-1'
+        return 'grid-cols-1 gap-6'
       default: // medium
-        return 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
     }
   }
 
-  const getCardSize = () => {
+  const getCardDimensions = () => {
     switch (layout) {
       case 'small':
-        return 'min-h-[24rem] sm:aspect-[4/5]'
+        return 'w-full h-[320px]'
       case 'large':
-        return 'min-h-[28rem] md:aspect-video'
+        return 'w-full h-[400px]'
       case 'list':
-        return 'min-h-[24rem]'
+        return 'w-full h-[200px] flex'
       default: // medium
-        return 'min-h-[26rem] sm:aspect-[3/4]'
+        return 'w-full h-[360px]'
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-1/2 relative" : "h-3/5 relative",
+        imageContainer: layout === 'small' ? "h-1/2" : "h-3/5",
         textContainer: `p-4 flex flex-col justify-between flex-grow`,
         overlay: "hidden"
       }
     } else {
       return {
-        imageContainer: "h-full relative",
+        imageContainer: "h-full",
         textContainer: "absolute bottom-0 left-0 right-0 p-4",
         overlay: "absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"
       }
@@ -70,19 +71,19 @@ export function ProductGrid({
   }
 
   return (
-    <div className={`grid ${getGridColumns()} gap-6 p-4`}>
+    <div className={`grid ${getGridStyles()} auto-rows-auto`}>
       {products?.map((product) => {
         const styles = getTextPlacementStyles(product)
         
         return (
           <div 
             key={product.id}
-            className={`group relative rounded-lg overflow-hidden transition-all duration-200 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] transform hover:scale-[1.01] ${getCardSize()} ${layout === 'list' ? 'flex' : ''}`}
+            className={`group relative overflow-hidden transition-all duration-200 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] transform hover:scale-[1.01] rounded-lg ${getCardDimensions()}`}
             onClick={() => onProductClick(product)}
             style={{ backgroundColor: productCardBackgroundColor }}
           >
             {product.images?.[0] && (
-              <div className={`${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer}`}>
+              <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer}`}>
                 <img
                   src={product.images[0]}
                   alt={product.name}
@@ -115,7 +116,6 @@ export function ProductGrid({
                   className="text-sm font-bold mb-1 line-clamp-2"
                   style={{ 
                     color: productTitleTextColor,
-                    fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
                     fontSize: layout === 'small' ? '12px' : '14px'
                   }}
                 >
@@ -123,10 +123,9 @@ export function ProductGrid({
                 </h3>
                 {product.description && (
                   <p 
-                    className="font-open-sans text-xs sm:text-sm line-clamp-2 mb-2"
+                    className="text-xs sm:text-sm line-clamp-2 mb-2"
                     style={{ 
                       color: productDescriptionTextColor,
-                      fontFamily: 'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
                       fontSize: layout === 'small' ? '10px' : '12px'
                     }}
                   >
