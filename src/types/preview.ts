@@ -32,4 +32,5 @@ export interface PreviewData {
   storefront_background_color?: string;
   header_opacity?: number;
   header_color?: string;
+  verification_modal_background_color?: string;
 }

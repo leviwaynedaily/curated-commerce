@@ -25,7 +25,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
     checkbox: previewData.verification_checkbox_color || '#D946EF',
     inputBorder: previewData.verification_input_border_color || '#E5E7EB',
     nextText: previewData.verification_next_text_color || '#4CAF50',
-    background: previewData.storefront_background_color || '#FFFFFF'
+    background: previewData.storefront_background_color || '#FFFFFF',
+    modalBackground: previewData.verification_modal_background_color || '#FFFFFF'
   }
 
   console.log("Verification colors being used:", colors);
@@ -64,7 +65,10 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[400px] rounded-lg shadow-xl bg-white/90 backdrop-blur-sm p-6 space-y-6">
+        <div 
+          className="w-[400px] rounded-lg shadow-xl backdrop-blur-sm p-6 space-y-6"
+          style={{ backgroundColor: `${colors.modalBackground}E6` }} // E6 adds 90% opacity
+        >
           {previewData.verification_logo_url && (
             <img 
               src={previewData.verification_logo_url} 

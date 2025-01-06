@@ -254,6 +254,7 @@ export type Database = {
           verification_input_border_color: string | null
           verification_legal_text: string | null
           verification_logo_url: string | null
+          verification_modal_background_color: string | null
           verification_next_text_color: string | null
           verification_password: string | null
           verification_text_color: string | null
@@ -298,6 +299,7 @@ export type Database = {
           verification_input_border_color?: string | null
           verification_legal_text?: string | null
           verification_logo_url?: string | null
+          verification_modal_background_color?: string | null
           verification_next_text_color?: string | null
           verification_password?: string | null
           verification_text_color?: string | null
@@ -342,6 +344,7 @@ export type Database = {
           verification_input_border_color?: string | null
           verification_legal_text?: string | null
           verification_logo_url?: string | null
+          verification_modal_background_color?: string | null
           verification_next_text_color?: string | null
           verification_password?: string | null
           verification_text_color?: string | null
