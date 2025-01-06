@@ -9,15 +9,15 @@ interface VerificationColorsProps {
 
 export function VerificationColors({ form, onColorChange }: VerificationColorsProps) {
   const verificationColors = [
-    { field: "verification_button_color", label: "Button Color" },
-    { field: "verification_button_text_color", label: "Button Text" },
-    { field: "verification_text_color", label: "Text Color" },
-    { field: "verification_checkbox_color", label: "Checkbox Color" },
-    { field: "verification_input_border_color", label: "Input Border" },
-    { field: "verification_next_text_color", label: "Next Button Text" },
-    { field: "verification_modal_background_color", label: "Modal Background" },
-  ].map(({ field, label }) => ({
-    color: form.watch(field),
+    { field: "verification_button_color", label: "Button Color", defaultValue: "#D946EF" },
+    { field: "verification_button_text_color", label: "Button Text", defaultValue: "#FFFFFF" },
+    { field: "verification_text_color", label: "Text Color", defaultValue: "#1A1F2C" },
+    { field: "verification_checkbox_color", label: "Checkbox Color", defaultValue: "#D946EF" },
+    { field: "verification_input_border_color", label: "Input Border", defaultValue: "#E5E7EB" },
+    { field: "verification_next_text_color", label: "Next Button Text", defaultValue: "#4CAF50" },
+    { field: "verification_modal_background_color", label: "Modal Background", defaultValue: "#FFFFFF" },
+  ].map(({ field, label, defaultValue }) => ({
+    color: form.watch(field) || defaultValue,
     label,
     field,
   }));
@@ -32,7 +32,11 @@ export function VerificationColors({ form, onColorChange }: VerificationColorsPr
         onColorClick={(color, field) => {
           console.log(`Color grid clicked - color: ${color}, field: ${field}`);
           if (field) {
-            document.getElementById(field)?.click();
+            const inputElement = document.getElementById(field);
+            if (inputElement) {
+              console.log(`Triggering click on input for field: ${field}`);
+              inputElement.click();
+            }
           }
         }}
       />

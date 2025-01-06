@@ -24,10 +24,18 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
 
   const handleColorChange = (field: string, value: string) => {
     console.log(`Color changed - field: ${field}, value: ${value}`);
+    // Prevent form from resetting to default values
+    const currentValues = form.getValues();
     form.setValue(field, value, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
+    });
+    // Ensure other form values are preserved
+    Object.keys(currentValues).forEach(key => {
+      if (key !== field && currentValues[key]) {
+        form.setValue(key, currentValues[key], { shouldValidate: false });
+      }
     });
   };
 
