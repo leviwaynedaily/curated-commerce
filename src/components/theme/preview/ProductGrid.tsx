@@ -1,25 +1,34 @@
-import { useMemo } from "react";
-import { ProductCard } from "./ProductCard";
+import { useEffect, useState, useCallback, useMemo } from "react"
+import { Button } from "@/components/ui/button"
+import { Loader2 } from "lucide-react"
+import { useInView } from "react-intersection-observer"
+import { ProductCard } from "./ProductCard"
+import { ProductCount } from "./ProductCount"
 
 interface ProductGridProps {
-  products: any[];
-  layout: string;
-  textPlacement: string;
-  onProductClick: (product: any) => void;
-  mainColor: string;
-  fontColor: string;
-  productCardBackgroundColor: string;
-  productTitleTextColor: string;
-  productDescriptionTextColor: string;
-  productPriceColor: string;
-  productPriceButtonColor: string;
-  productCategoryBackgroundColor: string;
-  productCategoryTextColor: string;
+  products: any[]
+  layout: string
+  textPlacement: string
+  onProductClick: (product: any) => void
+  mainColor: string
+  fontColor: string
+  productCardBackgroundColor: string
+  productTitleTextColor: string
+  productDescriptionTextColor: string
+  productPriceColor: string
+  productPriceButtonColor: string
+  productCategoryBackgroundColor: string
+  productCategoryTextColor: string
+  hasNextPage?: boolean
+  isFetchingNextPage?: boolean
+  fetchNextPage?: () => void
+  isDesktop?: boolean
 }
 
 export function ProductGrid({ 
   products, 
   layout, 
+  textPlacement,
   onProductClick,
   productCardBackgroundColor,
   productTitleTextColor,
@@ -28,7 +37,20 @@ export function ProductGrid({
   productPriceButtonColor,
   productCategoryBackgroundColor,
   productCategoryTextColor,
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
+  isDesktop = false
 }: ProductGridProps) {
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
+  
+  // Memoize the ref to prevent unnecessary re-renders
+  const { ref: infiniteScrollRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '100px',
+    skip: !hasNextPage || isFetchingNextPage || isDesktop,
+  });
+
   // Memoize grid styles
   const gridStyles = useMemo(() => {
     switch (layout) {
@@ -42,6 +64,19 @@ export function ProductGrid({
         return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
     }
   }, [layout]);
+
+  // Debounced scroll handler using useCallback
+  const handleScroll = useCallback(() => {
+    if (inView && hasNextPage && !isDesktop && !isFetchingNextPage) {
+      console.log("Infinite scroll trigger reached, loading more products");
+      fetchNextPage?.();
+    }
+  }, [inView, hasNextPage, isDesktop, isFetchingNextPage, fetchNextPage]);
+
+  // Optimize scroll event listener
+  useEffect(() => {
+    handleScroll();
+  }, [handleScroll]);
 
   // Memoize the product cards to prevent unnecessary re-renders
   const productCards = useMemo(() => {
@@ -76,9 +111,41 @@ export function ProductGrid({
 
   return (
     <div className="relative">
+      <ProductCount 
+        currentCount={products.length}
+        totalCount={products.length + (hasNextPage ? 25 : 0)}
+        isFetchingNextPage={isFetchingNextPage || false}
+        startIndex={visibleRange.start}
+        endIndex={visibleRange.end}
+      />
+
       <div className={`grid ${gridStyles} auto-rows-auto mt-1`}>
         {productCards}
       </div>
+
+      {!isDesktop && hasNextPage && (
+        <div ref={infiniteScrollRef} className="h-20 flex items-center justify-center">
+          {isFetchingNextPage && (
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          )}
+        </div>
+      )}
+
+      {isDesktop && hasNextPage && (
+        <div className="flex justify-center pt-4">
+          <Button
+            variant="outline"
+            onClick={() => fetchNextPage?.()}
+            disabled={isFetchingNextPage}
+            className="min-w-[200px]"
+          >
+            {isFetchingNextPage ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : null}
+            {isFetchingNextPage ? "Loading..." : "Load More Products"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
