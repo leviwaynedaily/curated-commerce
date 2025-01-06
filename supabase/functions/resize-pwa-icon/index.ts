@@ -51,7 +51,10 @@ serve(async (req) => {
 
       // Create canvas with target size
       const canvas = new OffscreenCanvas(size, size)
-      const ctx = canvas.getContext('2d', { alpha: true })
+      const ctx = canvas.getContext('2d', { 
+        alpha: true,
+        willReadFrequently: true
+      })
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
@@ -78,9 +81,23 @@ serve(async (req) => {
       )
 
       try {
-        // Convert directly to PNG blob with alpha channel
-        const resizedBlob = await canvas.convertToBlob({
-          type: 'image/png'
+        // Create a temporary canvas for RGBA conversion
+        const tempCanvas = new OffscreenCanvas(size, size)
+        const tempCtx = tempCanvas.getContext('2d', { 
+          alpha: true,
+          willReadFrequently: true 
+        })
+        
+        if (!tempCtx) {
+          throw new Error('Failed to get temporary canvas context')
+        }
+
+        // Copy the image to temp canvas
+        tempCtx.drawImage(canvas, 0, 0)
+
+        // Convert to PNG blob with proper color space handling
+        const resizedBlob = await tempCanvas.convertToBlob({
+          type: 'image/png',
         })
 
         const timestamp = Date.now()
