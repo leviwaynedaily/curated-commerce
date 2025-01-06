@@ -30,9 +30,12 @@ serve(async (req) => {
     if (!imageResponse.ok) {
       throw new Error(`Failed to fetch image: ${imageResponse.statusText}`)
     }
-    const imageBlob = await imageResponse.blob()
 
-    // Create image element
+    // Convert the response to an ArrayBuffer first
+    const imageBuffer = await imageResponse.arrayBuffer()
+    const imageBlob = new Blob([imageBuffer], { type: 'image/png' })
+
+    // Create image bitmap from blob
     const originalImage = await createImageBitmap(imageBlob)
 
     // Initialize Supabase client
@@ -51,23 +54,26 @@ serve(async (req) => {
 
       // Create canvas with target size
       const canvas = new OffscreenCanvas(size, size)
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { willReadFrequently: true })
 
       if (!ctx) {
         throw new Error('Failed to get canvas context')
       }
 
+      // Set background to white first
+      ctx.fillStyle = '#FFFFFF'
+      ctx.fillRect(0, 0, size, size)
+
       // Draw resized image
       ctx.drawImage(originalImage, 0, 0, size, size)
 
-      // Convert to blob
+      // Convert to blob with explicit PNG format
       const resizedBlob = await canvas.convertToBlob({
         type: 'image/png',
-        quality: 1
       })
 
       // Upload to Supabase Storage
-      const filePath = `${storefrontId}/pwa/icons/${size}x${size}/${Math.random()}.png`
+      const filePath = `${storefrontId}/pwa/icons/${size}x${size}/${Date.now()}.png`
       
       const { error: uploadError } = await supabase.storage
         .from('storefront-assets')
