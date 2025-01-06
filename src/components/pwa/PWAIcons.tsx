@@ -18,6 +18,7 @@ export function PWAIcons({ form }: PWAIconsProps) {
 
     setIsResizing(true);
     try {
+      console.log('Starting icon resize process with URL:', url);
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resize-pwa-icon`, {
         method: 'POST',
         headers: {
@@ -31,10 +32,13 @@ export function PWAIcons({ form }: PWAIconsProps) {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response from resize function:', errorText);
         throw new Error('Failed to resize icons');
       }
 
       const { icons } = await response.json();
+      console.log('Received resized icons:', icons);
 
       // Update all icon fields in the form
       Object.entries(icons).forEach(([key, value]) => {
