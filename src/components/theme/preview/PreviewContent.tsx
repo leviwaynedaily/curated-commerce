@@ -1,15 +1,14 @@
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { PreviewPagination } from "./PreviewPagination";
-import { ViewOptionsDropdown } from "./ViewOptionsDropdown";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
-import { Button } from "@/components/ui/button";
+import { InstructionsModal } from "./modals/InstructionsModal";
+import { useSearchState } from "./hooks/useSearchState";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -18,7 +17,6 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
-  const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("small");
@@ -30,19 +28,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   const modalRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 12;
 
-  // Get search query from URL params
-  const searchQuery = searchParams.get("search") || "";
-
-  // Update search query in URL
-  const handleSearchChange = (query: string) => {
-    if (query) {
-      searchParams.set("search", query);
-    } else {
-      searchParams.delete("search");
-    }
-    setSearchParams(searchParams);
-    setCurrentPage(1); // Reset to first page on search
-  };
+  const { searchQuery, handleSearchChange } = useSearchState();
 
   // Handle back navigation from product detail
   const handleBackFromProduct = () => {
@@ -185,40 +171,11 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       <PreviewLegalFooter />
 
       {showInstructions && previewData.enable_instructions && (
-        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
-          <div className="h-full w-full flex items-center justify-center p-4">
-            <div ref={modalRef} className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
-              {previewData.logo_url && (
-                <img 
-                  src={previewData.logo_url} 
-                  alt={previewData.name} 
-                  className="h-16 mx-auto object-contain"
-                />
-              )}
-              
-              <h2 className="text-xl font-semibold text-center">
-                Welcome to {previewData.name}
-              </h2>
-              
-              <div 
-                className="prose prose-sm max-w-none [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_li]:text-inherit space-y-4"
-                dangerouslySetInnerHTML={{ __html: previewData.instructions_text || '' }}
-              />
-
-              <Button
-                className="w-full"
-                onClick={() => setShowInstructions(false)}
-                style={{ 
-                  backgroundColor: previewData.verification_button_color,
-                  color: '#FFFFFF',
-                  border: 'none'
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
+        <InstructionsModal
+          previewData={previewData}
+          onClose={() => setShowInstructions(false)}
+          modalRef={modalRef}
+        />
       )}
     </div>
   );
