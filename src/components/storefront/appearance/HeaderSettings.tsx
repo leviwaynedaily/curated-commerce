@@ -12,8 +12,8 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     { 
       field: "header_color", 
       label: "Header Color", 
-      color: form.watch("header_color")
-    },
+      color: form.watch("header_color") || "#FFFFFF"
+    }
   ];
 
   console.log("HeaderSettings - Current header color:", form.watch("header_color"));
@@ -21,10 +21,18 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
 
   const handleColorChange = (color: string, field: string) => {
     console.log(`HeaderSettings - Setting ${field} to:`, color);
+    // Prevent form from resetting to default values
+    const currentValues = form.getValues();
     form.setValue(field, color, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
+    });
+    // Ensure other form values are preserved
+    Object.keys(currentValues).forEach(key => {
+      if (key !== field && currentValues[key]) {
+        form.setValue(key, currentValues[key], { shouldValidate: false });
+      }
     });
   };
 
@@ -43,20 +51,27 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                     type="number"
                     min={0}
                     max={100}
-                    value={form.watch("header_opacity")}
+                    value={form.watch("header_opacity") || 0}
                     onChange={(e) => {
                       const numValue = Math.min(Math.max(Number(e.target.value) || 0, 0), 100);
                       console.log("HeaderSettings - Setting opacity to:", numValue);
+                      const currentValues = form.getValues();
                       form.setValue("header_opacity", numValue, {
                         shouldDirty: true,
                         shouldTouch: true,
                         shouldValidate: true
                       });
+                      // Preserve other form values
+                      Object.keys(currentValues).forEach(key => {
+                        if (key !== "header_opacity" && currentValues[key]) {
+                          form.setValue(key, currentValues[key], { shouldValidate: false });
+                        }
+                      });
                     }}
                     className="w-24"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {form.watch("header_opacity")}%
+                    {form.watch("header_opacity") || 0}%
                   </span>
                 </div>
               </FormControl>
