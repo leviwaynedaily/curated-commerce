@@ -111,7 +111,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
   return (
     <div 
-      className="min-h-screen"
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
       <PreviewHeader 
@@ -133,7 +133,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
         onShowInstructions={() => setShowInstructions(true)}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-1">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
