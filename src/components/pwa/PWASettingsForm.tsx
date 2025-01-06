@@ -278,12 +278,12 @@ export function PWASettingsForm() {
 
         {manifestJson && (
           <Card>
-            <CardHeader className="py-4">
-              <CardTitle className="text-lg">Generated Manifest</CardTitle>
+            <CardHeader className="py-2">
+              <CardTitle className="text-sm font-medium">Generated Manifest</CardTitle>
             </CardHeader>
-            <CardContent className="max-h-[300px] overflow-y-auto">
-              <pre className="bg-secondary/10 p-3 rounded-lg overflow-x-auto">
-                <code className="text-xs font-mono whitespace-pre-wrap break-all">
+            <CardContent>
+              <pre className="bg-secondary/5 p-2 rounded-lg overflow-x-auto">
+                <code className="text-[10px] font-mono whitespace-pre-wrap break-all leading-tight">
                   {manifestJson}
                 </code>
               </pre>
