@@ -9,19 +9,27 @@ interface HeaderSettingsProps {
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
+  // Watch for changes in header opacity and color
+  const currentOpacity = form.watch("header_opacity");
+  const currentColor = form.watch("header_color");
+
+  console.log("HeaderSettings - Initial values:", { currentOpacity, currentColor });
+
   const handleOpacityChange = (value: string) => {
     // Convert to number and clamp between 0 and 100
     const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
-    console.log("Setting header opacity to:", numValue);
-    form.setValue("header_opacity", numValue, { 
+    console.log("HeaderSettings - Setting opacity to:", numValue);
+    
+    form.setValue("header_opacity", numValue, {
       shouldDirty: true,
       shouldTouch: true,
-      shouldValidate: true 
+      shouldValidate: true
     });
   };
 
   const handleHeaderColorChange = (color: string) => {
-    console.log("Setting header color to:", color);
+    console.log("HeaderSettings - Setting color to:", color);
+    
     form.setValue("header_color", color, {
       shouldDirty: true,
       shouldTouch: true,
@@ -29,22 +37,13 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     });
   };
 
-  // Watch for changes in header opacity and color
+  // Log when form values change
   useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === "header_opacity" || name === "header_color") {
-        console.log(`Header setting changed - ${name}:`, value[name]);
-      }
+    console.log("HeaderSettings - Form values updated:", {
+      opacity: currentOpacity,
+      color: currentColor
     });
-
-    return () => subscription.unsubscribe();
-  }, [form]);
-
-  // Get current values from form
-  const currentOpacity = form.watch("header_opacity") ?? 30;
-  const currentColor = form.watch("header_color") ?? "#FFFFFF";
-
-  console.log("Current header settings - opacity:", currentOpacity, "color:", currentColor);
+  }, [currentOpacity, currentColor]);
 
   return (
     <div className="space-y-4">
@@ -54,21 +53,20 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
           <FormField
             control={form.control}
             name="header_opacity"
-            render={({ field }) => (
+            render={() => (
               <FormItem className="flex-1">
-                <FormLabel>Header Opacity (%)</FormLabel>
                 <FormControl>
                   <div className="flex items-center gap-4">
                     <Input
                       type="number"
                       min={0}
                       max={100}
-                      value={currentOpacity}
+                      value={currentOpacity ?? 30}
                       onChange={(e) => handleOpacityChange(e.target.value)}
                       className="w-24"
                     />
                     <span className="text-sm text-muted-foreground">
-                      {currentOpacity}%
+                      {currentOpacity ?? 30}%
                     </span>
                   </div>
                 </FormControl>
@@ -79,13 +77,14 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
           <FormField
             control={form.control}
             name="header_color"
-            render={({ field }) => (
+            render={() => (
               <FormItem className="flex-1">
                 <FormControl>
                   <ColorPicker
                     colors={[]}
-                    selectedColor={currentColor}
+                    selectedColor={currentColor ?? "#FFFFFF"}
                     onColorSelect={handleHeaderColorChange}
+                    label=""
                   />
                 </FormControl>
               </FormItem>
