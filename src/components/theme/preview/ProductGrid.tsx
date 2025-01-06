@@ -42,7 +42,7 @@ export function ProductGrid({
   fetchNextPage,
   isDesktop = false
 }: ProductGridProps) {
-  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 }); // Default to first 12 items
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   
   const { ref: infiniteScrollRef, inView } = useInView({
     threshold: 0.5,
@@ -59,17 +59,16 @@ export function ProductGrid({
   const getGridStyles = () => {
     switch (layout) {
       case 'small':
-        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4'
+        return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3'
       case 'large':
-        return 'grid-cols-1 md:grid-cols-2 gap-6'
+        return 'grid-cols-1 md:grid-cols-2 gap-4'
       case 'list':
-        return 'grid-cols-1 gap-6'
+        return 'grid-cols-1 gap-4'
       default: // medium
-        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
+        return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
     }
   }
 
-  // Create refs for each product card to track visibility
   const productRefs = products.map(() => ({
     ref: useInView({
       threshold: 0.5,
@@ -77,7 +76,6 @@ export function ProductGrid({
     }),
   }));
 
-  // Update visible range whenever product visibility changes
   useEffect(() => {
     const visibleIndices = productRefs
       .map((ref, index) => ({ isVisible: ref.ref.inView, index }))
@@ -93,7 +91,7 @@ export function ProductGrid({
   }, [productRefs.map(ref => ref.ref.inView)]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       <ProductCount 
         currentCount={products.length}
         totalCount={products.length + (hasNextPage ? 25 : 0)}
@@ -121,7 +119,6 @@ export function ProductGrid({
         ))}
       </div>
 
-      {/* Infinite scroll trigger for mobile */}
       {!isDesktop && hasNextPage && (
         <div ref={infiniteScrollRef} className="h-20 flex items-center justify-center">
           {isFetchingNextPage && (
@@ -130,7 +127,6 @@ export function ProductGrid({
         </div>
       )}
 
-      {/* Load More button for desktop */}
       {isDesktop && hasNextPage && (
         <div className="flex justify-center pt-4">
           <Button

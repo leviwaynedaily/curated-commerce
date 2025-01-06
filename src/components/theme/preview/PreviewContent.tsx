@@ -2,10 +2,10 @@ import { useState, useRef } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
-import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { PreviewData } from "@/types/preview";
 import { InstructionsModal } from "./modals/InstructionsModal";
 import { useSearchState } from "./hooks/useSearchState";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -48,9 +48,9 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       className="min-h-full flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
-      <main className="container mx-auto px-4 pt-2 pb-4 flex-1">
+      <main className="container mx-auto px-4 pt-2 flex-1">
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {[...Array(8)].map((_, i) => (
               <div
                 key={i}
