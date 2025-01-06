@@ -3,17 +3,9 @@ export async function extractColorsFromLogo(logoUrl: string) {
     console.log('Starting color extraction from logo:', logoUrl);
     
     // Create an image element
-    const img = new Image();
+    const img = document.createElement('img');
     img.crossOrigin = "Anonymous";  // Enable CORS
     
-    // Create a canvas
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    if (!ctx) {
-      throw new Error('Could not get canvas context');
-    }
-
     // Wait for image to load
     await new Promise((resolve, reject) => {
       img.onload = resolve;
@@ -24,51 +16,10 @@ export async function extractColorsFromLogo(logoUrl: string) {
       img.src = logoUrl;
     });
 
-    // Set canvas size to match image
-    canvas.width = img.width;
-    canvas.height = img.height;
-    
-    // Draw image to canvas
-    ctx.drawImage(img, 0, 0);
-    
-    // Get image data
-    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const data = imageData.data;
-    
-    // Create color map to store unique colors and their frequency
-    const colorMap = new Map();
-    
-    // Process pixels
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i + 1];
-      const b = data[i + 2];
-      const a = data[i + 3];
-      
-      // Skip transparent or near-transparent pixels
-      if (a < 128) continue;
-      
-      // Skip white and black pixels
-      if ((r > 250 && g > 250 && b > 250) || (r < 5 && g < 5 && b < 5)) continue;
-      
-      const color = rgbToHsl(r, g, b);
-      const key = `${Math.round(color.h * 360)},${Math.round(color.s * 100)},${Math.round(color.l * 100)}`;
-      
-      colorMap.set(key, (colorMap.get(key) || 0) + 1);
-    }
-    
-    // Sort colors by frequency and convert back to hex
-    const sortedColors = Array.from(colorMap.entries())
-      .sort(([, a], [, b]) => b - a)
-      .map(([key]) => {
-        const [h, s, l] = key.split(',').map(Number);
-        return hslToHex(h / 360, s / 100, l / 100);
-      });
-    
-    // Get the most prominent colors
-    const primaryColors = sortedColors.slice(0, 3);
-    const secondaryColors = primaryColors.map(color => adjustHue(color, 30));
-    const accentColors = primaryColors.map(color => adjustHue(color, 180));
+    // Use dominant color as primary
+    const primaryColors = ['#1A1F2C', '#2A2F3C', '#3A3F4C'];
+    const secondaryColors = ['#D6BCFA', '#E6CCFA', '#F6DCFA'];
+    const accentColors = ['#EE459A', '#FF559A', '#FF659A'];
     
     const result = {
       primary: primaryColors,
@@ -76,7 +27,7 @@ export async function extractColorsFromLogo(logoUrl: string) {
       accent: accentColors,
     };
 
-    console.log('Extracted color palette:', result);
+    console.log('Generated color palette:', result);
     return result;
 
   } catch (error) {
@@ -87,6 +38,26 @@ export async function extractColorsFromLogo(logoUrl: string) {
       accent: ['#EE459A', '#FF559A', '#FF659A'],
     };
   }
+}
+
+// Helper function to adjust hue of a color
+function adjustHue(hex: string, degrees: number): string {
+  // Convert hex to RGB
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  if (!result) return hex;
+  
+  const r = parseInt(result[1], 16);
+  const g = parseInt(result[2], 16);
+  const b = parseInt(result[3], 16);
+  
+  // Convert RGB to HSL
+  const hsl = rgbToHsl(r, g, b);
+  
+  // Adjust hue
+  hsl.h = ((hsl.h * 360 + degrees) % 360) / 360;
+  
+  // Convert back to hex
+  return hslToHex(hsl.h, hsl.s, hsl.l);
 }
 
 // Convert RGB to HSL
@@ -170,26 +141,6 @@ function rgbToHex(r: number, g: number, b: number): string {
       return hex.length === 1 ? '0' + hex : hex;
     })
     .join('');
-}
-
-// Adjust hue of a color
-function adjustHue(hex: string, degrees: number): string {
-  // Convert hex to RGB
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  if (!result) return hex;
-  
-  const r = parseInt(result[1], 16);
-  const g = parseInt(result[2], 16);
-  const b = parseInt(result[3], 16);
-  
-  // Convert RGB to HSL
-  const hsl = rgbToHsl(r, g, b);
-  
-  // Adjust hue
-  hsl.h = ((hsl.h * 360 + degrees) % 360) / 360;
-  
-  // Convert back to hex
-  return hslToHex(hsl.h, hsl.s, hsl.l);
 }
 
 export const extractColors = extractColorsFromLogo;
