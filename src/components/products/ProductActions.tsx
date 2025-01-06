@@ -17,7 +17,7 @@ export function ProductActions({ productId, onEdit }: ProductActionsProps) {
       // First, get the product to access its images
       const { data: product, error: fetchError } = await supabase
         .from("products")
-        .select("images")
+        .select("images, storefront_id")
         .eq("id", productId)
         .single()
 
@@ -27,12 +27,14 @@ export function ProductActions({ productId, onEdit }: ProductActionsProps) {
       const images = product?.images as string[] | null
       if (images && Array.isArray(images) && images.length > 0) {
         console.log("Deleting images from storage:", images)
+        
+        // Extract the paths from the full URLs and organize them by product ID
         const imagePaths = images.map((url: string) => {
-          // Extract the path from the full URL
           const path = url.split("/storefront-assets/")[1]
           return path
         })
 
+        // Delete all files in the product's directory
         const { error: storageError } = await supabase.storage
           .from("storefront-assets")
           .remove(imagePaths)

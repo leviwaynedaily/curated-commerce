@@ -53,6 +53,9 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
       setIsUploading(true)
       const uploadedUrls = []
 
+      // If we're editing a product, use its ID, otherwise create a temporary one
+      const productId = product?.id || crypto.randomUUID()
+
       for (const file of files) {
         if (file.size > MAX_FILE_SIZE) {
           toast.error(`File ${file.name} is too large. Maximum size is 50MB.`)
@@ -66,7 +69,7 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
         }
 
         const fileExt = file.name.split('.').pop()
-        const filePath = `${storefrontId}/${crypto.randomUUID()}.${fileExt}`
+        const filePath = `${storefrontId}/products/${productId}/${crypto.randomUUID()}.${fileExt}`
 
         console.log("Uploading file:", filePath)
         const { data: uploadData, error: uploadError } = await supabase.storage
