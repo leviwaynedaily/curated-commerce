@@ -32,7 +32,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
     hasNextPage,
     isFetchingNextPage,
     isLoading 
-  } = useStorefrontProducts(previewData.id);
+  } = useStorefrontProducts(previewData.id || '');
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
   const filteredProducts = allProducts.filter(product => {

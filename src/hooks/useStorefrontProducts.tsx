@@ -1,18 +1,22 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Json } from "@/integrations/supabase/types";
 
 const ITEMS_PER_PAGE = 25;
 
 interface Product {
   id: string;
   name: string;
-  description?: string;
-  in_town_price: number;
-  shipping_price: number;
-  images: string[];
-  category?: string;
-  status: string;
-  sort_order: number;
+  description?: string | null;
+  in_town_price: number | null;
+  shipping_price: number | null;
+  images: Json | null;
+  category?: string | null;
+  status: 'active' | 'inactive';
+  sort_order: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  storefront_id?: string | null;
 }
 
 interface PageData {
@@ -47,7 +51,7 @@ export function useStorefrontProducts(storefrontId: string) {
 
       console.log(`Fetched ${products?.length} products, total count:`, count);
       return {
-        products: products || [],
+        products: products as Product[] || [],
         totalCount: count || 0,
         currentPage: pageParam as number,
       };
