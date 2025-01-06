@@ -1,25 +1,39 @@
 import { UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ColorPicker } from "./ColorPicker";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface HeaderSettingsProps {
   form: UseFormReturn<any>;
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
-  // Watch for changes in header opacity and color
-  const currentOpacity = form.watch("header_opacity");
-  const currentColor = form.watch("header_color");
+  // Use local state to track changes before committing them to form
+  const [opacity, setOpacity] = useState<number>(form.getValues("header_opacity") ?? 30);
+  const [color, setColor] = useState<string>(form.getValues("header_color") ?? "#FFFFFF");
 
-  console.log("HeaderSettings - Initial values:", { currentOpacity, currentColor });
+  // Initialize values from form
+  useEffect(() => {
+    const formOpacity = form.getValues("header_opacity");
+    const formColor = form.getValues("header_color");
+    
+    console.log("HeaderSettings - Loading initial values:", { formOpacity, formColor });
+    
+    if (formOpacity !== undefined) {
+      setOpacity(formOpacity);
+    }
+    if (formColor !== undefined) {
+      setColor(formColor);
+    }
+  }, []); // Only run once on mount
 
   const handleOpacityChange = (value: string) => {
     // Convert to number and clamp between 0 and 100
     const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
     console.log("HeaderSettings - Setting opacity to:", numValue);
     
+    setOpacity(numValue);
     form.setValue("header_opacity", numValue, {
       shouldDirty: true,
       shouldTouch: true,
@@ -30,20 +44,13 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
   const handleHeaderColorChange = (color: string) => {
     console.log("HeaderSettings - Setting color to:", color);
     
+    setColor(color);
     form.setValue("header_color", color, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
     });
   };
-
-  // Log when form values change
-  useEffect(() => {
-    console.log("HeaderSettings - Form values updated:", {
-      opacity: currentOpacity,
-      color: currentColor
-    });
-  }, [currentOpacity, currentColor]);
 
   return (
     <div className="space-y-4">
@@ -61,12 +68,12 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                       type="number"
                       min={0}
                       max={100}
-                      value={currentOpacity ?? 30}
+                      value={opacity}
                       onChange={(e) => handleOpacityChange(e.target.value)}
                       className="w-24"
                     />
                     <span className="text-sm text-muted-foreground">
-                      {currentOpacity ?? 30}%
+                      {opacity}%
                     </span>
                   </div>
                 </FormControl>
@@ -82,7 +89,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                 <FormControl>
                   <ColorPicker
                     colors={[]}
-                    selectedColor={currentColor ?? "#FFFFFF"}
+                    selectedColor={color}
                     onColorSelect={handleHeaderColorChange}
                     label=""
                   />
