@@ -14,9 +14,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[240px] border-r">
+      <div className="hidden md:block w-[240px] min-w-[240px] border-r">
         <DashboardSidebar />
       </div>
 
@@ -27,8 +27,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         </SheetContent>
       </Sheet>
 
-      <div className="flex-1">
-        <header className="h-16 border-b flex items-center gap-4 px-4">
+      <div className="flex-1 min-w-0">
+        <header className="h-16 border-b flex items-center gap-2 px-3 sm:px-4 w-full">
           <Button
             variant="ghost"
             size="icon"
@@ -39,18 +39,22 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
           
           {/* Curately branding */}
-          <div className="flex items-center gap-2">
-            <Lock className="h-5 w-5 text-primary" />
-            <span className="text-xl font-semibold">Curately</span>
+          <div className="flex items-center gap-2 truncate">
+            <Lock className="h-5 w-5 shrink-0 text-primary" />
+            <span className="text-xl font-semibold truncate">Curately</span>
           </div>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 shrink-0">
             <ThemeToggle />
             <UserButton />
           </div>
         </header>
 
-        <main className="p-4">{children}</main>
+        <main className="p-3 sm:p-4 w-full">
+          <div className="max-w-[1400px] mx-auto">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );
