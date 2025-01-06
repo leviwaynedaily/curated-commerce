@@ -69,23 +69,23 @@ export function LivePreview({
 
   return (
     <div 
-      className="h-full w-full bg-white overflow-auto"
+      className="h-full w-full bg-white overflow-auto relative"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
-      {shouldShowVerification ? (
+      <PreviewContent
+        previewData={previewData}
+        searchQuery={searchQuery}
+        selectedCategory={selectedCategory}
+        currentSort={currentSort}
+        textPlacement={textPlacement}
+        onLogoClick={handleRestartVerification}
+        showInstructions={shouldShowInstructions}
+        onCloseInstructions={handleContinue}
+        onShowInstructions={handleShowInstructions}
+      />
+      
+      {shouldShowVerification && (
         <VerificationPrompt previewData={previewData} onVerify={handleVerification} />
-      ) : (
-        <PreviewContent
-          previewData={previewData}
-          searchQuery={searchQuery}
-          selectedCategory={selectedCategory}
-          currentSort={currentSort}
-          textPlacement={textPlacement}
-          onLogoClick={handleRestartVerification}
-          showInstructions={shouldShowInstructions}
-          onCloseInstructions={handleContinue}
-          onShowInstructions={handleShowInstructions}
-        />
       )}
     </div>
   );

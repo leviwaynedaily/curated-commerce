@@ -56,14 +56,13 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/20"
+      className="fixed inset-0 z-50 bg-black/20 backdrop-blur-md"
       style={{
-        backdropFilter: 'blur(8px)',
-        WebkitBackdropFilter: 'blur(8px)'
+        WebkitBackdropFilter: 'blur(8px)',
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-[400px] rounded-lg shadow-xl bg-white/90 p-6 space-y-6">
+        <div className="w-[400px] rounded-lg shadow-xl bg-white/90 backdrop-blur-sm p-6 space-y-6">
           {previewData.verification_logo_url && (
             <img 
               src={previewData.verification_logo_url} 
