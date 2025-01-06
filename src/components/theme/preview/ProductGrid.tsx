@@ -45,6 +45,7 @@ export function ProductGrid({
   totalCount
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
+  const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
   
   // Update visible range when products change
   useEffect(() => {
@@ -74,21 +75,40 @@ export function ProductGrid({
   }, [handleScroll]);
 
   const productCards = useMemo(() => {
-    return products?.map((product) => (
-      <div key={product.id}>
-        <ProductCard
-          product={product}
-          productCardBackgroundColor={productCardBackgroundColor}
-          productTitleTextColor={productTitleTextColor}
-          productDescriptionTextColor={productDescriptionTextColor}
-          productPriceColor={productPriceColor}
-          productPriceButtonColor={productPriceButtonColor}
-          productCategoryBackgroundColor={productCategoryBackgroundColor}
-          productCategoryTextColor={productCategoryTextColor}
-          onProductClick={onProductClick}
-        />
-      </div>
-    ));
+    return products?.map((product) => {
+      const { ref: productRef, inView: isProductVisible } = useInView({
+        threshold: 0.3,
+        triggerOnce: false,
+      });
+
+      useEffect(() => {
+        setVisibleProducts(prev => {
+          const newSet = new Set(prev);
+          if (isProductVisible) {
+            newSet.add(product.id);
+          } else {
+            newSet.delete(product.id);
+          }
+          return newSet;
+        });
+      }, [isProductVisible, product.id]);
+
+      return (
+        <div key={product.id} ref={productRef}>
+          <ProductCard
+            product={product}
+            productCardBackgroundColor={productCardBackgroundColor}
+            productTitleTextColor={productTitleTextColor}
+            productDescriptionTextColor={productDescriptionTextColor}
+            productPriceColor={productPriceColor}
+            productPriceButtonColor={productPriceButtonColor}
+            productCategoryBackgroundColor={productCategoryBackgroundColor}
+            productCategoryTextColor={productCategoryTextColor}
+            onProductClick={onProductClick}
+          />
+        </div>
+      );
+    });
   }, [
     products,
     productCardBackgroundColor,
@@ -104,7 +124,7 @@ export function ProductGrid({
   return (
     <div className="relative">
       <ProductCount 
-        currentCount={currentCount}
+        currentCount={visibleProducts.size}
         totalCount={totalCount}
         isFetchingNextPage={isFetchingNextPage || false}
         startIndex={visibleRange.start}

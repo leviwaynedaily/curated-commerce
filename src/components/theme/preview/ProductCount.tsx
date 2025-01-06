@@ -22,7 +22,7 @@ export function ProductCount({
           <Loader2 className="h-3 w-3 animate-spin inline mr-1" />
         ) : null}
         <span className="text-xs text-gray-700 whitespace-nowrap">
-          Showing {startIndex + 1}-{endIndex + 1} of {totalCount} products
+          Showing {currentCount} visible of {totalCount} products
         </span>
       </div>
     </div>
