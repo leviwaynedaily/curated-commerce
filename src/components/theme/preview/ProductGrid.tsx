@@ -1,9 +1,9 @@
-import { useEffect, useState, useCallback, useMemo } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { useInView } from "react-intersection-observer"
-import { ProductCard } from "./ProductCard"
 import { ProductCount } from "./ProductCount"
+import { ProductCardWrapper } from "./ProductCardWrapper"
 
 interface ProductGridProps {
   products: any[]
@@ -74,52 +74,17 @@ export function ProductGrid({
     handleScroll();
   }, [handleScroll]);
 
-  const productCards = useMemo(() => {
-    return products?.map((product) => {
-      const { ref: productRef, inView: isProductVisible } = useInView({
-        threshold: 0.3,
-        triggerOnce: false,
-      });
-
-      useEffect(() => {
-        setVisibleProducts(prev => {
-          const newSet = new Set(prev);
-          if (isProductVisible) {
-            newSet.add(product.id);
-          } else {
-            newSet.delete(product.id);
-          }
-          return newSet;
-        });
-      }, [isProductVisible, product.id]);
-
-      return (
-        <div key={product.id} ref={productRef}>
-          <ProductCard
-            product={product}
-            productCardBackgroundColor={productCardBackgroundColor}
-            productTitleTextColor={productTitleTextColor}
-            productDescriptionTextColor={productDescriptionTextColor}
-            productPriceColor={productPriceColor}
-            productPriceButtonColor={productPriceButtonColor}
-            productCategoryBackgroundColor={productCategoryBackgroundColor}
-            productCategoryTextColor={productCategoryTextColor}
-            onProductClick={onProductClick}
-          />
-        </div>
-      );
+  const handleVisibilityChange = useCallback((productId: string, isVisible: boolean) => {
+    setVisibleProducts(prev => {
+      const newSet = new Set(prev);
+      if (isVisible) {
+        newSet.add(productId);
+      } else {
+        newSet.delete(productId);
+      }
+      return newSet;
     });
-  }, [
-    products,
-    productCardBackgroundColor,
-    productTitleTextColor,
-    productDescriptionTextColor,
-    productPriceColor,
-    productPriceButtonColor,
-    productCategoryBackgroundColor,
-    productCategoryTextColor,
-    onProductClick
-  ]);
+  }, []);
 
   return (
     <div className="relative">
@@ -132,7 +97,21 @@ export function ProductGrid({
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 mt-1">
-        {productCards}
+        {products?.map((product) => (
+          <ProductCardWrapper
+            key={product.id}
+            product={product}
+            productCardBackgroundColor={productCardBackgroundColor}
+            productTitleTextColor={productTitleTextColor}
+            productDescriptionTextColor={productDescriptionTextColor}
+            productPriceColor={productPriceColor}
+            productPriceButtonColor={productPriceButtonColor}
+            productCategoryBackgroundColor={productCategoryBackgroundColor}
+            productCategoryTextColor={productCategoryTextColor}
+            onProductClick={onProductClick}
+            onVisibilityChange={handleVisibilityChange}
+          />
+        ))}
       </div>
 
       {!isDesktop && hasNextPage && (
