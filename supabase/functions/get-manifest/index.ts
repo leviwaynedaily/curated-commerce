@@ -21,13 +21,12 @@ serve(async (req) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const storefrontId = url.searchParams.get('storefrontId');
-
+    // For POST requests, get storefrontId from request body
+    const { storefrontId } = await req.json();
     console.log('Processing request for storefrontId:', storefrontId);
 
     if (!storefrontId) {
-      console.error('Missing storefrontId parameter');
+      console.error('Missing storefrontId in request body');
       return new Response(
         JSON.stringify({ error: 'Storefront ID is required' }),
         { status: 400, headers: corsHeaders }
@@ -85,7 +84,7 @@ serve(async (req) => {
       { src: pwaSettings.icon_192x192, sizes: '192x192', type: 'image/png' },
       { src: pwaSettings.icon_384x384, sizes: '384x384', type: 'image/png' },
       { src: pwaSettings.icon_512x512, sizes: '512x512', type: 'image/png' },
-    ].filter(icon => icon.src); // Only include icons that have been uploaded
+    ].filter(icon => icon.src);
 
     // Construct screenshots array
     const screenshots = [];
