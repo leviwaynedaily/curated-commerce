@@ -69,6 +69,33 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
     };
 
     fetchStorefrontData();
+
+    // Subscribe to real-time updates for the storefront
+    const channel = supabase
+      .channel('storefront-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'storefronts',
+          filter: `id=eq.${storefrontId}`
+        },
+        (payload) => {
+          console.log("Received real-time update:", payload);
+          // Update the preview data with the new changes
+          setPreviewData(prevData => ({
+            ...prevData,
+            ...payload.new
+          }));
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [storefrontId]);
 
   const handleLogoClick = () => {
