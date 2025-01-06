@@ -3,7 +3,7 @@ import { ProductGrid } from "./ProductGrid";
 import { PreviewData } from "@/types/preview";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useSearchState } from "./hooks/useSearchState";
-import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
+import { useStorefrontProducts, ITEMS_PER_PAGE } from "@/hooks/useStorefrontProducts";
 
 interface PreviewContentProps {
   previewData: PreviewData;
