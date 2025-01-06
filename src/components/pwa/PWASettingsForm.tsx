@@ -25,6 +25,7 @@ export function PWASettingsForm() {
     queryFn: async () => {
       if (!currentStorefrontId) return null;
       
+      console.log("Fetching PWA settings for storefront:", currentStorefrontId);
       const { data, error } = await supabase
         .from("pwa_settings")
         .select("*")
@@ -36,6 +37,7 @@ export function PWASettingsForm() {
         throw error;
       }
 
+      console.log("Fetched PWA settings:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
@@ -46,6 +48,7 @@ export function PWASettingsForm() {
     queryFn: async () => {
       if (!currentStorefrontId) return null;
       
+      console.log("Fetching storefront data for PWA defaults:", currentStorefrontId);
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
@@ -57,7 +60,7 @@ export function PWASettingsForm() {
         throw error;
       }
 
-      console.log("Fetched storefront data for PWA defaults:", data);
+      console.log("Fetched storefront data:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
@@ -75,38 +78,58 @@ export function PWASettingsForm() {
   const form = useForm<PWAFormValues>({
     resolver: zodResolver(pwaFormSchema),
     defaultValues: {
-      name: pwaSettings?.name || storefront?.name || "",
-      short_name: pwaSettings?.short_name || (storefront?.name ? getDefaultShortName(storefront.name) : ""),
-      description: pwaSettings?.description || storefront?.description || "",
-      start_url: pwaSettings?.start_url || "/",
-      display: pwaSettings?.display || "standalone",
-      orientation: pwaSettings?.orientation || "any",
-      theme_color: pwaSettings?.theme_color || storefront?.main_color || "#000000",
-      background_color: pwaSettings?.background_color || storefront?.storefront_background_color || "#ffffff",
-      icon_72x72: pwaSettings?.icon_72x72 || "",
-      icon_96x96: pwaSettings?.icon_96x96 || "",
-      icon_128x128: pwaSettings?.icon_128x128 || "",
-      icon_144x144: pwaSettings?.icon_144x144 || "",
-      icon_152x152: pwaSettings?.icon_152x152 || "",
-      icon_192x192: pwaSettings?.icon_192x192 || "",
-      icon_384x384: pwaSettings?.icon_384x384 || "",
-      icon_512x512: pwaSettings?.icon_512x512 || "",
-      screenshot_mobile: pwaSettings?.screenshot_mobile || "",
-      screenshot_desktop: pwaSettings?.screenshot_desktop || "",
+      name: "",
+      short_name: "",
+      description: "",
+      start_url: "/",
+      display: "standalone",
+      orientation: "any",
+      theme_color: "#000000",
+      background_color: "#ffffff",
+      icon_72x72: "",
+      icon_96x96: "",
+      icon_128x128: "",
+      icon_144x144: "",
+      icon_152x152: "",
+      icon_192x192: "",
+      icon_384x384: "",
+      icon_512x512: "",
+      screenshot_mobile: "",
+      screenshot_desktop: "",
     },
     mode: "onChange"
   });
 
+  // Update form when data is loaded
   useEffect(() => {
-    if (storefront && !pwaSettings) {
-      console.log("Updating form with storefront defaults");
-      form.setValue('name', storefront.name);
-      form.setValue('short_name', getDefaultShortName(storefront.name));
-      form.setValue('description', storefront.description || '');
-      form.setValue('theme_color', storefront.main_color || '#000000');
-      form.setValue('background_color', storefront.storefront_background_color || '#ffffff');
+    if (!isPwaLoading && !isStorefrontLoading) {
+      console.log("Updating form with data:", { pwaSettings, storefront });
+      
+      const newValues = {
+        name: pwaSettings?.name || storefront?.name || "",
+        short_name: pwaSettings?.short_name || (storefront?.name ? getDefaultShortName(storefront.name) : ""),
+        description: pwaSettings?.description || storefront?.description || "",
+        start_url: pwaSettings?.start_url || "/",
+        display: pwaSettings?.display || "standalone",
+        orientation: pwaSettings?.orientation || "any",
+        theme_color: pwaSettings?.theme_color || storefront?.main_color || "#000000",
+        background_color: pwaSettings?.background_color || storefront?.storefront_background_color || "#ffffff",
+        icon_72x72: pwaSettings?.icon_72x72 || "",
+        icon_96x96: pwaSettings?.icon_96x96 || "",
+        icon_128x128: pwaSettings?.icon_128x128 || "",
+        icon_144x144: pwaSettings?.icon_144x144 || "",
+        icon_152x152: pwaSettings?.icon_152x152 || "",
+        icon_192x192: pwaSettings?.icon_192x192 || "",
+        icon_384x384: pwaSettings?.icon_384x384 || "",
+        icon_512x512: pwaSettings?.icon_512x512 || "",
+        screenshot_mobile: pwaSettings?.screenshot_mobile || "",
+        screenshot_desktop: pwaSettings?.screenshot_desktop || "",
+      };
+
+      console.log("Setting form values to:", newValues);
+      form.reset(newValues);
     }
-  }, [storefront, pwaSettings, form]);
+  }, [pwaSettings, storefront, isPwaLoading, isStorefrontLoading, form]);
 
   const isValid = form.formState.isValid;
   const isDirty = form.formState.isDirty;
