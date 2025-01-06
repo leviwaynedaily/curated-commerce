@@ -23,7 +23,10 @@ export function PWASettingsForm() {
   const { data: pwaSettings, isLoading: isPwaLoading } = useQuery({
     queryKey: ["pwa-settings", currentStorefrontId],
     queryFn: async () => {
-      if (!currentStorefrontId) return null;
+      if (!currentStorefrontId) {
+        console.log("No storefront ID found for PWA settings");
+        return null;
+      }
       
       console.log("Fetching PWA settings for storefront:", currentStorefrontId);
       const { data, error } = await supabase
@@ -32,48 +35,38 @@ export function PWASettingsForm() {
         .eq("storefront_id", currentStorefrontId)
         .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         console.error("Error fetching PWA settings:", error);
         throw error;
       }
 
-      console.log("Fetched PWA settings:", data);
-      return data;
-    },
-    enabled: !!currentStorefrontId,
-  });
-
-  const { data: storefront, isLoading: isStorefrontLoading } = useQuery({
-    queryKey: ["storefront", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return null;
-      
-      console.log("Fetching storefront data for PWA defaults:", currentStorefrontId);
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        throw error;
+      if (!data) {
+        console.log("No PWA settings found, will use defaults");
+      } else {
+        console.log("Successfully fetched PWA settings:", {
+          name: data.name,
+          short_name: data.short_name,
+          icons: {
+            '72x72': data.icon_72x72 ? '✓' : '✗',
+            '96x96': data.icon_96x96 ? '✓' : '✗',
+            '128x128': data.icon_128x128 ? '✓' : '✗',
+            '144x144': data.icon_144x144 ? '✓' : '✗',
+            '152x152': data.icon_152x152 ? '✓' : '✗',
+            '192x192': data.icon_192x192 ? '✓' : '✗',
+            '384x384': data.icon_384x384 ? '✓' : '✗',
+            '512x512': data.icon_512x512 ? '✓' : '✗',
+          },
+          screenshots: {
+            mobile: data.screenshot_mobile ? '✓' : '✗',
+            desktop: data.screenshot_desktop ? '✓' : '✗',
+          }
+        });
       }
 
-      console.log("Fetched storefront data:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
   });
-
-  const getDefaultShortName = (name: string) => {
-    const words = name.split(' ');
-    if (words.length === 1) return name;
-    if (words[0].length <= 3 && words.length > 1) {
-      return `${words[0]} ${words[1]}`;
-    }
-    return words[0];
-  };
 
   const form = useForm<PWAFormValues>({
     resolver: zodResolver(pwaFormSchema),
@@ -101,39 +94,15 @@ export function PWASettingsForm() {
   });
 
   useEffect(() => {
-    if (!isPwaLoading && !isStorefrontLoading) {
-      console.log("Checking if form should be populated:", { pwaSettings, storefront });
-      
-      if (!pwaSettings && storefront) {
-        console.log("No PWA settings found, using storefront defaults");
-        const defaultValues = {
-          name: storefront.name || "",
-          short_name: storefront.name ? getDefaultShortName(storefront.name) : "",
-          description: storefront.description || "",
-          start_url: "/",
-          display: "standalone" as const,
-          orientation: "any" as const,
-          theme_color: storefront.main_color || "#000000",
-          background_color: storefront.storefront_background_color || "#ffffff",
-          icon_72x72: null,
-          icon_96x96: null,
-          icon_128x128: null,
-          icon_144x144: null,
-          icon_152x152: null,
-          icon_192x192: "",
-          icon_384x384: null,
-          icon_512x512: "",
-          screenshot_mobile: null,
-          screenshot_desktop: null,
-        };
-        console.log("Setting form default values:", defaultValues);
-        form.reset(defaultValues);
-      } else if (pwaSettings) {
+    if (!isPwaLoading) {
+      if (!pwaSettings) {
+        console.log("No PWA settings found, using defaults");
+      } else {
         console.log("Using existing PWA settings");
         form.reset(pwaSettings);
       }
     }
-  }, [pwaSettings, storefront, isPwaLoading, isStorefrontLoading, form]);
+  }, [pwaSettings, isPwaLoading, form]);
 
   const hasRequiredFields = !![
     form.getValues("name"),
@@ -168,8 +137,6 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .upsert({
           ...values,
-          name: values.name || "",
-          short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
         }, {
           onConflict: 'storefront_id'
@@ -205,14 +172,28 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
-      console.log("Saving PWA settings with values:", { ...values, storefront_id: currentStorefrontId });
+      console.log("Saving PWA settings with values:", {
+        ...values,
+        icons: {
+          '72x72': values.icon_72x72 ? '✓' : '✗',
+          '96x96': values.icon_96x96 ? '✓' : '✗',
+          '128x128': values.icon_128x128 ? '✓' : '✗',
+          '144x144': values.icon_144x144 ? '✓' : '✗',
+          '152x152': values.icon_152x152 ? '✓' : '✗',
+          '192x192': values.icon_192x192 ? '✓' : '✗',
+          '384x384': values.icon_384x384 ? '✓' : '✗',
+          '512x512': values.icon_512x512 ? '✓' : '✗',
+        },
+        screenshots: {
+          mobile: values.screenshot_mobile ? '✓' : '✗',
+          desktop: values.screenshot_desktop ? '✓' : '✗',
+        }
+      });
       
       const { error: saveError } = await supabase
         .from("pwa_settings")
         .upsert({
           ...values,
-          name: values.name || "",
-          short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
         }, {
           onConflict: 'storefront_id'
@@ -242,7 +223,7 @@ export function PWASettingsForm() {
         description: "PWA settings saved and manifest generated successfully",
       });
     } catch (error) {
-      console.error("Error saving PWA settings:", error);
+      console.error("Error in PWA settings submission:", error);
       toast({
         title: "Error",
         description: `Failed to save PWA settings and generate manifest: ${error.message}`,
