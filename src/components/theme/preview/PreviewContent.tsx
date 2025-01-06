@@ -12,7 +12,6 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
-  const [layout, setLayout] = useState("small");
   const [textPlacement, setTextPlacement] = useState("below");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -66,7 +65,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
         ) : (
           <ProductGrid
             products={filteredProducts}
-            layout={layout}
+            layout="small"
             textPlacement={textPlacement}
             onProductClick={handleProductClick}
             mainColor={previewData.main_color || "#000000"}
