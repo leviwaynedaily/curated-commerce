@@ -11,6 +11,7 @@ import { PWAScreenshots } from "./PWAScreenshots";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const pwaFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -33,11 +34,10 @@ const pwaFormSchema = z.object({
   screenshot_desktop: z.string().optional(),
 });
 
-type PWAFormValues = z.infer<typeof pwaFormSchema>;
-
 export function PWASettingsForm() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [manifestJson, setManifestJson] = useState<string | null>(null);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   const { data: pwaSettings, isLoading } = useQuery({
@@ -119,9 +119,14 @@ export function PWASettingsForm() {
 
       if (error) throw error;
 
+      // Generate manifest preview
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`);
+      const manifest = await response.json();
+      setManifestJson(JSON.stringify(manifest, null, 2));
+
       toast({
         title: "Success",
-        description: "PWA settings saved successfully",
+        description: "PWA settings saved and manifest generated successfully",
       });
     } catch (error) {
       console.error("Error saving PWA settings:", error);
@@ -152,8 +157,21 @@ export function PWASettingsForm() {
         
         <Button type="submit" disabled={isSaving}>
           {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Save Changes
+          Save & Create Manifest
         </Button>
+
+        {manifestJson && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Generated Manifest</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <pre className="bg-secondary p-4 rounded-lg overflow-x-auto">
+                <code>{manifestJson}</code>
+              </pre>
+            </CardContent>
+          </Card>
+        )}
       </form>
     </Form>
   );
