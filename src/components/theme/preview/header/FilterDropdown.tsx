@@ -32,7 +32,7 @@ export function FilterDropdown({
           variant="ghost" 
           size="icon"
           style={{ 
-            backgroundColor: `${mainColor}10`,
+            backgroundColor: selectedCategory ? `${mainColor}20` : `${mainColor}10`,
             color: mainColor
           }}
           className="hover:bg-opacity-20 h-9 w-9"

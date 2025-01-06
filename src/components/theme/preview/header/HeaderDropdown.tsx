@@ -27,6 +27,8 @@ export function HeaderDropdown({
     onSortChange?.(sort);
   };
 
+  const isActive = currentSort && currentSort !== "newest";
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -34,7 +36,7 @@ export function HeaderDropdown({
           variant="ghost" 
           size="icon"
           style={{ 
-            backgroundColor: `${mainColor}10`,
+            backgroundColor: isActive ? `${mainColor}20` : `${mainColor}10`,
             color: mainColor
           }}
           className="hover:bg-opacity-20 h-9 w-9"
