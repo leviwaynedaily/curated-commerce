@@ -8,70 +8,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#000000" />
     <script>
-      // Get storefront slug from URL
       const path = window.location.pathname;
-      const slug = path.split('/')[1]; // Get first part of path after /
+      const slug = path.split('/')[1];
       
       if (slug) {
-        // Fetch PWA settings and set manifest
         const fetchManifest = async () => {
           try {
-            console.log('Starting manifest fetch process for storefront:', slug);
-            console.log('Fetching from URL:', `/api/pwa-settings/${slug}`);
-            
             const response = await fetch(`/api/pwa-settings/${slug}`);
-            console.log('Manifest fetch response status:', response.status);
             
             if (response.ok) {
               const manifestData = await response.json();
-              console.log('Successfully fetched manifest data:', manifestData);
-              
-              // Create manifest URL from data
               const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
               const manifestUrl = URL.createObjectURL(manifestBlob);
-              console.log('Created manifest Blob URL:', manifestUrl);
               
-              // Add manifest link to head
               const manifestLink = document.createElement('link');
               manifestLink.rel = 'manifest';
               manifestLink.href = manifestUrl;
               document.head.appendChild(manifestLink);
-              console.log('Successfully added manifest link to document head');
-              
-              // Verify manifest link
-              const manifestLinks = document.querySelectorAll('link[rel="manifest"]');
-              console.log('Number of manifest links found:', manifestLinks.length);
-              manifestLinks.forEach(link => {
-                console.log('Manifest link href:', link.href);
-              });
             } else {
-              console.error('Failed to fetch manifest:', response.status, response.statusText);
-              const text = await response.text();
-              console.error('Response content:', text);
+              console.error('Failed to fetch manifest:', response.status);
             }
           } catch (error) {
-            console.error('Error in manifest fetch process:', error);
+            console.error('Error fetching manifest:', error);
           }
         };
         
         fetchManifest();
-      } else {
-        console.log('No storefront slug found in URL, skipping manifest fetch');
       }
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          console.log('Attempting to register service worker...');
           navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('ServiceWorker registration successful with scope:', registration.scope);
-            })
             .catch(err => {
-              console.error('ServiceWorker registration failed: ', err);
+              console.error('ServiceWorker registration failed:', err);
             });
         });
-      } else {
-        console.warn('Service workers are not supported in this browser');
       }
     </script>
   </head>

@@ -35,23 +35,19 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
 
     try {
       setIsUploading(true);
-      console.log("Starting file upload for storefront:", storefrontId);
 
       const fileExt = fileType === 'image/svg+xml' ? 'svg' : 
                      fileType.includes('icon') ? 'ico' : 
                      file.name.split('.').pop();
                      
-      // Include storefrontId in the path if available
       const filePath = storefrontId 
         ? `${storefrontId}/${path}/${Math.random()}.${fileExt}`
         : `${path}/${Math.random()}.${fileExt}`;
 
-      console.log("Uploading file to path:", filePath);
-
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
-          contentType: fileType // Explicitly set content type for proper handling
+          contentType: fileType
         });
 
       if (uploadError) throw uploadError;
@@ -59,15 +55,10 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
       const { data: { publicUrl } } = supabase.storage
         .from(bucket)
         .getPublicUrl(filePath);
-
-      console.log("File uploaded successfully, public URL:", publicUrl);
       
-      // Update the form value
       onChange(publicUrl);
 
-      // Force an immediate invalidation of the storefront query
       if (storefrontId) {
-        console.log("Invalidating storefront query after file upload");
         await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
       }
 
@@ -88,11 +79,8 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
   };
 
   const handleRemove = async () => {
-    console.log("Removing image, current value:", value);
     onChange(null);
-    // Force an immediate invalidation of the storefront query
     if (storefrontId) {
-      console.log("Invalidating storefront query after image removal");
       await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
     }
   };
