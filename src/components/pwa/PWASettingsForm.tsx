@@ -86,16 +86,16 @@ export function PWASettingsForm() {
       orientation: "any",
       theme_color: "#000000",
       background_color: "#ffffff",
-      icon_72x72: "",
-      icon_96x96: "",
-      icon_128x128: "",
-      icon_144x144: "",
-      icon_152x152: "",
+      icon_72x72: null,
+      icon_96x96: null,
+      icon_128x128: null,
+      icon_144x144: null,
+      icon_152x152: null,
       icon_192x192: "",
-      icon_384x384: "",
+      icon_384x384: null,
       icon_512x512: "",
-      screenshot_mobile: "",
-      screenshot_desktop: "",
+      screenshot_mobile: null,
+      screenshot_desktop: null,
     },
     mode: "onChange"
   });
@@ -115,16 +115,16 @@ export function PWASettingsForm() {
           orientation: "any" as const,
           theme_color: storefront.main_color || "#000000",
           background_color: storefront.storefront_background_color || "#ffffff",
-          icon_72x72: "",
-          icon_96x96: "",
-          icon_128x128: "",
-          icon_144x144: "",
-          icon_152x152: "",
+          icon_72x72: null,
+          icon_96x96: null,
+          icon_128x128: null,
+          icon_144x144: null,
+          icon_152x152: null,
           icon_192x192: "",
-          icon_384x384: "",
+          icon_384x384: null,
           icon_512x512: "",
-          screenshot_mobile: "",
-          screenshot_desktop: "",
+          screenshot_mobile: null,
+          screenshot_desktop: null,
         };
         console.log("Setting form default values:", defaultValues);
         form.reset(defaultValues);
@@ -218,13 +218,24 @@ export function PWASettingsForm() {
           onConflict: 'storefront_id'
         });
 
-      if (saveError) throw saveError;
+      if (saveError) {
+        console.error("Error saving PWA settings:", saveError);
+        throw saveError;
+      }
 
       console.log("PWA settings saved, generating manifest...");
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`);
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+      });
       
       if (!response.ok) {
-        throw new Error(`Failed to generate manifest: ${response.statusText}`);
+        const errorText = await response.text();
+        console.error("Manifest generation failed:", errorText);
+        throw new Error(`Failed to generate manifest: ${response.statusText}. Details: ${errorText}`);
       }
 
       const manifest = await response.json();
@@ -239,7 +250,7 @@ export function PWASettingsForm() {
       console.error("Error saving PWA settings:", error);
       toast({
         title: "Error",
-        description: "Failed to save PWA settings and generate manifest",
+        description: `Failed to save PWA settings and generate manifest: ${error.message}`,
         variant: "destructive",
       });
     } finally {
