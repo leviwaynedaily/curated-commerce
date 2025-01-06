@@ -3,6 +3,7 @@ import { ImageUpload } from "@/components/storefront/ImageUpload";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PWAIconsProps {
   form: UseFormReturn<any>;
@@ -19,29 +20,23 @@ export function PWAIcons({ form }: PWAIconsProps) {
     setIsResizing(true);
     try {
       console.log('Starting icon resize process with URL:', url);
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/resize-pwa-icon`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        },
-        body: JSON.stringify({
+      
+      const { data, error } = await supabase.functions.invoke('resize-pwa-icon', {
+        body: {
           imageUrl: url,
           storefrontId,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response from resize function:', errorText);
-        throw new Error('Failed to resize icons');
+      if (error) {
+        console.error('Error from resize function:', error);
+        throw error;
       }
 
-      const { icons } = await response.json();
-      console.log('Received resized icons:', icons);
+      console.log('Received resized icons:', data.icons);
 
       // Update all icon fields in the form
-      Object.entries(icons).forEach(([key, value]) => {
+      Object.entries(data.icons).forEach(([key, value]) => {
         form.setValue(key, value);
       });
 
