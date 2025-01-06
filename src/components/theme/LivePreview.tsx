@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PreviewHeader } from "./preview/PreviewHeader";
 import { PreviewContent } from "./preview/PreviewContent";
 import { PreviewError } from "./preview/PreviewError";
@@ -13,6 +13,7 @@ interface LivePreviewProps {
 export function LivePreview({ storefrontId }: LivePreviewProps) {
   const { data, isLoading, error } = useStorefront(storefrontId);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -61,9 +62,16 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   return (
     <div className="w-full h-full bg-background">
       <div className="w-full h-full flex flex-col">
-        <PreviewHeader previewData={data} />
+        <PreviewHeader 
+          previewData={data} 
+          onShowInstructions={() => setShowInstructions(true)}
+        />
         <div className="flex-1 overflow-y-auto">
-          <PreviewContent previewData={data} />
+          <PreviewContent 
+            previewData={data}
+            showInstructions={showInstructions}
+            onCloseInstructions={() => setShowInstructions(false)}
+          />
         </div>
       </div>
     </div>

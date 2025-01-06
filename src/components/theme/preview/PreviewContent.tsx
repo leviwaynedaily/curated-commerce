@@ -4,6 +4,7 @@ import { PreviewData } from "@/types/preview";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts, ITEMS_PER_PAGE } from "@/hooks/useStorefrontProducts";
+import { PreviewInstructions } from "./PreviewInstructions";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -14,6 +15,7 @@ interface PreviewContentProps {
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [showInstructions, setShowInstructions] = useState(false);
   
   const { searchQuery, handleSearchChange } = useSearchState();
 
@@ -27,7 +29,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
   
-  console.log("Current sort value in PreviewContent:", currentSort); // Debug log
+  console.log("Current sort value in PreviewContent:", currentSort);
   
   // Apply filters and sorting
   const filteredAndSortedProducts = allProducts.filter(product => {
@@ -68,6 +70,13 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       className="min-h-full flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
+      {showInstructions && (
+        <PreviewInstructions 
+          previewData={previewData} 
+          onContinue={() => setShowInstructions(false)} 
+        />
+      )}
+
       <main className="container mx-auto px-4 pt-2 flex-1">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
