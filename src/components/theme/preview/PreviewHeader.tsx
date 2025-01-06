@@ -16,6 +16,7 @@ interface PreviewHeaderProps {
   textPlacement?: string;
   onTextPlacementChange?: (placement: string) => void;
   onShowInstructions?: () => void;
+  onRestartVerification?: () => void;
 }
 
 export function PreviewHeader({
@@ -32,6 +33,7 @@ export function PreviewHeader({
   textPlacement = "below",
   onTextPlacementChange = () => {},
   onShowInstructions,
+  onRestartVerification,
 }: PreviewHeaderProps) {
   console.log("PreviewHeader - header_opacity:", previewData.header_opacity);
   console.log("PreviewHeader - header_color:", previewData.header_color);
@@ -44,6 +46,15 @@ export function PreviewHeader({
 
   // Convert opacity to hex for background color
   const opacityHex = Math.round((opacity / 100) * 255).toString(16).padStart(2, '0');
+
+  const handleLogoClick = () => {
+    if (onRestartVerification) {
+      onRestartVerification();
+    }
+    if (onLogoClick) {
+      onLogoClick();
+    }
+  };
 
   return (
     <header 
@@ -69,7 +80,7 @@ export function PreviewHeader({
           currentSort={currentSort}
           textPlacement={textPlacement}
           onTextPlacementChange={onTextPlacementChange}
-          onLogoClick={onLogoClick}
+          onLogoClick={handleLogoClick}
           onShowInstructions={onShowInstructions}
         />
         
@@ -82,7 +93,7 @@ export function PreviewHeader({
           categories={categories}
           selectedCategory={selectedCategory}
           currentSort={currentSort}
-          onLogoClick={onLogoClick}
+          onLogoClick={handleLogoClick}
           onShowInstructions={onShowInstructions}
         />
       </div>
