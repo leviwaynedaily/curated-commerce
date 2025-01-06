@@ -19,6 +19,41 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Update document title and favicon when storefront data changes
+  useEffect(() => {
+    if (previewData) {
+      // Update document title
+      const siteName = previewData.page_title || previewData.name;
+      if (siteName) {
+        console.log("Updating document title to:", siteName);
+        document.title = siteName;
+      }
+
+      // Update favicon
+      if (previewData.favicon_url) {
+        console.log("Updating favicon to:", previewData.favicon_url);
+        const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+        if (favicon) {
+          favicon.href = previewData.favicon_url;
+        } else {
+          const newFavicon = document.createElement('link');
+          newFavicon.rel = 'icon';
+          newFavicon.href = previewData.favicon_url;
+          document.head.appendChild(newFavicon);
+        }
+      }
+    }
+
+    // Cleanup function to reset title and favicon when component unmounts
+    return () => {
+      document.title = 'Lovable';
+      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+      if (favicon) {
+        favicon.href = '/favicon.ico';
+      }
+    };
+  }, [previewData]);
+
   useEffect(() => {
     const fetchStorefrontData = async () => {
       try {
