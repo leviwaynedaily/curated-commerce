@@ -1,12 +1,18 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
-import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
 
 interface HeaderSettingsProps {
   form: UseFormReturn<any>;
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
+  const handleOpacityChange = (value: string) => {
+    // Convert to number and clamp between 0 and 100
+    const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
+    form.setValue("header_opacity", numValue);
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Header Settings</h3>
@@ -15,18 +21,18 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
         name="header_opacity"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Header Opacity</FormLabel>
+            <FormLabel>Header Opacity (%)</FormLabel>
             <FormControl>
               <div className="flex items-center gap-4">
-                <Slider
+                <Input
+                  type="number"
                   min={0}
                   max={100}
-                  step={1}
-                  value={[field.value ?? 30]}
-                  onValueChange={(value) => field.onChange(value[0])}
-                  className="flex-1"
+                  value={field.value ?? 30}
+                  onChange={(e) => handleOpacityChange(e.target.value)}
+                  className="w-24"
                 />
-                <span className="text-sm text-muted-foreground w-12">
+                <span className="text-sm text-muted-foreground">
                   {field.value ?? 30}%
                 </span>
               </div>
