@@ -60,7 +60,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
       className="fixed inset-0 z-50 backdrop-blur-md"
       style={{
         WebkitBackdropFilter: 'blur(8px)',
-        backgroundColor: `${colors.background}CC` // CC adds 80% opacity
+        backgroundColor: `${colors.background}80` // 80 adds 50% opacity
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
