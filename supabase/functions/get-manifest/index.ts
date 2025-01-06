@@ -37,7 +37,7 @@ serve(async (req) => {
       .from('pwa_settings')
       .select('*')
       .eq('storefront_id', storefrontId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error fetching PWA settings:', error);
@@ -57,7 +57,7 @@ serve(async (req) => {
 
     console.log('Successfully fetched PWA settings');
 
-    // Construct icons array
+    // Construct icons array - only include icons that have been uploaded
     const icons = [
       { src: pwaSettings.icon_72x72, sizes: '72x72', type: 'image/png' },
       { src: pwaSettings.icon_96x96, sizes: '96x96', type: 'image/png' },
