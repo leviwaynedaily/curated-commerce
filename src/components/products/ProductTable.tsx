@@ -133,15 +133,16 @@ export function ProductTable({
 
   const handleCellUpdate = async (productId: string, field: string, value: string) => {
     try {
-      const numericFields = ["in_town_price", "shipping_price"]
-      let updateValue = value;
+      let updateValue: string | number | string[];
 
       // Handle different field types
-      if (numericFields.includes(field)) {
-        updateValue = Number(value)
+      if (field === "in_town_price" || field === "shipping_price") {
+        updateValue = Number(value);
       } else if (field === "category") {
-        // Convert category string to proper PostgreSQL array format
-        updateValue = value.split(',').map(cat => cat.trim())
+        // Convert comma-separated string to array and store as string representation
+        updateValue = value.split(',').map(cat => cat.trim());
+      } else {
+        updateValue = value;
       }
 
       console.log(`Updating product ${productId}, field ${field} with value:`, updateValue)
@@ -202,7 +203,7 @@ export function ProductTable({
             <TableRow>
               <TableHeader className="w-12 h-12">
                 <Checkbox
-                  checked={products.length > 0 && selectedProducts.length === products.length}
+                  checked={products?.length > 0 && selectedProducts.length === products.length}
                   onCheckedChange={toggleAllProducts}
                   aria-label="Select all"
                   className="translate-y-[2px]"
@@ -263,7 +264,7 @@ export function ProductTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map(product => (
+            {products?.map(product => (
               <ProductTableRow
                 key={product.id}
                 product={product}
