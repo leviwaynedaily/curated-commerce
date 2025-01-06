@@ -104,7 +104,6 @@ export function PWASettingsForm() {
     if (!isPwaLoading && !isStorefrontLoading) {
       console.log("Checking if form should be populated:", { pwaSettings, storefront });
       
-      // Only populate with storefront defaults if no PWA settings exist
       if (!pwaSettings && storefront) {
         console.log("No PWA settings found, using storefront defaults");
         const defaultValues = {
@@ -208,7 +207,7 @@ export function PWASettingsForm() {
     try {
       console.log("Saving PWA settings with values:", { ...values, storefront_id: currentStorefrontId });
       
-      const { error } = await supabase
+      const { error: saveError } = await supabase
         .from("pwa_settings")
         .upsert({
           ...values,
@@ -219,10 +218,17 @@ export function PWASettingsForm() {
           onConflict: 'storefront_id'
         });
 
-      if (error) throw error;
+      if (saveError) throw saveError;
 
+      console.log("PWA settings saved, generating manifest...");
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`);
+      
+      if (!response.ok) {
+        throw new Error(`Failed to generate manifest: ${response.statusText}`);
+      }
+
       const manifest = await response.json();
+      console.log("Generated manifest:", manifest);
       setManifestJson(JSON.stringify(manifest, null, 2));
 
       toast({
@@ -233,7 +239,7 @@ export function PWASettingsForm() {
       console.error("Error saving PWA settings:", error);
       toast({
         title: "Error",
-        description: "Failed to save PWA settings",
+        description: "Failed to save PWA settings and generate manifest",
         variant: "destructive",
       });
     } finally {
