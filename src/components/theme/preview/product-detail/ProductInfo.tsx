@@ -14,6 +14,15 @@ export function ProductInfo({ product, previewData, onDownload }: ProductInfoPro
     return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -39,34 +48,25 @@ export function ProductInfo({ product, previewData, onDownload }: ProductInfoPro
         </h1>
         {product.description && (
           <p 
-            className="text-lg"
+            className="text-lg mb-6"
             style={{ color: previewData.product_description_text_color }}
           >
             {product.description}
           </p>
         )}
-      </div>
 
-      <div 
-        className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-3"
-        style={{ backgroundColor: `${previewData.product_price_button_color}40` }}
-      >
-        <div 
-          className="flex items-center gap-3"
-          style={{ color: previewData.product_price_color }}
-        >
-          <span className="text-sm font-medium uppercase">In Town:</span>
-          <span className="text-2xl font-bold">${product.in_town_price}</span>
+        <div className="space-y-2">
+          <p className="text-lg" style={{ color: previewData.product_title_text_color }}>
+            <span className="font-medium">In Town Price:</span>{' '}
+            <span className="font-bold">{formatPrice(product.in_town_price)}</span>
+          </p>
+          {product.shipping_price > 0 && (
+            <p className="text-lg" style={{ color: previewData.product_title_text_color }}>
+              <span className="font-medium">Shipping Price:</span>{' '}
+              <span className="font-bold">{formatPrice(product.shipping_price)}</span>
+            </p>
+          )}
         </div>
-        {product.shipping_price > 0 && (
-          <div 
-            className="flex items-center gap-3"
-            style={{ color: previewData.product_price_color }}
-          >
-            <span className="text-sm font-medium uppercase">Ship:</span>
-            <span className="text-2xl font-bold">${product.shipping_price}</span>
-          </div>
-        )}
       </div>
 
       <div className="flex flex-wrap gap-2">
