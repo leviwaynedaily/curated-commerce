@@ -100,7 +100,7 @@ export function ProductGrid({
         endIndex={visibleRange.end}
       />
 
-      <div className={`grid ${getGridStyles()} auto-rows-auto mt-2`}>
+      <div className={`grid ${getGridStyles()} auto-rows-auto mt-1`}>
         {products?.map((product, index) => (
           <div key={product.id} ref={productRefs[index].ref.ref}>
             <ProductCard
