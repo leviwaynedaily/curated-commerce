@@ -155,7 +155,7 @@ export function PreviewContent({
         )}
       </main>
 
-      <PreviewLegalFooter businessName={previewData.name} />
+      <PreviewLegalFooter previewData={previewData} />
     </div>
   );
 }
