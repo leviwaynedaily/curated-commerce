@@ -1,4 +1,4 @@
-import { ImagePlus, Loader2, X } from "lucide-react"
+import { ImagePlus, Loader2, Star, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -25,7 +25,6 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
     try {
       setDeletingUrl(urlToDelete);
       
-      // Extract the file path from the URL
       const filePath = urlToDelete.split('/storefront-assets/')[1];
       if (!filePath) {
         throw new Error('Invalid file path');
@@ -33,7 +32,6 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
 
       console.log("Deleting file from storage:", filePath);
       
-      // Delete from storage
       const { error: storageError } = await supabase.storage
         .from('storefront-assets')
         .remove([filePath]);
@@ -43,7 +41,6 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
         throw storageError;
       }
 
-      // Update the form state by removing the deleted URL
       const currentImages = form.getValues("images") || [];
       const updatedImages = currentImages.filter(url => url !== urlToDelete);
       form.setValue("images", updatedImages);
@@ -57,8 +54,19 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
     }
   };
 
+  const handleSetPrimary = (url: string) => {
+    const currentImages = form.getValues("images") || [];
+    const updatedImages = [
+      url,
+      ...currentImages.filter(image => image !== url)
+    ];
+    form.setValue("images", updatedImages);
+    toast.success("Primary asset updated");
+  };
+
   const renderMediaPreview = (url: string, index: number) => {
     const isDeleting = deletingUrl === url;
+    const isPrimary = index === 0;
 
     return (
       <div key={index} className="relative w-full h-32 group">
@@ -78,21 +86,39 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
           />
         )}
         
-        {/* Delete button overlay */}
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={() => handleDelete(url)}
-          disabled={isDeleting}
-        >
-          {isDeleting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <X className="h-4 w-4" />
+        <div className="absolute top-2 right-2 flex gap-2">
+          {!isPrimary && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="icon"
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={() => handleSetPrimary(url)}
+              title="Set as primary"
+            >
+              <Star className="h-4 w-4" />
+            </Button>
           )}
-        </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            size="icon"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => handleDelete(url)}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <X className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        {isPrimary && (
+          <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded">
+            Primary
+          </div>
+        )}
       </div>
     );
   };
@@ -137,5 +163,5 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
         </FormItem>
       )}
     />
-  )
+  );
 }
