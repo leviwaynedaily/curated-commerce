@@ -1,212 +1,91 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { PreviewData } from "@/types/preview";
-import { VerificationPrompt } from "./preview/VerificationPrompt";
+import { useEffect, useRef } from "react";
+import { PreviewHeader } from "./preview/PreviewHeader";
 import { PreviewContent } from "./preview/PreviewContent";
-import { PreviewLoading } from "./preview/PreviewLoading";
 import { PreviewError } from "./preview/PreviewError";
-import { PreviewInstructions } from "./preview/PreviewInstructions";
-import { toast } from "sonner";
+import { PreviewLoading } from "./preview/PreviewLoading";
+import { PreviewData } from "@/types/preview";
 
 interface LivePreviewProps {
-  storefrontId: string;
+  data: PreviewData | null;
+  isLoading: boolean;
+  error: Error | null;
 }
 
-export function LivePreview({ storefrontId }: LivePreviewProps) {
-  const [previewData, setPreviewData] = useState<PreviewData>({});
-  const [showContent, setShowContent] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Update document title and favicon when storefront data changes
-  useEffect(() => {
-    if (previewData) {
-      // Update document title
-      const siteName = previewData.page_title || previewData.name;
-      if (siteName) {
-        console.log("Updating document title to:", siteName);
-        document.title = siteName;
-      }
-
-      // Update favicon
-      if (previewData.favicon_url) {
-        console.log("Updating favicon to:", previewData.favicon_url);
-        const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-        if (favicon) {
-          favicon.href = previewData.favicon_url;
-        } else {
-          const newFavicon = document.createElement('link');
-          newFavicon.rel = 'icon';
-          newFavicon.href = previewData.favicon_url;
-          document.head.appendChild(newFavicon);
-        }
-      }
-    }
-
-    // Cleanup function to reset title and favicon when component unmounts
-    return () => {
-      document.title = 'Lovable';
-      const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
-      if (favicon) {
-        favicon.href = '/favicon.ico';
-      }
-    };
-  }, [previewData]);
+export function LivePreview({ data, isLoading, error }: LivePreviewProps) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    const fetchStorefrontData = async () => {
-      try {
-        console.log("Fetching storefront data for preview. ID:", storefrontId);
-        
-        const { data, error } = await supabase
-          .from("storefronts")
-          .select()
-          .match({ id: storefrontId })
-          .maybeSingle();
+    if (!data) return;
 
-        console.log("Supabase response - Data:", data);
-        console.log("Supabase response - Error:", error);
+    const iframe = iframeRef.current;
+    if (!iframe) return;
 
-        if (error) {
-          console.error("Error fetching storefront:", error);
-          setError("An error occurred while loading the store.");
-          toast.error("An error occurred while loading the store.");
-          return;
-        }
+    const iframeDoc = iframe.contentDocument;
+    if (!iframeDoc) return;
 
-        if (!data) {
-          console.error("No storefront found");
-          setError("This store is not available.");
-          toast.error("This store is not available.");
-          return;
-        }
+    // Update title
+    const title = data.page_title || data.name || "Store Preview";
+    iframeDoc.title = title;
 
-        console.log("Fetched storefront data:", data);
-        setPreviewData(data);
+    // Update favicon
+    let faviconLink = iframeDoc.querySelector('link[rel="icon"]');
+    if (!faviconLink) {
+      faviconLink = iframeDoc.createElement('link');
+      faviconLink.rel = 'icon';
+      iframeDoc.head.appendChild(faviconLink);
+    }
+    faviconLink.href = data.favicon_url || '/favicon.ico';
 
-        // If no verification is required, show instructions or content directly
-        if (data.verification_type === 'none') {
-          setIsVerified(true);
-          if (data.enable_instructions) {
-            setShowInstructions(true);
-          } else {
-            setShowContent(true);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch storefront:", err);
-        setError("An error occurred while loading the store.");
-        toast.error("An error occurred while loading the store.");
-      }
-    };
+    // Update manifest
+    let manifestLink = iframeDoc.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      manifestLink = iframeDoc.createElement('link');
+      manifestLink.rel = 'manifest';
+      iframeDoc.head.appendChild(manifestLink);
+    }
+    manifestLink.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/serve-manifest?slug=${data.slug}`;
 
-    fetchStorefrontData();
-
-    // Subscribe to real-time updates for the storefront
-    const channel = supabase
-      .channel('storefront-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'storefronts',
-          filter: `id=eq.${storefrontId}`
-        },
-        (payload) => {
-          console.log("Received real-time update:", payload);
-          // Update the preview data with the new changes
-          setPreviewData(prevData => ({
-            ...prevData,
-            ...payload.new
-          }));
-        }
-      )
-      .subscribe();
-
-    // Cleanup subscription on unmount
     return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [storefrontId]);
-
-  const handleLogoClick = () => {
-    console.log("Logo clicked, resetting verification state");
-    handleReset();
-  };
-
-  const handleVerification = (password?: string) => {
-    console.log("Handling verification...");
-    if (previewData.verification_type === 'password' || previewData.verification_type === 'both') {
-      if (password !== previewData.verification_password) {
-        toast.error("Invalid password");
-        return;
+      if (iframeDoc) {
+        iframeDoc.title = "Store Preview";
+        if (faviconLink) faviconLink.href = '/favicon.ico';
+        if (manifestLink) manifestLink.href = '/manifest.json';
       }
-    }
-    setIsVerified(true);
-    if (previewData.enable_instructions) {
-      console.log("Showing instructions after verification");
-      setShowInstructions(true);
-    } else {
-      console.log("Showing content directly after verification");
-      setShowContent(true);
-    }
-  };
+    };
+  }, [data]);
 
-  const handleContinue = () => {
-    console.log("Continuing to content from instructions");
-    setShowInstructions(false);
-    setShowContent(true);
-  };
-
-  const handleReset = () => {
-    console.log("Resetting preview state");
-    setIsVerified(false);
-    setShowContent(false);
-    setShowInstructions(false);
-  };
-
-  if (error) {
-    return <PreviewError error={error} />;
-  }
-
-  if (!previewData || Object.keys(previewData).length === 0) {
-    return <PreviewLoading />;
-  }
+  if (error) return <PreviewError error={error} />;
+  if (isLoading) return <PreviewLoading />;
+  if (!data) return null;
 
   return (
-    <div className="h-screen w-full overflow-y-auto bg-background">
-      {/* Main content area */}
-      <div 
-        className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}
-      >
-        <PreviewContent 
-          previewData={previewData} 
-          onReset={handleReset}
-          onLogoClick={handleLogoClick}
-        />
-      </div>
-
-      {/* Verification overlay */}
-      {!isVerified && previewData.verification_type !== 'none' && (
-        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
-          <div className="h-full w-full flex items-center justify-center p-4">
-            <VerificationPrompt 
-              previewData={previewData} 
-              onVerify={handleVerification}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Instructions overlay */}
-      {isVerified && showInstructions && previewData.enable_instructions && (
-        <PreviewInstructions 
-          previewData={previewData}
-          onContinue={handleContinue}
-        />
-      )}
+    <div className="w-full h-full bg-background">
+      <iframe
+        ref={iframeRef}
+        className="w-full h-full"
+        title="Store Preview"
+        srcDoc={`
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Store Preview</title>
+              <link rel="icon" href="/favicon.ico" />
+              <link rel="manifest" href="/manifest.json" />
+              ${document.head.innerHTML}
+            </head>
+            <body>
+              <div id="root">
+                <div style="display: flex; flex-direction: column; min-height: 100vh;">
+                  ${PreviewHeader({ data })}
+                  ${PreviewContent({ data })}
+                </div>
+              </div>
+            </body>
+          </html>
+        `}
+      />
     </div>
   );
 }
