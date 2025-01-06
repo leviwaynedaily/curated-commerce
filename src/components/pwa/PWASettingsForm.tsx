@@ -226,7 +226,7 @@ export function PWASettingsForm() {
       console.log("PWA settings saved, generating manifest...");
       const { data: manifestData, error: manifestError } = await supabase.functions.invoke('get-manifest', {
         method: 'GET',
-        query: { storefrontId: currentStorefrontId }
+        body: { storefrontId: currentStorefrontId }
       });
       
       if (manifestError) {
