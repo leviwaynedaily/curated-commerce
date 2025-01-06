@@ -43,30 +43,41 @@ export function ProductGrid({
   const getCardDimensions = () => {
     switch (layout) {
       case 'small':
-        return 'w-full h-[360px]' // Increased height
+        return 'w-full h-[360px]'
       case 'large':
-        return 'w-full h-[480px]' // Increased height
+        return 'w-full h-[480px]'
       case 'list':
         return 'w-full h-[200px] flex'
       default: // medium
-        return 'w-full h-[420px]' // Increased height
+        return 'w-full h-[420px]'
     }
   }
 
   const getTextPlacementStyles = (product: any) => {
     if (textPlacement === 'below') {
       return {
-        imageContainer: layout === 'small' ? "h-3/4" : "h-4/5", // Increased image height ratio
-        textContainer: `p-3 flex flex-col justify-between flex-grow`, // Reduced padding
-        overlay: "hidden"
+        imageContainer: layout === 'small' ? "h-3/4" : "h-4/5",
+        textContainer: `p-3 flex flex-col justify-between flex-grow`,
+        overlay: "hidden",
+        priceContainer: "absolute bottom-3 right-3"
       }
     } else {
       return {
         imageContainer: "h-full",
-        textContainer: "absolute bottom-0 left-0 right-0 p-3", // Reduced padding
-        overlay: "absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" // Enhanced gradient
+        textContainer: "absolute bottom-0 left-0 right-0 p-3",
+        overlay: "absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent",
+        priceContainer: "absolute top-3 right-3"
       }
     }
+  }
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)
   }
 
   return (
@@ -89,6 +100,30 @@ export function ProductGrid({
                   className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
                 />
                 <div className={styles.overlay} />
+                
+                {/* Price Badge */}
+                <div className={styles.priceContainer}>
+                  <div 
+                    className="backdrop-blur-md rounded-full px-4 py-2 font-semibold shadow-lg transform transition-transform group-hover:scale-110"
+                    style={{ 
+                      backgroundColor: `${productPriceColor}dd`,
+                      color: '#FFFFFF'
+                    }}
+                  >
+                    {formatPrice(product.in_town_price)}
+                  </div>
+                  {product.shipping_price > 0 && (
+                    <div 
+                      className="mt-2 text-xs backdrop-blur-md rounded-full px-3 py-1 text-center"
+                      style={{ 
+                        backgroundColor: `${productPriceColor}99`,
+                        color: '#FFFFFF'
+                      }}
+                    >
+                      +{formatPrice(product.shipping_price)} ship
+                    </div>
+                  )}
+                </div>
               </div>
             )}
             
@@ -128,21 +163,6 @@ export function ProductGrid({
                   >
                     {product.description}
                   </p>
-                )}
-              </div>
-              <div 
-                className="mt-1.5 space-y-0.5"
-                style={{ color: textPlacement === 'overlay' ? '#fff' : productPriceColor }}
-              >
-                <div className="flex items-center gap-1">
-                  <span className="text-xs opacity-85">In Town:</span>
-                  <span className="text-sm font-semibold">${product.in_town_price}</span>
-                </div>
-                {product.shipping_price > 0 && (
-                  <div className="flex items-center gap-1">
-                    <span className="text-xs opacity-85">Ship:</span>
-                    <span className="text-sm font-semibold">${product.shipping_price}</span>
-                  </div>
                 )}
               </div>
             </div>
