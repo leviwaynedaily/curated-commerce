@@ -53,7 +53,7 @@ export function PreviewContent({
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
-    if (selectedCategory && product.category !== selectedCategory) {
+    if (selectedCategory && (!product.category || !product.category.includes(selectedCategory))) {
       return false;
     }
     return true;
@@ -82,8 +82,8 @@ export function PreviewContent({
     ? filteredAndSortedProducts.length + ITEMS_PER_PAGE 
     : filteredAndSortedProducts.length;
 
-  // Get unique categories from products
-  const categories = [...new Set(allProducts.map(product => product.category))].filter(Boolean) as string[];
+  // Get unique categories from products, flattening the arrays and removing duplicates
+  const categories = [...new Set(allProducts.flatMap(product => product.category || []))].filter(Boolean) as string[];
 
   if (selectedProduct) {
     return (
@@ -100,7 +100,6 @@ export function PreviewContent({
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
-      {/* Only render the PreviewHeader here, not in the parent component */}
       <PreviewHeader
         previewData={previewData}
         searchQuery={searchQuery}
