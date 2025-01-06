@@ -2,6 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ColorPicker } from "./ColorPicker";
+import { useEffect } from "react";
 
 interface HeaderSettingsProps {
   form: UseFormReturn<any>;
@@ -28,6 +29,17 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     });
   };
 
+  // Watch for changes in header opacity and color
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "header_opacity" || name === "header_color") {
+        console.log(`Header setting changed - ${name}:`, value[name]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form]);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Header Settings</h3>
@@ -36,7 +48,6 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
           <FormField
             control={form.control}
             name="header_opacity"
-            defaultValue={30}
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>Header Opacity (%)</FormLabel>
@@ -62,7 +73,6 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
           <FormField
             control={form.control}
             name="header_color"
-            defaultValue="#FFFFFF"
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
