@@ -12,16 +12,17 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
   const [opacity, setOpacity] = useState<number>(30);
   const [color, setColor] = useState<string>("#FFFFFF");
 
-  // Sync with form values when they change
+  // Initialize values from form
   useEffect(() => {
-    const headerOpacity = form.getValues("header_opacity");
-    const headerColor = form.getValues("header_color");
+    const currentValues = form.getValues();
+    console.log("HeaderSettings - Initializing with form values:", {
+      header_opacity: currentValues.header_opacity,
+      header_color: currentValues.header_color
+    });
     
-    console.log("HeaderSettings - Form values updated:", { headerOpacity, headerColor });
-    
-    setOpacity(typeof headerOpacity === 'number' ? headerOpacity : 30);
-    setColor(headerColor || "#FFFFFF");
-  }, [form.watch("header_opacity"), form.watch("header_color")]);
+    setOpacity(currentValues.header_opacity ?? 30);
+    setColor(currentValues.header_color ?? "#FFFFFF");
+  }, []);
 
   const handleOpacityChange = (value: string) => {
     const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
