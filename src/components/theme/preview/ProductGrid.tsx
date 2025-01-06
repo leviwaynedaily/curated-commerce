@@ -27,7 +27,6 @@ export function ProductGrid({
   productCategoryBackgroundColor,
   productCategoryTextColor
 }: ProductGridProps) {
-  // Define fixed card dimensions based on layout type
   const getGridStyles = () => {
     switch (layout) {
       case 'small':
@@ -83,11 +82,11 @@ export function ProductGrid({
             style={{ backgroundColor: productCardBackgroundColor }}
           >
             {product.images?.[0] && (
-              <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer}`}>
+              <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer} bg-gray-50`}>
                 <img
                   src={product.images[0]}
                   alt={product.name}
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-contain p-2"
                 />
                 <div className={styles.overlay} />
               </div>
