@@ -27,6 +27,8 @@ export function HeaderDropdown({
   mainColor,
 }: HeaderDropdownProps) {
   console.log("HeaderDropdown - currentSort:", currentSort);
+  console.log("HeaderDropdown - selectedCategory:", selectedCategory);
+  console.log("HeaderDropdown - available categories:", categories);
 
   const handleSortChange = (sort: string) => {
     console.log("Changing sort to:", sort);
@@ -52,21 +54,24 @@ export function HeaderDropdown({
         className="w-56 bg-white/95 backdrop-blur-sm" 
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        {categories.length > 0 && (
-          <>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Categories</DropdownMenuLabel>
-            {categories.map((category) => (
-              <DropdownMenuCheckboxItem
-                key={category}
-                checked={selectedCategory === category}
-                onCheckedChange={() => onCategoryChange?.(category === selectedCategory ? null : category)}
-              >
-                {category}
-              </DropdownMenuCheckboxItem>
-            ))}
-            <DropdownMenuSeparator />
-          </>
-        )}
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Categories</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          checked={selectedCategory === null}
+          onCheckedChange={() => onCategoryChange?.(null)}
+        >
+          All Categories
+        </DropdownMenuCheckboxItem>
+        {categories.map((category) => (
+          <DropdownMenuCheckboxItem
+            key={category}
+            checked={selectedCategory === category}
+            onCheckedChange={() => onCategoryChange?.(category)}
+          >
+            {category}
+          </DropdownMenuCheckboxItem>
+        ))}
+
+        <DropdownMenuSeparator />
 
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
         <DropdownMenuCheckboxItem
