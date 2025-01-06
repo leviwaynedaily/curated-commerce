@@ -9,20 +9,29 @@
     <meta name="theme-color" content="#000000" />
     <script>
       const path = window.location.pathname;
+      const searchParams = new URLSearchParams(window.location.search);
+      const storefrontId = searchParams.get('storefrontId');
       const slug = path.split('/')[1];
       
-      if (slug) {
+      if (slug || storefrontId) {
         const fetchManifest = async () => {
           try {
-            console.log('Attempting to fetch manifest for slug:', slug);
-            const manifestUrl = `/api/pwa-settings/${slug}`;
+            const targetId = storefrontId || slug;
+            console.log('Attempting to fetch manifest for:', targetId);
+            
+            // Construct the manifest URL based on whether we have a storefrontId or slug
+            const manifestUrl = storefrontId 
+              ? `/api/pwa-settings/${storefrontId}`
+              : `/api/pwa-settings/${slug}`;
+              
             console.log('Manifest URL:', manifestUrl);
             
             const response = await fetch(manifestUrl, {
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-              }
+              },
+              credentials: 'same-origin'
             });
             
             console.log('Manifest fetch response status:', response.status);
@@ -34,6 +43,11 @@
             
             const manifestData = await response.json();
             console.log('Manifest data received:', manifestData);
+            
+            if (!manifestData) {
+              console.warn('No manifest data received');
+              return;
+            }
             
             const manifestBlob = new Blob([JSON.stringify(manifestData)], { 
               type: 'application/json'
@@ -50,7 +64,6 @@
             console.error('Error fetching manifest:', error);
             console.log('Current location:', window.location.href);
             console.log('Base URL:', window.location.origin);
-            console.log('Full manifest URL:', new URL(`/api/pwa-settings/${slug}`, window.location.origin).href);
           }
         };
         

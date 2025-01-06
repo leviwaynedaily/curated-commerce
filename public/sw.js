@@ -37,7 +37,8 @@ self.addEventListener('fetch', (event) => {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'same-origin'
       })
         .then(async response => {
           console.log('Manifest fetch response:', response.status, response.statusText);
@@ -45,9 +46,19 @@ self.addEventListener('fetch', (event) => {
             throw new Error(`Manifest fetch failed: ${response.status}`);
           }
           
-          const cache = await caches.open('manifest-cache');
-          cache.put(event.request, response.clone());
-          console.log('Cached manifest response');
+          // Clone the response before reading it
+          const responseToCache = response.clone();
+          
+          try {
+            // Validate JSON before caching
+            await responseToCache.json();
+            const cache = await caches.open('manifest-cache');
+            cache.put(event.request, responseToCache);
+            console.log('Cached manifest response');
+          } catch (error) {
+            console.error('Invalid JSON in manifest response:', error);
+          }
+          
           return response;
         })
         .catch(error => {
