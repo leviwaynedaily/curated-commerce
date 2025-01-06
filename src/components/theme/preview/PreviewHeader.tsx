@@ -36,6 +36,8 @@ export function PreviewHeader({
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
 
+  const opacity = previewData.header_opacity ?? 30;
+
   return (
     <header 
       className="sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300"
@@ -43,7 +45,12 @@ export function PreviewHeader({
         backgroundColor: `${previewData.storefront_background_color}10`,
       }}
     >
-      <div className="w-full py-2 px-4 md:px-8 backdrop-blur-md bg-white/40">
+      <div 
+        className="w-full py-2 px-4 md:px-8 backdrop-blur-md"
+        style={{
+          backgroundColor: `rgb(255 255 255 / ${opacity}%)`
+        }}
+      >
         <MobileHeader 
           previewData={previewData}
           searchQuery={searchQuery}

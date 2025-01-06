@@ -30,4 +30,5 @@ export interface PreviewData {
   product_category_background_color?: string;
   product_category_text_color?: string;
   storefront_background_color?: string;
+  header_opacity?: number;
 }

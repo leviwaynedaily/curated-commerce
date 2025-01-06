@@ -8,6 +8,7 @@ import { SuggestedColorPalette } from "./SuggestedColorPalette";
 import { BrandColors } from "./BrandColors";
 import { VerificationColors } from "./VerificationColors";
 import { ProductCardColors } from "./ProductCardColors";
+import { HeaderSettings } from "./HeaderSettings";
 import { ThemeConfig } from "@/types/theme";
 
 interface ColorManagementProps {
@@ -99,6 +100,7 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
       </CardHeader>
       <CardContent className="space-y-8">
         <SuggestedColorPalette colors={predefinedColors} logoUrl={logoUrl} />
+        <HeaderSettings form={form} />
         <BrandColors form={form} onColorChange={handleColorChange} />
         <VerificationColors form={form} onColorChange={handleColorChange} />
         <ProductCardColors form={form} onColorChange={handleColorChange} />
