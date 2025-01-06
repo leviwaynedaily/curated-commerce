@@ -56,10 +56,10 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-md"
       onKeyDown={handleKeyPress}
     >
-      <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
+      <div className="w-[400px] rounded-lg shadow-xl bg-white/90 backdrop-blur-sm p-6 space-y-6">
         {previewData.verification_logo_url && (
           <img 
             src={previewData.verification_logo_url} 
@@ -142,7 +142,7 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
             onClick={handleVerification}
             style={{ 
               backgroundColor: colors.button,
-              color: '#FFFFFF',
+              color: colors.buttonText,
               border: 'none'
             }}
           >
