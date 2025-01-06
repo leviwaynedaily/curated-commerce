@@ -16,7 +16,52 @@ import { ProductForm } from "@/components/forms/ProductForm"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2 } from "lucide-react"
+import { AlertCircle, RotateCw } from "lucide-react"
+import { Loader2 } from "lucide-react"
+
+// Extracted components to reduce file size
+const LoadingState = () => (
+  <div className="flex items-center justify-center min-h-[400px]">
+    <div className="flex items-center gap-2">
+      <Loader2 className="h-6 w-6 animate-spin" />
+      <p>Loading...</p>
+    </div>
+  </div>
+);
+
+const ErrorState = ({ onRefresh }: { onRefresh: () => void }) => (
+  <div className="space-y-4">
+    <Alert variant="destructive">
+      <AlertCircle className="h-4 w-4" />
+      <AlertDescription>
+        There was an error loading the storefront. Please try refreshing the page.
+      </AlertDescription>
+    </Alert>
+    <Button 
+      variant="outline" 
+      onClick={onRefresh}
+      className="gap-2"
+    >
+      <RotateCw className="h-4 w-4" />
+      Refresh Page
+    </Button>
+  </div>
+);
+
+const NoStorefrontSelected = ({ onNavigate }: { onNavigate: () => void }) => (
+  <div className="text-center space-y-4">
+    <h2 className="text-2xl font-bold">No storefront selected</h2>
+    <p className="text-muted-foreground">
+      Please select a storefront from the dropdown in the sidebar to manage its products.
+    </p>
+    <Button 
+      variant="default"
+      onClick={onNavigate}
+    >
+      Go to Stores
+    </Button>
+  </div>
+);
 
 const Products = () => {
   const [selectedStatus, setSelectedStatus] = useState("all")
@@ -39,6 +84,7 @@ const Products = () => {
         console.error("Auth error:", error)
         throw error
       }
+      console.log("Session status:", session ? "Authenticated" : "Not authenticated")
       return session
     },
     retry: 1,
@@ -98,12 +144,7 @@ const Products = () => {
   if (isLoadingAuth || isStorefrontLoading) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <p>Loading...</p>
-          </div>
-        </div>
+        <LoadingState />
       </DashboardLayout>
     )
   }
@@ -133,20 +174,7 @@ const Products = () => {
     console.error("Error loading storefront:", storefrontError)
     return (
       <DashboardLayout>
-        <Alert variant="destructive" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            There was an error loading the storefront. Please try refreshing the page.
-          </AlertDescription>
-        </Alert>
-        <Button 
-          variant="outline" 
-          onClick={() => window.location.reload()}
-          className="gap-2"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Refresh Page
-        </Button>
+        <ErrorState onRefresh={() => window.location.reload()} />
       </DashboardLayout>
     )
   }
@@ -154,18 +182,7 @@ const Products = () => {
   if (!currentStorefrontId || !storefront) {
     return (
       <DashboardLayout>
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">No storefront selected</h2>
-          <p className="text-muted-foreground">
-            Please select a storefront from the dropdown in the sidebar to manage its products.
-          </p>
-          <Button 
-            variant="default"
-            onClick={() => navigate("/stores")}
-          >
-            Go to Stores
-          </Button>
-        </div>
+        <NoStorefrontSelected onNavigate={() => navigate("/stores")} />
       </DashboardLayout>
     )
   }
