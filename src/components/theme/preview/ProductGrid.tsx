@@ -71,33 +71,33 @@ export function ProductGrid({
           onClick={() => onProductClick(product)}
           style={{ backgroundColor: productCardBackgroundColor }}
         >
-          <div className="p-3">
-            {product.category && (
-              <Badge 
-                variant="outline"
-                className="text-xs mb-2"
-                style={{
-                  backgroundColor: productCategoryBackgroundColor,
-                  color: productCategoryTextColor,
-                  borderColor: 'transparent'
-                }}
-              >
-                {product.category}
-              </Badge>
-            )}
-          </div>
-
-          {product.images?.[0] && (
-            <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-3/5`}>
+          <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-3/5`}>
+            {product.images?.[0] && (
               <img
                 src={product.images[0]}
                 alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover"
+                className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
               />
-            </div>
-          )}
+            )}
+            
+            {product.category && (
+              <div className="absolute top-3 left-3 z-10">
+                <Badge 
+                  variant="outline"
+                  className="text-xs backdrop-blur-md bg-opacity-70"
+                  style={{
+                    backgroundColor: `${productCategoryBackgroundColor}CC`,
+                    color: productCategoryTextColor,
+                    borderColor: 'transparent'
+                  }}
+                >
+                  {product.category}
+                </Badge>
+              </div>
+            )}
+          </div>
           
-          <div className="p-3 space-y-2">
+          <div className="p-4 space-y-3">
             <h3 
               className="font-bold line-clamp-1 transition-colors"
               style={{ 
