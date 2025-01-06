@@ -1,20 +1,13 @@
-import { Settings2 } from "lucide-react";
+import { ArrowDownUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface HeaderDropdownProps {
   categories: string[];
@@ -22,8 +15,6 @@ interface HeaderDropdownProps {
   onCategoryChange?: (category: string | null) => void;
   currentSort?: string;
   onSortChange?: (sort: string) => void;
-  textPlacement?: string;
-  onTextPlacementChange?: (placement: string) => void;
   mainColor?: string;
 }
 
@@ -33,81 +24,53 @@ export function HeaderDropdown({
   onCategoryChange,
   currentSort,
   onSortChange,
-  textPlacement,
-  onTextPlacementChange,
   mainColor,
 }: HeaderDropdownProps) {
   return (
-    <TooltipProvider>
-      <DropdownMenu modal={false}>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="bg-white/80 hover:bg-white/90 h-9 w-9"
-              >
-                <Settings2 className="h-4 w-4" style={{ color: mainColor }} />
-              </Button>
-            </DropdownMenuTrigger>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>View Options</p>
-          </TooltipContent>
-        </Tooltip>
-        <DropdownMenuContent 
-          className="w-56 bg-white/95 backdrop-blur-sm" 
-          onCloseAutoFocus={(e) => e.preventDefault()}
-          onInteractOutside={(e) => {
-            const target = e.target as Node;
-            const currentTarget = e.currentTarget as HTMLElement;
-            if (!currentTarget.contains(target)) {
-              currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
-            }
-          }}
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger asChild>
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="bg-white/80 hover:bg-white/90 h-9 w-9"
         >
-          {categories.length > 0 && (
-            <>
-              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
-              <DropdownMenuRadioGroup 
-                value={selectedCategory || "all"} 
-                onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}
+          <ArrowDownUp className="h-4 w-4" style={{ color: mainColor }} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        className="w-56 bg-white/95 backdrop-blur-sm" 
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
+        {categories.length > 0 && (
+          <>
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Categories</DropdownMenuLabel>
+            {categories.map((category) => (
+              <DropdownMenuCheckboxItem
+                key={category}
+                checked={selectedCategory === category}
+                onCheckedChange={() => onCategoryChange?.(category === selectedCategory ? null : category)}
               >
-                <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
-                {categories.map((category) => (
-                  <DropdownMenuRadioItem key={category} value={category}>
-                    {category}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-              <DropdownMenuSeparator />
-            </>
-          )}
+                {category}
+              </DropdownMenuCheckboxItem>
+            ))}
+            <DropdownMenuSeparator />
+          </>
+        )}
 
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
-          <DropdownMenuRadioGroup 
-            value={currentSort} 
-            onValueChange={onSortChange}
-          >
-            <DropdownMenuRadioItem value="newest">Newest First</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="price-asc">Price: Low to High</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="price-desc">Price: High to Low</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-
-          <DropdownMenuSeparator />
-          
-          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Text Placement</DropdownMenuLabel>
-          <DropdownMenuRadioGroup 
-            value={textPlacement} 
-            onValueChange={onTextPlacementChange}
-          >
-            <DropdownMenuRadioItem value="overlay">Text Overlay</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="below">Text Below</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </TooltipProvider>
+        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          checked={currentSort === "price-desc"}
+          onCheckedChange={() => onSortChange?.("price-desc")}
+        >
+          Price: High to Low
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={currentSort === "price-asc"}
+          onCheckedChange={() => onSortChange?.("price-asc")}
+        >
+          Price: Low to High
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
