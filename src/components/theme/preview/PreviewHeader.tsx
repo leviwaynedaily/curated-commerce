@@ -39,7 +39,6 @@ export function PreviewHeader({
   console.log("PreviewHeader - header_color:", previewData.header_color);
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
-  console.log("PreviewHeader - onRestartVerification exists:", !!onRestartVerification);
 
   // Ensure we have valid values, using defaults if not provided
   const opacity = typeof previewData.header_opacity === 'number' ? previewData.header_opacity : 30;
@@ -49,9 +48,11 @@ export function PreviewHeader({
   const opacityHex = Math.round((opacity / 100) * 255).toString(16).padStart(2, '0');
 
   const handleLogoClick = () => {
-    console.log("Logo clicked in PreviewHeader - calling restart verification");
+    console.log("Logo clicked in PreviewHeader");
     if (onRestartVerification) {
       onRestartVerification();
+    } else if (onLogoClick) {
+      onLogoClick();
     }
   };
 
