@@ -121,12 +121,12 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 asChild={!route.onClick}
               >
                 {route.onClick ? (
-                  <div className="flex items-center">
+                  <div className="flex w-full items-center">
                     <route.icon className="mr-2 h-4 w-4" />
                     {route.label}
                   </div>
                 ) : (
-                  <Link to={route.href}>
+                  <Link to={route.href} className="flex w-full items-center">
                     <route.icon className="mr-2 h-4 w-4" />
                     {route.label}
                   </Link>
