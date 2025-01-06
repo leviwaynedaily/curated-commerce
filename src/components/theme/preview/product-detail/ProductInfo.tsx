@@ -55,6 +55,7 @@ export function ProductInfo({ product, previewData, onDownload }: ProductInfoPro
           className="flex items-center gap-3"
           style={{ color: previewData.product_price_color }}
         >
+          <span className="text-sm font-medium uppercase">In Town:</span>
           <span className="text-2xl font-bold">${product.in_town_price}</span>
         </div>
         {product.shipping_price > 0 && (
@@ -62,6 +63,7 @@ export function ProductInfo({ product, previewData, onDownload }: ProductInfoPro
             className="flex items-center gap-3"
             style={{ color: previewData.product_price_color }}
           >
+            <span className="text-sm font-medium uppercase">Ship:</span>
             <span className="text-2xl font-bold">${product.shipping_price}</span>
           </div>
         )}
