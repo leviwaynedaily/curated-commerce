@@ -32,33 +32,46 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/pwa-settings/')) {
     console.log('Intercepting manifest request:', event.request.url);
+    
+    // Create a new request with the correct headers
+    const manifestRequest = new Request(event.request.url, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      credentials: 'same-origin',
+      mode: 'cors'
+    });
+
     event.respondWith(
-      fetch(event.request, {
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        credentials: 'same-origin'
-      })
+      fetch(manifestRequest)
         .then(async response => {
           console.log('Manifest fetch response:', response.status, response.statusText);
+          console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+          
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
           }
-          
+
           // Clone the response before reading it
           const responseToCache = response.clone();
-          
+
           try {
-            // Validate JSON before caching
-            await responseToCache.json();
-            const cache = await caches.open('manifest-cache');
-            cache.put(event.request, responseToCache);
-            console.log('Cached manifest response');
+            // Try to parse the JSON to validate it
+            const jsonData = await responseToCache.json();
+            console.log('Successfully parsed manifest JSON:', jsonData);
+            
+            if (jsonData) {
+              const cache = await caches.open('manifest-cache');
+              await cache.put(event.request, response.clone());
+              console.log('Cached valid manifest response');
+            }
           } catch (error) {
             console.error('Invalid JSON in manifest response:', error);
+            console.log('Response text:', await response.clone().text());
           }
-          
+
           return response;
         })
         .catch(error => {
