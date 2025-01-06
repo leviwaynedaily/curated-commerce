@@ -46,13 +46,13 @@ export function ProductGrid({
   const getCardDimensions = () => {
     switch (layout) {
       case 'small':
-        return 'w-full h-[300px]' // Reduced height since we're showing less content
+        return 'w-full h-[360px]'
       case 'large':
-        return 'w-full h-[400px]'
+        return 'w-full h-[480px]'
       case 'list':
         return 'w-full h-[200px] flex'
       default: // medium
-        return 'w-full h-[350px]'
+        return 'w-full h-[420px]'
     }
   }
 
@@ -74,7 +74,7 @@ export function ProductGrid({
           onClick={() => onProductClick(product)}
           style={{ backgroundColor: productCardBackgroundColor }}
         >
-          <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-4/5`}>
+          <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-3/5`}>
             {product.images?.[0] && (
               <img
                 src={product.images[0]}
@@ -100,30 +100,58 @@ export function ProductGrid({
             )}
           </div>
           
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/50 to-transparent backdrop-blur-sm">
-            <div className="flex flex-wrap gap-2 justify-center">
+          <div className="p-4 space-y-3">
+            <h3 
+              className="font-bold line-clamp-1 transition-colors"
+              style={{ 
+                color: productTitleTextColor,
+                fontSize: layout === 'small' ? '0.875rem' : '1rem'
+              }}
+            >
+              {product.name}
+            </h3>
+
+            <div className="flex flex-wrap gap-2">
               <div 
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-white/90"
-                style={{ color: productPriceColor }}
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                style={{ 
+                  backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
+                  color: productPriceColor
+                }}
               >
                 <Home className="h-3.5 w-3.5" />
                 <span className="text-sm font-semibold whitespace-nowrap">
-                  {formatPrice(product.in_town_price)}
+                  In Town: {formatPrice(product.in_town_price)}
                 </span>
               </div>
 
               {product.shipping_price > 0 && (
                 <div 
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 bg-white/90"
-                  style={{ color: productPriceColor }}
+                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                  style={{ 
+                    backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
+                    color: productPriceColor
+                  }}
                 >
                   <Truck className="h-3.5 w-3.5" />
                   <span className="text-sm font-semibold whitespace-nowrap">
-                    {formatPrice(product.shipping_price)}
+                    Ship: {formatPrice(product.shipping_price)}
                   </span>
                 </div>
               )}
             </div>
+
+            {product.description && (
+              <p 
+                className="text-xs line-clamp-2 group-hover:line-clamp-3 transition-all duration-300"
+                style={{ 
+                  color: productDescriptionTextColor,
+                  opacity: 0.85
+                }}
+              >
+                {product.description}
+              </p>
+            )}
           </div>
         </div>
       ))}
