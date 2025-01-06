@@ -99,7 +99,7 @@ export function DesktopHeader({
                   placeholder="Search products..."
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
-                  className="pl-10 bg-white/80 backdrop-blur-sm"
+                  className="pl-10 bg-white/80 backdrop-blur-sm border"
                   style={{ borderColor: previewData.main_color }}
                   autoFocus
                   onBlur={() => {
