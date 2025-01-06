@@ -52,7 +52,7 @@ export function DesktopHeader({
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-64 pl-8 h-9 bg-white/80"
+                className="w-64 pl-8 h-9"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 autoFocus
@@ -62,6 +62,7 @@ export function DesktopHeader({
                   }
                 }}
                 style={{
+                  backgroundColor: `${previewData.main_color}10`,
                   borderColor: previewData.main_color,
                 }}
               />
@@ -75,9 +76,13 @@ export function DesktopHeader({
               variant="ghost"
               size="icon"
               onClick={() => setShowSearch(true)}
-              className="bg-white/80 hover:bg-white/90"
+              style={{ 
+                backgroundColor: `${previewData.main_color}10`,
+                color: previewData.main_color
+              }}
+              className="hover:bg-opacity-20"
             >
-              <Search className="h-5 w-5" style={{ color: previewData.main_color }} />
+              <Search className="h-5 w-5" />
             </Button>
           )}
         </div>
@@ -96,9 +101,13 @@ export function DesktopHeader({
             variant="ghost"
             size="icon"
             onClick={onShowInstructions}
-            className="bg-white/80 hover:bg-white/90"
+            style={{ 
+              backgroundColor: `${previewData.main_color}10`,
+              color: previewData.main_color
+            }}
+            className="hover:bg-opacity-20"
           >
-            <CircleHelp className="h-5 w-5" style={{ color: previewData.main_color }} />
+            <CircleHelp className="h-5 w-5" />
           </Button>
         )}
       </div>

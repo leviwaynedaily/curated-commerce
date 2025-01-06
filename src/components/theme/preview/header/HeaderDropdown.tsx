@@ -26,15 +26,21 @@ export function HeaderDropdown({
   onSortChange,
   mainColor,
 }: HeaderDropdownProps) {
+  console.log("Current sort value:", currentSort); // Debug log
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
           size="icon"
-          className="bg-white/80 hover:bg-white/90 h-9 w-9"
+          style={{ 
+            backgroundColor: `${mainColor}10`,
+            color: mainColor
+          }}
+          className="hover:bg-opacity-20 h-9 w-9"
         >
-          <ArrowDownUp className="h-4 w-4" style={{ color: mainColor }} />
+          <ArrowDownUp className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
@@ -58,6 +64,18 @@ export function HeaderDropdown({
         )}
 
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem
+          checked={currentSort === "newest"}
+          onCheckedChange={() => onSortChange?.("newest")}
+        >
+          Newest First
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem
+          checked={currentSort === "oldest"}
+          onCheckedChange={() => onSortChange?.("oldest")}
+        >
+          Oldest First
+        </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={currentSort === "price-desc"}
           onCheckedChange={() => onSortChange?.("price-desc")}

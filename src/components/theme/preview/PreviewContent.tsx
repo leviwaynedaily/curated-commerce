@@ -12,7 +12,6 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
-  const [textPlacement, setTextPlacement] = useState("below");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
@@ -28,6 +27,8 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
   
+  console.log("Current sort value in PreviewContent:", currentSort); // Debug log
+  
   // Apply filters and sorting
   const filteredAndSortedProducts = allProducts.filter(product => {
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -39,12 +40,16 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
     return true;
   }).sort((a, b) => {
     switch (currentSort) {
+      case "newest":
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case "oldest":
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
       case "price-desc":
         return (b.in_town_price || 0) - (a.in_town_price || 0);
       case "price-asc":
         return (a.in_town_price || 0) - (b.in_town_price || 0);
       default:
-        return 0;
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }
   });
 
@@ -77,7 +82,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
           <ProductGrid
             products={filteredAndSortedProducts}
             layout="small"
-            textPlacement={textPlacement}
+            textPlacement="below"
             onProductClick={handleProductClick}
             mainColor={previewData.main_color || "#000000"}
             fontColor={previewData.font_color || "#FFFFFF"}
