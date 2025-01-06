@@ -1,5 +1,5 @@
 import { UseFormReturn } from "react-hook-form";
-import { ImageUpload } from "@/components/storefront/ImageUpload";
+import { PWAIconUpload } from "./PWAIconUpload";
 
 interface PWAIconsProps {
   form: UseFormReturn<any>;
@@ -27,18 +27,14 @@ export function PWAIcons({ form }: PWAIconsProps) {
       </div>
 
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {iconSizes.map(({ name, size, description }) => (
-          <div key={name} className="space-y-2">
-            <h3 className="text-sm font-medium">{size} Icon</h3>
-            <p className="text-xs text-muted-foreground">{description}</p>
-            <ImageUpload
-              value={form.watch(name)}
-              onChange={(url) => form.setValue(name, url)}
-              bucket="storefront-assets"
-              path={`pwa/icons/${size}`}
-              storefrontId={localStorage.getItem('lastStorefrontId') || undefined}
-            />
-          </div>
+        {iconSizes.map((icon) => (
+          <PWAIconUpload
+            key={icon.name}
+            form={form}
+            name={icon.name}
+            size={icon.size}
+            description={icon.description}
+          />
         ))}
       </div>
     </div>
