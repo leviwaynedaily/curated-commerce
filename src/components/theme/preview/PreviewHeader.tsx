@@ -33,6 +33,9 @@ export function PreviewHeader({
   onTextPlacementChange = () => {},
   onShowInstructions,
 }: PreviewHeaderProps) {
+  console.log("PreviewHeader - searchQuery:", searchQuery);
+  console.log("PreviewHeader - currentSort:", currentSort);
+
   return (
     <header 
       className="sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300"

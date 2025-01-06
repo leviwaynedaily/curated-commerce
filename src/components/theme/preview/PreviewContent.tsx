@@ -5,6 +5,7 @@ import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts, ITEMS_PER_PAGE } from "@/hooks/useStorefrontProducts";
 import { PreviewInstructions } from "./PreviewInstructions";
+import { PreviewHeader } from "./PreviewHeader";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -36,7 +37,8 @@ export function PreviewContent({
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
   
-  console.log("Current sort value in PreviewContent:", currentSort);
+  console.log("PreviewContent - currentSort:", currentSort);
+  console.log("PreviewContent - searchQuery:", searchQuery);
   
   // Apply filters and sorting
   const filteredAndSortedProducts = allProducts.filter(product => {
@@ -63,7 +65,6 @@ export function PreviewContent({
   });
 
   const handleProductClick = () => {
-    // Placeholder for product click handler
     console.log("Product clicked");
   };
 
@@ -72,11 +73,27 @@ export function PreviewContent({
     ? filteredAndSortedProducts.length + ITEMS_PER_PAGE 
     : filteredAndSortedProducts.length;
 
+  // Get unique categories from products
+  const categories = [...new Set(allProducts.map(product => product.category))].filter(Boolean) as string[];
+
   return (
     <div 
       className="min-h-full flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
+      <PreviewHeader
+        previewData={previewData}
+        searchQuery={searchQuery}
+        onSearchChange={handleSearchChange}
+        currentSort={currentSort}
+        onSortChange={setCurrentSort}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        categories={categories}
+        onLogoClick={onLogoClick}
+        onShowInstructions={onCloseInstructions}
+      />
+
       {showInstructions && (
         <PreviewInstructions 
           previewData={previewData} 

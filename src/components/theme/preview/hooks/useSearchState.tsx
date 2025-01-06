@@ -15,6 +15,7 @@ export function useSearchState() {
 
   // Update search query in URL
   const handleSearchChange = (query: string) => {
+    console.log("Search query changed to:", query);
     if (query) {
       searchParams.set("search", query);
       setShowSearch(true);

@@ -26,7 +26,12 @@ export function HeaderDropdown({
   onSortChange,
   mainColor,
 }: HeaderDropdownProps) {
-  console.log("Current sort value:", currentSort); // Debug log
+  console.log("HeaderDropdown - currentSort:", currentSort);
+
+  const handleSortChange = (sort: string) => {
+    console.log("Changing sort to:", sort);
+    onSortChange?.(sort);
+  };
 
   return (
     <DropdownMenu modal={false}>
@@ -66,25 +71,25 @@ export function HeaderDropdown({
         <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
         <DropdownMenuCheckboxItem
           checked={currentSort === "newest"}
-          onCheckedChange={() => onSortChange?.("newest")}
+          onCheckedChange={() => handleSortChange("newest")}
         >
           Newest First
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={currentSort === "oldest"}
-          onCheckedChange={() => onSortChange?.("oldest")}
+          onCheckedChange={() => handleSortChange("oldest")}
         >
           Oldest First
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={currentSort === "price-desc"}
-          onCheckedChange={() => onSortChange?.("price-desc")}
+          onCheckedChange={() => handleSortChange("price-desc")}
         >
           Price: High to Low
         </DropdownMenuCheckboxItem>
         <DropdownMenuCheckboxItem
           checked={currentSort === "price-asc"}
-          onCheckedChange={() => onSortChange?.("price-asc")}
+          onCheckedChange={() => handleSortChange("price-asc")}
         >
           Price: Low to High
         </DropdownMenuCheckboxItem>
