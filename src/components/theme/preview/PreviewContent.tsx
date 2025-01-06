@@ -6,6 +6,7 @@ import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts, ITEMS_PER_PAGE } from "@/hooks/useStorefrontProducts";
 import { PreviewInstructions } from "./PreviewInstructions";
 import { PreviewHeader } from "./PreviewHeader";
+import { ProductDetailView } from "./ProductDetailView";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -26,6 +27,7 @@ export function PreviewContent({
 }: PreviewContentProps) {
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<any | null>(null);
   
   const { searchQuery, handleSearchChange } = useSearchState();
 
@@ -66,8 +68,9 @@ export function PreviewContent({
     }
   });
 
-  const handleProductClick = () => {
-    console.log("Product clicked");
+  const handleProductClick = (product: any) => {
+    console.log("Product clicked, setting selected product:", product);
+    setSelectedProduct(product);
   };
 
   // Calculate total count based on current page data and whether there are more pages
@@ -77,6 +80,17 @@ export function PreviewContent({
 
   // Get unique categories from products
   const categories = [...new Set(allProducts.map(product => product.category))].filter(Boolean) as string[];
+
+  if (selectedProduct) {
+    return (
+      <ProductDetailView
+        product={selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        mainColor={previewData.main_color}
+        fontColor={previewData.font_color}
+      />
+    );
+  }
 
   return (
     <div 
