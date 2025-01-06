@@ -60,32 +60,10 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
   return (
     <div className="w-full h-full bg-background">
-      <iframe
-        ref={iframeRef}
-        className="w-full h-full"
-        title="Store Preview"
-        srcDoc={`
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>Store Preview</title>
-              <link rel="icon" href="/favicon.ico" />
-              <link rel="manifest" href="/manifest.json" />
-              ${document.head.innerHTML}
-            </head>
-            <body>
-              <div id="root">
-                <div style="display: flex; flex-direction: column; min-height: 100vh;">
-                  <PreviewHeader previewData={data} />
-                  <PreviewContent previewData={data} />
-                </div>
-              </div>
-            </body>
-          </html>
-        `}
-      />
+      <div className="w-full h-full">
+        <PreviewHeader previewData={data} />
+        <PreviewContent previewData={data} />
+      </div>
     </div>
   );
 }
