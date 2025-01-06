@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { PreviewData } from "@/types/preview";
+import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 
@@ -37,6 +38,11 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
     return true;
   });
 
+  const handleProductClick = () => {
+    // Placeholder for product click handler
+    console.log("Product clicked");
+  };
+
   return (
     <div 
       className="min-h-full flex flex-col"
@@ -57,6 +63,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             products={filteredProducts}
             layout={layout}
             textPlacement={textPlacement}
+            onProductClick={handleProductClick}
             mainColor={previewData.main_color || "#000000"}
             fontColor={previewData.font_color || "#FFFFFF"}
             productCardBackgroundColor={previewData.product_card_background_color || "#FFFFFF"}
@@ -73,6 +80,8 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
           />
         )}
       </main>
+
+      <PreviewLegalFooter businessName={previewData.name} />
     </div>
   );
 }
