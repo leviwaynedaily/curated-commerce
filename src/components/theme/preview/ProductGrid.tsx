@@ -121,7 +121,7 @@ export function ProductGrid({
               >
                 <Home className="h-3.5 w-3.5" />
                 <span className="text-sm font-semibold whitespace-nowrap">
-                  In Town: {formatPrice(product.in_town_price)}
+                  {formatPrice(product.in_town_price)}
                 </span>
               </div>
 
@@ -135,7 +135,7 @@ export function ProductGrid({
                 >
                   <Truck className="h-3.5 w-3.5" />
                   <span className="text-sm font-semibold whitespace-nowrap">
-                    Ship: {formatPrice(product.shipping_price)}
+                    {formatPrice(product.shipping_price)}
                   </span>
                 </div>
               )}
