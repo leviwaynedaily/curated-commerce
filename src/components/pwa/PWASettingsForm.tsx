@@ -100,7 +100,6 @@ export function PWASettingsForm() {
     mode: "onChange"
   });
 
-  // Update form when data is loaded
   useEffect(() => {
     if (!isPwaLoading && !isStorefrontLoading) {
       console.log("Checking if form should be populated:", { pwaSettings, storefront });
@@ -139,6 +138,22 @@ export function PWASettingsForm() {
 
   const isValid = form.formState.isValid;
   const isDirty = form.formState.isDirty;
+  
+  console.log("Form validation state:", {
+    isValid,
+    isDirty,
+    errors: form.formState.errors,
+    values: form.getValues(),
+  });
+
+  const missingRequirements = [
+    !form.getValues("name") && "App name",
+    !form.getValues("short_name") && "Short name",
+    !form.getValues("icon_192x192") && "192x192 icon",
+    !form.getValues("icon_512x512") && "512x512 icon",
+  ].filter(Boolean);
+
+  console.log("Missing requirements:", missingRequirements);
 
   const saveDraft = async () => {
     if (!currentStorefrontId) {
@@ -238,13 +253,6 @@ export function PWASettingsForm() {
       </div>
     );
   }
-
-  const missingRequirements = [
-    !form.watch("name") && "App name",
-    !form.watch("short_name") && "Short name",
-    !form.watch("icon_192x192") && "192x192 icon",
-    !form.watch("icon_512x512") && "512x512 icon",
-  ].filter(Boolean);
 
   return (
     <Form {...form}>
