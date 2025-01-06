@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
@@ -17,17 +18,37 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("small");
   const [textPlacement, setTextPlacement] = useState("below");
-  const [searchQuery, setSearchQuery] = useState("");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const itemsPerPage = 12;
+
+  // Get search query from URL params
+  const searchQuery = searchParams.get("search") || "";
+
+  // Update search query in URL
+  const handleSearchChange = (query: string) => {
+    if (query) {
+      searchParams.set("search", query);
+    } else {
+      searchParams.delete("search");
+    }
+    setSearchParams(searchParams);
+    setCurrentPage(1); // Reset to first page on search
+  };
+
+  // Handle back navigation from product detail
+  const handleBackFromProduct = () => {
+    setSelectedProduct(null);
+    // Search params are preserved automatically by React Router
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -92,20 +113,11 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
     },
   });
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   if (selectedProduct) {
     return (
       <ProductDetailView
         product={selectedProduct}
-        onBack={() => setSelectedProduct(null)}
+        onBack={handleBackFromProduct}
         previewData={previewData}
       />
     );
@@ -120,7 +132,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
         previewData={previewData}
         onReset={onReset}
         searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
+        onSearchChange={handleSearchChange}
         onSortChange={setCurrentSort}
         onCategoryChange={setSelectedCategory}
         categories={Array.from(new Set(products.map(p => p.category).filter(Boolean)))}
@@ -172,7 +184,6 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
       <PreviewLegalFooter />
 
-      {/* Instructions Modal */}
       {showInstructions && previewData.enable_instructions && (
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
           <div className="h-full w-full flex items-center justify-center p-4">
