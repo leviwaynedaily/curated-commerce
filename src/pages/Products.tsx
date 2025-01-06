@@ -15,6 +15,8 @@ import {
 import { ProductForm } from "@/components/forms/ProductForm"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle, Loader2 } from "lucide-react"
 
 const Products = () => {
   const [selectedStatus, setSelectedStatus] = useState("all")
@@ -27,8 +29,30 @@ const Products = () => {
   // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
-  // Effect to handle storefront changes
+  // First check authentication
+  const { data: session, isLoading: isLoadingAuth } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      console.log("Checking authentication status...")
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error("Auth error:", error)
+        throw error
+      }
+      return session
+    },
+    retry: 1,
+  })
+
+  // Effect to handle authentication and storefront changes
   useEffect(() => {
+    if (!isLoadingAuth && !session) {
+      console.log("No active session, redirecting to login")
+      toast.error("Please login to access this page")
+      navigate("/login")
+      return
+    }
+
     if (!currentStorefrontId) {
       console.log("No storefront selected, redirecting to stores page")
       toast.error("Please select a storefront first")
@@ -39,20 +63,17 @@ const Products = () => {
       queryClient.invalidateQueries({ queryKey: ["storefront"] })
       queryClient.invalidateQueries({ queryKey: ["products"] })
     }
-  }, [currentStorefrontId, navigate, queryClient])
+  }, [currentStorefrontId, navigate, queryClient, session, isLoadingAuth])
 
   const { data: storefront, isLoading: isStorefrontLoading, error: storefrontError } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
       console.log("Fetching storefront data with ID:", currentStorefrontId)
       
-      if (!currentStorefrontId) {
-        console.log("No storefront ID found in localStorage")
+      if (!currentStorefrontId || !session) {
+        console.log("Missing storefront ID or session")
         return null
       }
-
-      const { data: session } = await supabase.auth.getSession()
-      console.log("Current session:", session?.session?.user?.id)
 
       const { data, error } = await supabase
         .from("storefronts")
@@ -68,39 +89,64 @@ const Products = () => {
       console.log("Fetched storefront:", data)
       return data
     },
-    enabled: !!currentStorefrontId,
+    enabled: !!currentStorefrontId && !!session,
     retry: 1,
     staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
   })
 
   // Handle loading states
-  if (isStorefrontLoading) {
+  if (isLoadingAuth || isStorefrontLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <p>Loading...</p>
+          </div>
         </div>
       </DashboardLayout>
     )
   }
 
-  // Handle errors
+  // Handle authentication error
+  if (!session) {
+    return (
+      <DashboardLayout>
+        <div className="text-center space-y-4">
+          <h2 className="text-2xl font-bold text-destructive">Authentication Required</h2>
+          <p className="text-muted-foreground">
+            Please login to access this page.
+          </p>
+          <Button 
+            variant="default"
+            onClick={() => navigate("/login")}
+          >
+            Go to Login
+          </Button>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // Handle storefront errors
   if (storefrontError) {
     console.error("Error loading storefront:", storefrontError)
     return (
       <DashboardLayout>
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-destructive">Error loading storefront</h2>
-          <p className="text-muted-foreground">
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
             There was an error loading the storefront. Please try refreshing the page.
-          </p>
-          <Button 
-            variant="outline" 
-            onClick={() => window.location.reload()}
-          >
-            Refresh Page
-          </Button>
-        </div>
+          </AlertDescription>
+        </Alert>
+        <Button 
+          variant="outline" 
+          onClick={() => window.location.reload()}
+          className="gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh Page
+        </Button>
       </DashboardLayout>
     )
   }
