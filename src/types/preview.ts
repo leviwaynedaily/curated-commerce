@@ -23,6 +23,7 @@ export interface PreviewData {
   product_title_text_color?: string;
   product_description_text_color?: string;
   product_price_color?: string;
+  product_price_button_color?: string;
   product_category_background_color?: string;
   product_category_text_color?: string;
   storefront_background_color?: string;
