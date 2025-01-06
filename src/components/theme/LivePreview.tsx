@@ -5,15 +5,46 @@ import { PreviewError } from "./preview/PreviewError";
 import { PreviewLoading } from "./preview/PreviewLoading";
 import { PreviewData } from "@/types/preview";
 import { useStorefront } from "@/hooks/useStorefront";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LivePreviewProps {
   storefrontId: string;
 }
 
 export function LivePreview({ storefrontId }: LivePreviewProps) {
-  const { data, isLoading, error } = useStorefront(storefrontId);
+  const { data, isLoading, error, refetch } = useStorefront(storefrontId);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [showInstructions, setShowInstructions] = useState(false);
+
+  // Subscribe to realtime updates for the storefront
+  useEffect(() => {
+    if (!storefrontId) return;
+
+    console.log("Setting up realtime subscription for storefront:", storefrontId);
+    
+    const channel = supabase
+      .channel('storefront-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'storefronts',
+          filter: `id=eq.${storefrontId}`
+        },
+        async (payload) => {
+          console.log("Received storefront update:", payload);
+          // Refetch the storefront data to update the preview
+          await refetch();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log("Cleaning up realtime subscription");
+      supabase.removeChannel(channel);
+    };
+  }, [storefrontId, refetch]);
 
   useEffect(() => {
     if (!data) return;
