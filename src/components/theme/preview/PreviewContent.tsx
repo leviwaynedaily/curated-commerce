@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
-import { PreviewHeader } from "./PreviewHeader";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { PreviewData } from "@/types/preview";
@@ -20,7 +19,6 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   const [textPlacement, setTextPlacement] = useState("below");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   
@@ -47,28 +45,9 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
   return (
     <div 
-      className="min-h-screen flex flex-col"
+      className="min-h-full flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
-      <PreviewHeader 
-        previewData={previewData}
-        onReset={onReset}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        onSortChange={setCurrentSort}
-        onCategoryChange={setSelectedCategory}
-        categories={Array.from(new Set(allProducts.map(p => p.category).filter(Boolean)))}
-        selectedCategory={selectedCategory}
-        currentSort={currentSort}
-        isScrolled={isScrolled}
-        layout={layout}
-        textPlacement={textPlacement}
-        onLayoutChange={setLayout}
-        onTextPlacementChange={setTextPlacement}
-        onLogoClick={onLogoClick}
-        onShowInstructions={() => setShowInstructions(true)}
-      />
-      
       <main className="container mx-auto px-4 py-8 flex-1">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
