@@ -9,9 +9,8 @@ interface HeaderSettingsProps {
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
-  // Use local state to track changes before committing them to form
-  const [opacity, setOpacity] = useState<number>(form.getValues("header_opacity") ?? 30);
-  const [color, setColor] = useState<string>(form.getValues("header_color") ?? "#FFFFFF");
+  const [opacity, setOpacity] = useState<number>(30);
+  const [color, setColor] = useState<string>("#FFFFFF");
 
   // Initialize values from form
   useEffect(() => {
@@ -20,10 +19,10 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     
     console.log("HeaderSettings - Loading initial values:", { formOpacity, formColor });
     
-    if (formOpacity !== undefined) {
+    if (typeof formOpacity === 'number') {
       setOpacity(formOpacity);
     }
-    if (formColor !== undefined) {
+    if (formColor) {
       setColor(formColor);
     }
   }, []); // Only run once on mount
@@ -41,11 +40,11 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     });
   };
 
-  const handleHeaderColorChange = (color: string) => {
-    console.log("HeaderSettings - Setting color to:", color);
+  const handleHeaderColorChange = (newColor: string) => {
+    console.log("HeaderSettings - Setting color to:", newColor);
     
-    setColor(color);
-    form.setValue("header_color", color, {
+    setColor(newColor);
+    form.setValue("header_color", newColor, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
