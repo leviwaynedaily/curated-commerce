@@ -5,6 +5,7 @@ import { QuickActions } from "./QuickActions"
 import { Progress } from "@/components/ui/progress"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { toast } from "sonner"
 
 const getTimeBasedGreeting = () => {
   const hour = new Date().getHours()
@@ -26,7 +27,7 @@ const calculateSetupProgress = (storefront: any) => {
 }
 
 export function Dashboard({ storefront }: { storefront: any }) {
-  const { data: products } = useQuery({
+  const { data: products, error: productsError } = useQuery({
     queryKey: ["products", storefront.id],
     queryFn: async () => {
       console.log("Fetching products for storefront:", storefront.id)
@@ -37,26 +38,47 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
       if (error) {
         console.error("Error fetching products:", error)
-        throw error
+        toast.error("Failed to load products")
+        return []
       }
 
       console.log("All products fetched:", data)
-      return data
+      return data || []
     },
     enabled: !!storefront?.id,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   })
 
-  const { data: user } = useQuery({
+  const { data: user, error: userError } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if (error) {
+        console.error("Error fetching user:", error)
+        toast.error("Failed to load user data")
+        return null
+      }
       return user
     },
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   })
 
   const greeting = getTimeBasedGreeting()
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there'
   const setupProgress = calculateSetupProgress(storefront)
+
+  if (productsError || userError) {
+    return (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          There was an error loading the dashboard. Please try refreshing the page.
+        </AlertDescription>
+      </Alert>
+    )
+  }
 
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
