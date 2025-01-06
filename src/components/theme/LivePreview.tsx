@@ -19,7 +19,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   const [showInstructions, setShowInstructions] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [slug, setSlug] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStorefrontData = async () => {
@@ -50,8 +49,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
         }
 
         console.log("Fetched storefront data:", data);
+        console.log("Store slug:", data.slug);
         setPreviewData(data);
-        setSlug(data.slug);
 
         // If no verification is required, show instructions or content directly
         if (data.verification_type === 'none') {
@@ -100,11 +99,6 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
 
   return (
     <div className="h-screen w-full overflow-y-auto bg-background">
-      {/* Slug display */}
-      <div className="fixed top-0 left-0 z-50 p-2 bg-black/50 text-white text-sm rounded-br">
-        Slug: {slug}
-      </div>
-
       {/* Main content area */}
       <div 
         className={`${(!isVerified || (isVerified && showInstructions)) ? 'blur-sm' : ''} transition-all duration-300`}
