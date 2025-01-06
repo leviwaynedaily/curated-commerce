@@ -9,23 +9,18 @@ interface HeaderSettingsProps {
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
-  const [opacity, setOpacity] = useState<number>(30);
-  const [color, setColor] = useState<string>("#FFFFFF");
+  // Initialize state with form values or defaults
+  const [opacity, setOpacity] = useState<number>(() => {
+    const formValue = form.getValues("header_opacity");
+    console.log("Initial header_opacity from form:", formValue);
+    return typeof formValue === 'number' ? formValue : 30;
+  });
 
-  // Initialize values from form
-  useEffect(() => {
-    const formOpacity = form.getValues("header_opacity");
-    const formColor = form.getValues("header_color");
-    
-    console.log("HeaderSettings - Loading initial values:", { formOpacity, formColor });
-    
-    if (typeof formOpacity === 'number') {
-      setOpacity(formOpacity);
-    }
-    if (formColor) {
-      setColor(formColor);
-    }
-  }, []); // Only run once on mount
+  const [color, setColor] = useState<string>(() => {
+    const formValue = form.getValues("header_color");
+    console.log("Initial header_color from form:", formValue);
+    return formValue || "#FFFFFF";
+  });
 
   const handleOpacityChange = (value: string) => {
     // Convert to number and clamp between 0 and 100
