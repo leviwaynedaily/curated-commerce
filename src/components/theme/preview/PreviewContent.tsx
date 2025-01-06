@@ -1,8 +1,7 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { PreviewData } from "@/types/preview";
-import { InstructionsModal } from "./modals/InstructionsModal";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { ProductFilters } from "./ProductFilters";
@@ -18,11 +17,9 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("small");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showInstructions, setShowInstructions] = useState(false);
   const { searchQuery, handleSearchChange } = useSearchState();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [currentSort, setCurrentSort] = useState("newest");
-  const modalRef = useRef<HTMLDivElement>(null);
 
   const { 
     data,
@@ -108,14 +105,6 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       </main>
 
       <PreviewLegalFooter />
-
-      {showInstructions && previewData.enable_instructions && (
-        <InstructionsModal
-          previewData={previewData}
-          onClose={() => setShowInstructions(false)}
-          modalRef={modalRef}
-        />
-      )}
     </div>
   );
 }
