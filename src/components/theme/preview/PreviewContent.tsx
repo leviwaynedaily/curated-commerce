@@ -5,8 +5,8 @@ import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts, ITEMS_PER_PAGE } from "@/hooks/useStorefrontProducts";
 import { PreviewInstructions } from "./PreviewInstructions";
-import { PreviewHeader } from "./PreviewHeader";
 import { ProductDetailView } from "./ProductDetailView";
+import { PreviewHeader } from "./PreviewHeader";
 
 interface PreviewContentProps {
   previewData: PreviewData;
@@ -100,6 +100,7 @@ export function PreviewContent({
       className="min-h-screen flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
+      {/* Only render the PreviewHeader here, not in the parent component */}
       <PreviewHeader
         previewData={previewData}
         searchQuery={searchQuery}

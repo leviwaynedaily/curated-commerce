@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { PreviewHeader } from "./preview/PreviewHeader";
 import { PreviewContent } from "./preview/PreviewContent";
 import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
@@ -76,36 +75,17 @@ export function LivePreview({
       {shouldShowVerification ? (
         <VerificationPrompt previewData={previewData} onVerify={handleVerification} />
       ) : (
-        <>
-          <PreviewHeader
-            previewData={previewData}
-            searchQuery={searchQuery}
-            onSearchChange={(query) => {
-              setSearchQuery(query);
-              onSearchChange?.(query);
-            }}
-            onSortChange={onSortChange}
-            onCategoryChange={onCategoryChange}
-            categories={categories}
-            selectedCategory={selectedCategory}
-            currentSort={currentSort}
-            textPlacement={textPlacement}
-            onTextPlacementChange={onTextPlacementChange}
-            onShowInstructions={handleShowInstructions}
-            onRestartVerification={handleRestartVerification}
-          />
-          <PreviewContent
-            previewData={previewData}
-            searchQuery={searchQuery}
-            selectedCategory={selectedCategory}
-            currentSort={currentSort}
-            textPlacement={textPlacement}
-          />
-          <PreviewLegalFooter previewData={previewData} />
-        </>
-      )}
-      {shouldShowInstructions && (
-        <PreviewInstructions previewData={previewData} onContinue={handleContinue} />
+        <PreviewContent
+          previewData={previewData}
+          searchQuery={searchQuery}
+          selectedCategory={selectedCategory}
+          currentSort={currentSort}
+          textPlacement={textPlacement}
+          onLogoClick={handleRestartVerification}
+          showInstructions={shouldShowInstructions}
+          onCloseInstructions={handleContinue}
+          onShowInstructions={handleShowInstructions}
+        />
       )}
     </div>
   );
