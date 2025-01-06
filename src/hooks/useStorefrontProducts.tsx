@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const ITEMS_PER_PAGE = 25;
+export const ITEMS_PER_PAGE = 1000; // Set to a large number to effectively load all products
 
 interface Product {
   id: string;
@@ -38,23 +38,9 @@ export function useStorefrontProducts({ storefrontId, selectedCategory }: UseSto
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
       try {
-        console.log("Fetching products page:", pageParam);
+        console.log("Fetching all products");
         console.log("With category filter:", selectedCategory);
         
-        // First check if we have an authenticated session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-          console.error("Session error:", sessionError);
-          throw sessionError;
-        }
-        
-        if (!session) {
-          console.log("No active session, proceeding with public access");
-        }
-
-        const start = Number(pageParam) * ITEMS_PER_PAGE;
-        const end = start + ITEMS_PER_PAGE - 1;
-
         let query = supabase
           .from("products")
           .select("*", { count: "exact" })
@@ -62,13 +48,9 @@ export function useStorefrontProducts({ storefrontId, selectedCategory }: UseSto
           .eq("status", "active")
           .order("sort_order", { ascending: true });
 
-        // Add category filter if selected
         if (selectedCategory) {
           query = query.contains('category', [selectedCategory]);
         }
-
-        // Add range for pagination
-        query = query.range(start, end);
 
         const { data: products, error, count } = await query;
 
@@ -80,10 +62,9 @@ export function useStorefrontProducts({ storefrontId, selectedCategory }: UseSto
 
         console.log(`Fetched ${products?.length} products, total count:`, count);
         
-        const hasNextPage = products && products.length === ITEMS_PER_PAGE;
         return {
           products: products as Product[] || [],
-          nextPage: hasNextPage ? Number(pageParam) + 1 : undefined,
+          nextPage: undefined, // No more pages since we're loading all at once
         };
       } catch (error) {
         console.error("Error in products query:", error);

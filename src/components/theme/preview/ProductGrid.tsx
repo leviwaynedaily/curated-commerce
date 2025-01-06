@@ -37,9 +37,7 @@ export function ProductGrid({
   productPriceButtonColor,
   productCategoryBackgroundColor,
   productCategoryTextColor,
-  hasNextPage,
   isFetchingNextPage,
-  fetchNextPage,
   isDesktop = false,
   currentCount,
   totalCount
@@ -47,7 +45,6 @@ export function ProductGrid({
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
   
-  // Update visible range when products change
   useEffect(() => {
     if (products.length > 0) {
       setVisibleRange({
@@ -56,23 +53,6 @@ export function ProductGrid({
       });
     }
   }, [products.length, totalCount]);
-
-  const { ref: infiniteScrollRef, inView } = useInView({
-    threshold: 0,
-    rootMargin: '100px',
-    skip: !hasNextPage || isFetchingNextPage || isDesktop,
-  });
-
-  const handleScroll = useCallback(() => {
-    if (inView && hasNextPage && !isDesktop && !isFetchingNextPage) {
-      console.log("Infinite scroll trigger reached, loading more products");
-      fetchNextPage?.();
-    }
-  }, [inView, hasNextPage, isDesktop, isFetchingNextPage, fetchNextPage]);
-
-  useEffect(() => {
-    handleScroll();
-  }, [handleScroll]);
 
   const handleVisibilityChange = useCallback((productId: string, isVisible: boolean) => {
     setVisibleProducts(prev => {
@@ -113,30 +93,6 @@ export function ProductGrid({
           />
         ))}
       </div>
-
-      {!isDesktop && hasNextPage && (
-        <div ref={infiniteScrollRef} className="h-20 flex items-center justify-center">
-          {isFetchingNextPage && (
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          )}
-        </div>
-      )}
-
-      {isDesktop && hasNextPage && (
-        <div className="flex justify-center pt-4">
-          <Button
-            variant="outline"
-            onClick={() => fetchNextPage?.()}
-            disabled={isFetchingNextPage}
-            className="min-w-[200px]"
-          >
-            {isFetchingNextPage ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : null}
-            {isFetchingNextPage ? "Loading..." : "Load More Products"}
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
