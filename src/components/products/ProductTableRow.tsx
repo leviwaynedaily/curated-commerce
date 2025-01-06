@@ -31,6 +31,10 @@ export function ProductTableRow({
   onKeyDown,
   onEdit,
 }: ProductTableRowProps) {
+  const isVideo = (url: string) => {
+    return url.toLowerCase().match(/\.(mp4|webm|ogg|mov)$/i);
+  };
+
   const renderCell = (field: string) => {
     const isEditing = editingCell?.productId === product.id && editingCell?.field === field
 
@@ -51,11 +55,26 @@ export function ProductTableRow({
         return (
           <div className="flex items-center gap-3">
             {product.images?.[0] && (
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="h-10 w-10 rounded-md object-cover"
-              />
+              isVideo(product.images[0]) ? (
+                <video
+                  src={product.images[0]}
+                  className="h-10 w-10 rounded-md object-cover"
+                  muted
+                  loop
+                  onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                  onMouseOut={(e) => {
+                    const video = e.target as HTMLVideoElement;
+                    video.pause();
+                    video.currentTime = 0;
+                  }}
+                />
+              ) : (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="h-10 w-10 rounded-md object-cover"
+                />
+              )
             )}
             <span className="cursor-pointer hover:text-primary">{product[field]}</span>
           </div>
