@@ -228,7 +228,6 @@ export function PWASettingsForm() {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.VITE_SUPABASE_ANON_KEY}`,
         },
       });
       
