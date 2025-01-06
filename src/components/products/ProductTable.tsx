@@ -134,7 +134,17 @@ export function ProductTable({
   const handleCellUpdate = async (productId: string, field: string, value: string) => {
     try {
       const numericFields = ["in_town_price", "shipping_price"]
-      const updateValue = numericFields.includes(field) ? Number(value) : value
+      let updateValue = value;
+
+      // Handle different field types
+      if (numericFields.includes(field)) {
+        updateValue = Number(value)
+      } else if (field === "category") {
+        // Convert category string to proper PostgreSQL array format
+        updateValue = value.split(',').map(cat => cat.trim())
+      }
+
+      console.log(`Updating product ${productId}, field ${field} with value:`, updateValue)
 
       const { error: updateError } = await supabase
         .from("products")
