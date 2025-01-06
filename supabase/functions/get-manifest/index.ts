@@ -42,7 +42,7 @@ serve(async (req) => {
     if (error) {
       console.error('Error fetching PWA settings:', error);
       return new Response(
-        JSON.stringify({ error: 'Failed to fetch PWA settings' }),
+        JSON.stringify({ error: 'Failed to fetch PWA settings', details: error.message }),
         { status: 500, headers: corsHeaders }
       );
     }
@@ -55,7 +55,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Successfully fetched PWA settings');
+    console.log('Successfully fetched PWA settings:', pwaSettings);
 
     // Construct icons array - only include icons that have been uploaded
     const icons = [
