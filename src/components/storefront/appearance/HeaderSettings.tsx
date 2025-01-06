@@ -8,32 +8,25 @@ interface HeaderSettingsProps {
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
+  console.log("HeaderSettings - Raw form values:", form.getValues());
+  
+  const headerColor = form.watch("header_color");
+  const headerOpacity = form.watch("header_opacity");
+  
+  console.log("HeaderSettings - Direct header_color value:", headerColor);
+  console.log("HeaderSettings - Direct header_opacity value:", headerOpacity);
+
   const headerSettings = [
     { 
       field: "header_color", 
       label: "Header Color", 
-      color: form.watch("header_color") || "#FFFFFF"
+      color: headerColor
     }
   ];
 
-  console.log("HeaderSettings - Current header color:", form.watch("header_color"));
-  console.log("HeaderSettings - Current header opacity:", form.watch("header_opacity"));
-
   const handleColorChange = (color: string, field: string) => {
     console.log(`HeaderSettings - Setting ${field} to:`, color);
-    // Prevent form from resetting to default values
-    const currentValues = form.getValues();
-    form.setValue(field, color, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
-    // Ensure other form values are preserved
-    Object.keys(currentValues).forEach(key => {
-      if (key !== field && currentValues[key]) {
-        form.setValue(key, currentValues[key], { shouldValidate: false });
-      }
-    });
+    form.setValue(field, color);
   };
 
   return (
@@ -51,27 +44,16 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                     type="number"
                     min={0}
                     max={100}
-                    value={form.watch("header_opacity") || 0}
+                    value={headerOpacity}
                     onChange={(e) => {
-                      const numValue = Math.min(Math.max(Number(e.target.value) || 0, 0), 100);
+                      const numValue = Math.min(Math.max(Number(e.target.value), 0), 100);
                       console.log("HeaderSettings - Setting opacity to:", numValue);
-                      const currentValues = form.getValues();
-                      form.setValue("header_opacity", numValue, {
-                        shouldDirty: true,
-                        shouldTouch: true,
-                        shouldValidate: true
-                      });
-                      // Preserve other form values
-                      Object.keys(currentValues).forEach(key => {
-                        if (key !== "header_opacity" && currentValues[key]) {
-                          form.setValue(key, currentValues[key], { shouldValidate: false });
-                        }
-                      });
+                      form.setValue("header_opacity", numValue);
                     }}
                     className="w-24"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {form.watch("header_opacity") || 0}%
+                    {headerOpacity}%
                   </span>
                 </div>
               </FormControl>
