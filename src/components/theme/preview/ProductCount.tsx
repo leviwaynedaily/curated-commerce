@@ -21,7 +21,7 @@ export function ProductCount({
         {isFetchingNextPage ? (
           <Loader2 className="h-3 w-3 animate-spin inline mr-1" />
         ) : null}
-        <span className="text-xs text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-gray-700 whitespace-nowrap">
           Showing {startIndex + 1}-{Math.min(endIndex + 1, currentCount)} of {totalCount} products
         </span>
       </div>
