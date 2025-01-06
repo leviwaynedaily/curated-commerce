@@ -22,13 +22,15 @@ export function VerificationColors({ form, onColorChange }: VerificationColorsPr
     field,
   }));
 
+  console.log("Verification colors being rendered:", verificationColors);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Verification Colors</h3>
       <ColorGrid
         colors={verificationColors}
-        onColorClick={(color) => {
-          const field = verificationColors.find((c) => c.color === color)?.field;
+        onColorClick={(color, field) => {
+          console.log(`Color grid clicked - color: ${color}, field: ${field}`);
           if (field) {
             document.getElementById(field)?.click();
           }
@@ -40,7 +42,10 @@ export function VerificationColors({ form, onColorChange }: VerificationColorsPr
           id={field}
           type="color"
           value={color}
-          onChange={(e) => onColorChange(field, e.target.value)}
+          onChange={(e) => {
+            console.log(`Color input changed - field: ${field}, value: ${e.target.value}`);
+            onColorChange(field, e.target.value);
+          }}
           className="sr-only"
         />
       ))}
