@@ -62,17 +62,12 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   return (
     <div className="w-full h-full bg-background">
       <div className="w-full h-full flex flex-col">
-        <PreviewHeader 
-          previewData={data} 
+        <PreviewContent 
+          previewData={data}
+          showInstructions={showInstructions}
+          onCloseInstructions={() => setShowInstructions(false)}
           onShowInstructions={() => setShowInstructions(true)}
         />
-        <div className="flex-1 overflow-y-auto">
-          <PreviewContent 
-            previewData={data}
-            showInstructions={showInstructions}
-            onCloseInstructions={() => setShowInstructions(false)}
-          />
-        </div>
       </div>
     </div>
   );

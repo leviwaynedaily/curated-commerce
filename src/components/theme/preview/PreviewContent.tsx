@@ -13,6 +13,7 @@ interface PreviewContentProps {
   onLogoClick?: () => void;
   showInstructions?: boolean;
   onCloseInstructions?: () => void;
+  onShowInstructions?: () => void;
 }
 
 export function PreviewContent({ 
@@ -20,7 +21,8 @@ export function PreviewContent({
   onReset, 
   onLogoClick,
   showInstructions = false,
-  onCloseInstructions = () => {}
+  onCloseInstructions = () => {},
+  onShowInstructions = () => {},
 }: PreviewContentProps) {
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -91,7 +93,7 @@ export function PreviewContent({
         onCategoryChange={setSelectedCategory}
         categories={categories}
         onLogoClick={onLogoClick}
-        onShowInstructions={onCloseInstructions}
+        onShowInstructions={onShowInstructions}
       />
 
       {showInstructions && (
