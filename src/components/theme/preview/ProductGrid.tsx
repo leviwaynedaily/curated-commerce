@@ -48,6 +48,16 @@ export function ProductGrid({
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   
+  // Update visible range when products change
+  useEffect(() => {
+    if (products.length > 0) {
+      setVisibleRange({
+        start: 0,
+        end: Math.min(products.length - 1, totalCount - 1)
+      });
+    }
+  }, [products.length, totalCount]);
+
   // Memoize the ref to prevent unnecessary re-renders
   const { ref: infiniteScrollRef, inView } = useInView({
     threshold: 0,
