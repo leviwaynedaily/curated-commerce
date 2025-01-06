@@ -1,85 +1,79 @@
-const CACHE_NAME = 'storefront-cache-v1';
-
-// Files to cache
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/src/index.css',
-  '/src/main.tsx'
-];
-
-// Install service worker
-self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing');
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Service Worker: Caching Files');
-        return cache.addAll(urlsToCache);
-      })
-  );
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('manifest.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          return response;
+        })
+        .catch(() => {
+          // If network request fails, try to return cached manifest
+          return caches.match(event.request);
+        })
+    );
+  }
 });
 
-// Activate service worker
-self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activated');
-  event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Clearing Old Cache');
-            return caches.delete(cache);
-          }
+// Cache manifest when it's fetched
+self.addEventListener('fetch', (event) => {
+  if (event.request.url.includes('manifest.json')) {
+    event.waitUntil(
+      fetch(event.request)
+        .then(response => {
+          return caches.open('manifest-cache')
+            .then(cache => {
+              return cache.put(event.request, response.clone());
+            })
+            .then(() => {
+              return response;
+            });
         })
-      );
+    );
+  }
+});
+
+// Cache static assets
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('static-cache').then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/favicon.ico',
+        '/src/main.tsx',
+      ]);
     })
   );
 });
 
-// Fetch event
+// Serve cached content when offline
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  // Special handling for manifest.json requests
-  if (event.request.url.includes('manifest.json')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => response)
-        .catch(() => {
-          console.error('Failed to fetch manifest');
-          return new Response(JSON.stringify({
-            name: 'Storefront',
-            short_name: 'Store',
-            start_url: '/',
-            display: 'standalone',
-            background_color: '#ffffff',
-            theme_color: '#000000',
-            icons: []
-          }), {
-            headers: { 'Content-Type': 'application/json' }
-          });
-        })
-    );
-    return;
-  }
-
-  console.log('Service Worker: Fetching');
   event.respondWith(
-    fetch(event.request)
+    caches.match(event.request)
       .then((response) => {
-        // Clone the response
-        const responseClone = response.clone();
-        caches.open(CACHE_NAME)
-          .then((cache) => {
-            // Add response to cache
-            cache.put(event.request, responseClone);
-          });
-        return response;
+        return response || fetch(event.request);
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => {
+        // Return the offline page for navigation requests
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+        return null;
+      })
+  );
+});
+
+// Clean up old caches
+self.addEventListener('activate', (event) => {
+  const cacheWhitelist = ['static-cache', 'manifest-cache'];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });

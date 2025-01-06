@@ -10,6 +10,7 @@ export default function Preview() {
   const { slug } = useParams();
   const [storefrontId, setStorefrontId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [manifestData, setManifestData] = useState<any>(null);
 
   useEffect(() => {
     const getStorefrontId = async () => {
@@ -51,6 +52,31 @@ export default function Preview() {
     getStorefrontId();
   }, [searchParams, slug]);
 
+  // Fetch PWA settings when storefrontId is available
+  useEffect(() => {
+    const fetchPWASettings = async () => {
+      if (!storefrontId) return;
+
+      const { data, error } = await supabase
+        .from("pwa_settings")
+        .select("*")
+        .eq("storefront_id", storefrontId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching PWA settings:", error);
+        return;
+      }
+
+      if (data) {
+        console.log("Found PWA settings:", data);
+        setManifestData(data);
+      }
+    };
+
+    fetchPWASettings();
+  }, [storefrontId]);
+
   const { data: storefront } = useStorefront(storefrontId || '');
 
   useEffect(() => {
@@ -90,7 +116,14 @@ export default function Preview() {
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
           )}
-          <link rel="manifest" href={`/manifest.json?slug=${slug}`} />
+          {manifestData && (
+            <link 
+              rel="manifest" 
+              href={`data:application/json;charset=utf-8,${encodeURIComponent(
+                JSON.stringify(manifestData)
+              )}`} 
+            />
+          )}
         </Helmet>
       )}
       <div className="w-full h-screen overflow-hidden">
