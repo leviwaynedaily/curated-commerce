@@ -16,14 +16,12 @@ interface ColorManagementProps {
 }
 
 export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagementProps) {
-  const predefinedColors = [
-    // Define your predefined colors here
-    "#FF5733",
-    "#33FF57",
-    "#3357FF",
-    "#F1C40F",
-    "#8E44AD",
-  ];
+  // Structure the predefined colors according to the expected format
+  const predefinedColors = {
+    primary: ["#FF5733", "#33FF57"],
+    secondary: ["#3357FF", "#F1C40F"],
+    accent: ["#8E44AD", "#D946EF"]
+  };
 
   const handleColorChange = (color: string) => {
     // Handle color change logic here
