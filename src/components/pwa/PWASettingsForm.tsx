@@ -7,12 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { PWABasicInfo } from "./PWABasicInfo";
 import { PWAIcons } from "./PWAIcons";
 import { PWAScreenshots } from "./PWAScreenshots";
-import { Button } from "@/components/ui/button";
-import { Loader2, AlertCircle } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PWAFormValues, pwaFormSchema } from "./types";
+import { PWAFormValidation } from "./PWAFormValidation";
+import { PWAFormActions } from "./PWAFormActions";
+import { useState, useEffect } from "react";
 
 export function PWASettingsForm() {
   const { toast } = useToast();
@@ -136,24 +136,19 @@ export function PWASettingsForm() {
     }
   }, [pwaSettings, storefront, isPwaLoading, isStorefrontLoading, form]);
 
-  const isValid = form.formState.isValid;
-  const isDirty = form.formState.isDirty;
-  
+  const hasRequiredFields = !![
+    form.getValues("name"),
+    form.getValues("short_name"),
+    form.getValues("icon_192x192"),
+    form.getValues("icon_512x512"),
+  ].every(Boolean);
+
   console.log("Form validation state:", {
-    isValid,
-    isDirty,
+    hasRequiredFields,
+    isDirty: form.formState.isDirty,
     errors: form.formState.errors,
     values: form.getValues(),
   });
-
-  const missingRequirements = [
-    !form.getValues("name") && "App name",
-    !form.getValues("short_name") && "Short name",
-    !form.getValues("icon_192x192") && "192x192 icon",
-    !form.getValues("icon_512x512") && "512x512 icon",
-  ].filter(Boolean);
-
-  console.log("Missing requirements:", missingRequirements);
 
   const saveDraft = async () => {
     if (!currentStorefrontId) {
@@ -257,44 +252,17 @@ export function PWASettingsForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {missingRequirements.length > 0 && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Missing Required Fields</AlertTitle>
-            <AlertDescription>
-              The following fields are required to create a PWA manifest:
-              <ul className="list-disc list-inside mt-2">
-                {missingRequirements.map((req) => (
-                  <li key={req}>{req}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
-
+        <PWAFormValidation form={form} />
         <PWABasicInfo form={form} />
         <PWAIcons form={form} />
         <PWAScreenshots form={form} />
         
-        <div className="flex gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={saveDraft}
-            disabled={isSaving || !isDirty}
-          >
-            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Draft
-          </Button>
-
-          <Button 
-            type="submit" 
-            disabled={isSaving || !isValid || missingRequirements.length > 0}
-          >
-            {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save & Create Manifest
-          </Button>
-        </div>
+        <PWAFormActions 
+          form={form}
+          isSaving={isSaving}
+          onSaveDraft={saveDraft}
+          hasRequiredFields={hasRequiredFields}
+        />
 
         {manifestJson && (
           <Card>
