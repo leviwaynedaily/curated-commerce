@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
-import Sharp from 'https://esm.sh/sharp@0.32.6'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,31 +21,46 @@ serve(async (req) => {
       )
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
-
     // Download the original image
     const response = await fetch(imageUrl)
-    const imageBuffer = await response.arrayBuffer()
+    const imageBlob = await response.blob()
+
+    // Create image element
+    const originalImage = await createImageBitmap(imageBlob)
 
     // Define icon sizes
     const sizes = [72, 96, 128, 144, 152, 192, 384, 512]
     const resizedIcons: Record<string, string> = {}
 
-    // Resize for each size
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Process each size
     for (const size of sizes) {
-      const resizedBuffer = await Sharp(new Uint8Array(imageBuffer))
-        .resize(size, size)
-        .png()
-        .toBuffer()
+      // Create canvas with target size
+      const canvas = new OffscreenCanvas(size, size)
+      const ctx = canvas.getContext('2d')
+
+      if (!ctx) {
+        throw new Error('Failed to get canvas context')
+      }
+
+      // Draw resized image
+      ctx.drawImage(originalImage, 0, 0, size, size)
+
+      // Convert to blob
+      const resizedBlob = await canvas.convertToBlob({
+        type: 'image/png',
+        quality: 1
+      })
 
       const filePath = `${storefrontId}/pwa/icons/${size}x${size}/${crypto.randomUUID()}.png`
       
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('storefront-assets')
-        .upload(filePath, resizedBuffer, {
+        .upload(filePath, resizedBlob, {
           contentType: 'image/png',
           upsert: true
         })
