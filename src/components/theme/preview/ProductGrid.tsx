@@ -14,6 +14,7 @@ interface ProductGridProps {
   productPriceButtonColor: string
   productCategoryBackgroundColor: string
   productCategoryTextColor: string
+  productPriceButtonColor: string
 }
 
 export function ProductGrid({ 
@@ -122,7 +123,7 @@ export function ProductGrid({
               </span>
               {product.shipping_price > 0 && (
                 <span className="text-xs ml-1 opacity-75">
-                  +{formatPrice(product.shipping_price)} ship
+                  | {formatPrice(product.shipping_price)} ship
                 </span>
               )}
             </div>
