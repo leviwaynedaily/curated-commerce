@@ -11,6 +11,7 @@ interface ProductGridProps {
   productTitleTextColor: string
   productDescriptionTextColor: string
   productPriceColor: string
+  productPriceButtonColor: string
   productCategoryBackgroundColor: string
   productCategoryTextColor: string
 }
@@ -24,6 +25,7 @@ export function ProductGrid({
   productTitleTextColor,
   productDescriptionTextColor,
   productPriceColor,
+  productPriceButtonColor,
   productCategoryBackgroundColor,
   productCategoryTextColor
 }: ProductGridProps) {
@@ -111,7 +113,7 @@ export function ProductGrid({
             <div 
               className="inline-block rounded-full px-4 py-1.5"
               style={{ 
-                backgroundColor: `${productPriceColor}15`,
+                backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
                 color: productPriceColor
               }}
             >

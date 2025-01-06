@@ -12,7 +12,8 @@ export function ProductCardColors({ form, onColorChange }: ProductCardColorsProp
     { field: "product_card_background_color", label: "Card Background" },
     { field: "product_title_text_color", label: "Title Text" },
     { field: "product_description_text_color", label: "Description Text" },
-    { field: "product_price_color", label: "Price Color" },
+    { field: "product_price_color", label: "Price Text" },
+    { field: "product_price_button_color", label: "Price Button" },
     { field: "product_category_background_color", label: "Category Background" },
     { field: "product_category_text_color", label: "Category Text" },
   ].map(({ field, label }) => ({

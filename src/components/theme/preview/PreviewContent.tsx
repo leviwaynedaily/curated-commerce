@@ -157,6 +157,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             productTitleTextColor={previewData.product_title_text_color || "#1A1F2C"}
             productDescriptionTextColor={previewData.product_description_text_color || "#8E9196"}
             productPriceColor={previewData.product_price_color || "#D946EF"}
+            productPriceButtonColor={previewData.product_price_button_color || "#F1F0FB"}
             productCategoryBackgroundColor={previewData.product_category_background_color || "#E5E7EB"}
             productCategoryTextColor={previewData.product_category_text_color || "#1A1F2C"}
           />
