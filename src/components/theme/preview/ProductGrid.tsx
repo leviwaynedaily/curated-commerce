@@ -49,6 +49,12 @@ export function ProductGrid({
     skip: !hasNextPage || isFetchingNextPage || isDesktop,
   });
 
+  const { ref: visibilityRef, inView: isVisible } = useInView({
+    threshold: 0.1,
+    trackVisibility: true,
+    delay: 100
+  });
+
   useEffect(() => {
     if (inView && hasNextPage && !isDesktop) {
       console.log("Infinite scroll trigger reached, loading more products");
@@ -69,26 +75,15 @@ export function ProductGrid({
     }
   }
 
-  const productRefs = products.map(() => ({
-    ref: useInView({
-      threshold: 0.5,
-      triggerOnce: false,
-    }),
-  }));
-
   useEffect(() => {
-    const visibleIndices = productRefs
-      .map((ref, index) => ({ isVisible: ref.ref.inView, index }))
-      .filter(item => item.isVisible)
-      .map(item => item.index);
-
-    if (visibleIndices.length > 0) {
+    if (isVisible) {
+      const visibleProducts = products.length;
       setVisibleRange({
-        start: Math.min(...visibleIndices),
-        end: Math.max(...visibleIndices),
+        start: 0,
+        end: Math.min(visibleProducts - 1, 11)
       });
     }
-  }, [productRefs.map(ref => ref.ref.inView)]);
+  }, [isVisible, products.length]);
 
   return (
     <div className="relative">
@@ -100,9 +95,12 @@ export function ProductGrid({
         endIndex={visibleRange.end}
       />
 
-      <div className={`grid ${getGridStyles()} auto-rows-auto mt-1`}>
+      <div 
+        ref={visibilityRef}
+        className={`grid ${getGridStyles()} auto-rows-auto mt-1`}
+      >
         {products?.map((product, index) => (
-          <div key={product.id} ref={productRefs[index].ref.ref}>
+          <div key={product.id}>
             <ProductCard
               product={product}
               layout={layout}
