@@ -1,6 +1,8 @@
 import { PreviewData } from "@/types/preview";
 import { ViewOptionsDropdown } from "../ViewOptionsDropdown";
 import { HeaderDropdown } from "./HeaderDropdown";
+import { Button } from "@/components/ui/button";
+import { ArrowDownUp, Info } from "lucide-react";
 
 interface MobileHeaderProps {
   previewData: PreviewData;
@@ -43,12 +45,6 @@ export function MobileHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        <ViewOptionsDropdown
-          textPlacement={textPlacement}
-          mainColor={previewData.main_color || "#000000"}
-          onTextPlacementChange={onTextPlacementChange}
-        />
-        
         <HeaderDropdown
           categories={categories}
           selectedCategory={selectedCategory}
@@ -59,6 +55,26 @@ export function MobileHeader({
           onTextPlacementChange={onTextPlacementChange}
           mainColor={previewData.main_color || "#000000"}
         />
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onSortChange?.(currentSort === 'newest' ? 'oldest' : 'newest')}
+          className="bg-white/80 hover:bg-white/90"
+        >
+          <ArrowDownUp className="h-5 w-5" style={{ color: previewData.main_color }} />
+        </Button>
+
+        {previewData.enable_instructions && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onShowInstructions}
+            className="bg-white/80 hover:bg-white/90"
+          >
+            <Info className="h-5 w-5" style={{ color: previewData.main_color }} />
+          </Button>
+        )}
       </div>
     </div>
   );
