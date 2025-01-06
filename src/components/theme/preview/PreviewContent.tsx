@@ -48,7 +48,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       className="min-h-full flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
-      <main className="container mx-auto px-4 py-8 flex-1">
+      <main className="container mx-auto px-4 py-4 flex-1">
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
