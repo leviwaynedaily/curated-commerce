@@ -5,9 +5,11 @@ import { PreviewData } from "@/types/preview";
 import { VerificationPrompt } from "./preview/VerificationPrompt";
 import { PreviewInstructions } from "./preview/PreviewInstructions";
 import { PreviewLegalFooter } from "./preview/PreviewLegalFooter";
+import { useStorefront } from "@/hooks/useStorefront";
 
 interface LivePreviewProps {
-  previewData: PreviewData;
+  storefrontId: string;
+  previewData?: PreviewData;
   onSearchChange?: (query: string) => void;
   onSortChange?: (sort: string) => void;
   onCategoryChange?: (category: string | null) => void;
@@ -19,7 +21,8 @@ interface LivePreviewProps {
 }
 
 export function LivePreview({
-  previewData,
+  storefrontId,
+  previewData: initialPreviewData,
   onSearchChange,
   onSortChange,
   onCategoryChange,
@@ -32,6 +35,14 @@ export function LivePreview({
   const [isVerified, setIsVerified] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  // Fetch storefront data if not provided
+  const { data: fetchedPreviewData, isLoading } = useStorefront(storefrontId);
+  const previewData = initialPreviewData || fetchedPreviewData;
+
+  if (isLoading || !previewData) {
+    return <div>Loading...</div>;
+  }
 
   const handleVerification = () => {
     setIsVerified(true);

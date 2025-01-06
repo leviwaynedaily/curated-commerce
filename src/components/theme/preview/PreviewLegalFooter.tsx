@@ -1,8 +1,11 @@
+import { PreviewData } from "@/types/preview";
+
 interface PreviewLegalFooterProps {
+  previewData: PreviewData;
   businessName?: string;
 }
 
-export function PreviewLegalFooter({ businessName = "Business" }: PreviewLegalFooterProps) {
+export function PreviewLegalFooter({ previewData, businessName = previewData.name || "Business" }: PreviewLegalFooterProps) {
   const currentYear = new Date().getFullYear();
 
   return (

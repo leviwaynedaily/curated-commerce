@@ -10,6 +10,10 @@ import { ProductDetailView } from "./ProductDetailView";
 
 interface PreviewContentProps {
   previewData: PreviewData;
+  searchQuery?: string;
+  selectedCategory?: string | null;
+  currentSort?: string;
+  textPlacement?: string;
   onReset?: () => void;
   onLogoClick?: () => void;
   showInstructions?: boolean;
