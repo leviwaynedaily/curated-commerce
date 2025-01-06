@@ -31,51 +31,51 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Header Settings</h3>
-      <div className="grid gap-6">
-        <FormField
-          control={form.control}
-          name="header_opacity"
-          defaultValue={30}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Header Opacity (%)</FormLabel>
-              <FormControl>
-                <div className="flex items-center gap-4">
-                  <Input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={field.value}
-                    onChange={(e) => handleOpacityChange(e.target.value)}
-                    className="w-24"
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {field.value}%
-                  </span>
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
+      <div className="grid gap-4">
+        <div className="flex items-start gap-6">
+          <FormField
+            control={form.control}
+            name="header_opacity"
+            defaultValue={30}
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Header Opacity (%)</FormLabel>
+                <FormControl>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={100}
+                      value={field.value}
+                      onChange={(e) => handleOpacityChange(e.target.value)}
+                      className="w-24"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      {field.value}%
+                    </span>
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="header_color"
-          defaultValue="#FFFFFF"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Header Color</FormLabel>
-              <FormControl>
-                <ColorPicker
-                  colors={[]}
-                  selectedColor={field.value}
-                  onColorSelect={handleHeaderColorChange}
-                  label="Header Background Color"
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="header_color"
+            defaultValue="#FFFFFF"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormControl>
+                  <ColorPicker
+                    colors={[]}
+                    selectedColor={field.value}
+                    onColorSelect={handleHeaderColorChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
     </div>
   );
