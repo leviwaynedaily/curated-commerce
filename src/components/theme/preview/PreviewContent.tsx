@@ -93,7 +93,7 @@ export function PreviewContent({
 
   return (
     <div 
-      className="min-h-full flex flex-col"
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: previewData.storefront_background_color }}
     >
       <PreviewHeader

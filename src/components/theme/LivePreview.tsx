@@ -60,8 +60,8 @@ export function LivePreview({ storefrontId }: LivePreviewProps) {
   if (!data) return null;
 
   return (
-    <div className="w-full h-full bg-background">
-      <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full bg-background overflow-auto">
+      <div className="w-full min-h-full flex flex-col">
         <PreviewContent 
           previewData={data}
           showInstructions={showInstructions}
