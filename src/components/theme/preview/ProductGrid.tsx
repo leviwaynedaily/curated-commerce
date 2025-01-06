@@ -75,7 +75,7 @@ export function ProductGrid({
       {products?.map((product) => (
         <div 
           key={product.id}
-          className={`group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_10px_30px_-15px_rgba(0,0,0,0.2)] transform hover:scale-[1.02] rounded-lg ${getCardDimensions()}`}
+          className={`group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-15px_rgba(0,0,0,0.3)] transform hover:scale-[1.02] rounded-lg ${getCardDimensions()}`}
           onClick={() => onProductClick(product)}
           style={{ backgroundColor: productCardBackgroundColor }}
         >
@@ -160,7 +160,7 @@ export function ProductGrid({
 
             {product.description && (
               <p 
-                className="text-xs line-clamp-1 transition-all duration-300" // Changed from line-clamp-2 to line-clamp-1
+                className="text-xs line-clamp-1 transition-all duration-300"
                 style={{ 
                   color: productDescriptionTextColor,
                   opacity: 0.85
