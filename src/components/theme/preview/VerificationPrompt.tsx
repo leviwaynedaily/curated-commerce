@@ -56,104 +56,109 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-md"
-      onKeyDown={handleKeyPress}
+      className="fixed inset-0 z-50 bg-black/20"
+      style={{
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)'
+      }}
     >
-      <div className="w-[400px] rounded-lg shadow-xl bg-white/90 backdrop-blur-sm p-6 space-y-6">
-        {previewData.verification_logo_url && (
-          <img 
-            src={previewData.verification_logo_url} 
-            alt="Verification" 
-            className="h-24 mx-auto object-contain"
-          />
-        )}
-        
-        <h2 
-          className="text-xl font-semibold text-center" 
-          style={{ color: colors.text }}
-        >
-          Verification Required
-        </h2>
-
-        <div className="space-y-4">
-          {showAge && (
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="age-verification"
-                checked={ageConfirmed}
-                onCheckedChange={(checked) => {
-                  setAgeConfirmed(checked as boolean)
-                  setError(null)
-                }}
-                className="mt-1"
-                style={{ 
-                  backgroundColor: ageConfirmed ? colors.checkbox : 'transparent',
-                  borderColor: colors.checkbox 
-                }}
-              />
-              <label 
-                htmlFor="age-verification" 
-                className="text-sm cursor-pointer select-none"
-                style={{ color: colors.text }}
-                dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
-              />
-            </div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-[400px] rounded-lg shadow-xl bg-white/90 p-6 space-y-6">
+          {previewData.verification_logo_url && (
+            <img 
+              src={previewData.verification_logo_url} 
+              alt="Verification" 
+              className="h-24 mx-auto object-contain"
+            />
           )}
-
-          {showPassword && (
-            <div className="space-y-2">
-              <label 
-                className="text-sm font-medium block"
-                style={{ color: colors.text }}
-              >
-                Site Password
-              </label>
-              <Input
-                type="password"
-                placeholder="Enter site password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  setError(null)
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleVerification()
-                  }
-                }}
-                className="w-full"
-                style={{ 
-                  borderColor: colors.inputBorder,
-                  color: colors.text
-                }}
-              />
-            </div>
-          )}
-
-          {error && (
-            <p className="text-destructive text-sm">
-              {error}
-            </p>
-          )}
-
-          <Button 
-            className="w-full"
-            onClick={handleVerification}
-            style={{ 
-              backgroundColor: colors.button,
-              color: colors.buttonText,
-              border: 'none'
-            }}
-          >
-            {previewData.enable_instructions ? "Next" : "Enter Site"}
-          </Button>
-
-          <div 
-            className="text-xs text-center"
+          
+          <h2 
+            className="text-xl font-semibold text-center" 
             style={{ color: colors.text }}
-            dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
-          />
+          >
+            Verification Required
+          </h2>
+
+          <div className="space-y-4">
+            {showAge && (
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="age-verification"
+                  checked={ageConfirmed}
+                  onCheckedChange={(checked) => {
+                    setAgeConfirmed(checked as boolean)
+                    setError(null)
+                  }}
+                  className="mt-1"
+                  style={{ 
+                    backgroundColor: ageConfirmed ? colors.checkbox : 'transparent',
+                    borderColor: colors.checkbox 
+                  }}
+                />
+                <label 
+                  htmlFor="age-verification" 
+                  className="text-sm cursor-pointer select-none"
+                  style={{ color: colors.text }}
+                  dangerouslySetInnerHTML={{ __html: previewData.verification_age_text || '' }}
+                />
+              </div>
+            )}
+
+            {showPassword && (
+              <div className="space-y-2">
+                <label 
+                  className="text-sm font-medium block"
+                  style={{ color: colors.text }}
+                >
+                  Site Password
+                </label>
+                <Input
+                  type="password"
+                  placeholder="Enter site password"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setError(null)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleVerification()
+                    }
+                  }}
+                  className="w-full"
+                  style={{ 
+                    borderColor: colors.inputBorder,
+                    color: colors.text
+                  }}
+                />
+              </div>
+            )}
+
+            {error && (
+              <p className="text-destructive text-sm">
+                {error}
+              </p>
+            )}
+
+            <Button 
+              className="w-full"
+              onClick={handleVerification}
+              style={{ 
+                backgroundColor: colors.button,
+                color: colors.buttonText,
+                border: 'none'
+              }}
+            >
+              {previewData.enable_instructions ? "Next" : "Enter Site"}
+            </Button>
+
+            <div 
+              className="text-xs text-center"
+              style={{ color: colors.text }}
+              dangerouslySetInnerHTML={{ __html: previewData.verification_legal_text || '' }}
+            />
+          </div>
         </div>
       </div>
     </div>
