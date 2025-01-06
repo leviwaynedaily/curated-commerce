@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client"
 import { productFormSchema, type ProductFormValues } from "../products/ProductFormTypes"
 import { ProductFormFields } from "./ProductFormFields"
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB for video support
 
 interface ProductFormProps {
   storefrontId: string
@@ -55,7 +55,13 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
 
       for (const file of files) {
         if (file.size > MAX_FILE_SIZE) {
-          toast.error(`File ${file.name} is too large. Maximum size is 5MB.`)
+          toast.error(`File ${file.name} is too large. Maximum size is 50MB.`)
+          continue
+        }
+
+        // Check if file is an image or video
+        if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+          toast.error(`File ${file.name} is not a supported format. Please upload images or videos only.`)
           continue
         }
 
@@ -83,10 +89,10 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
 
       const currentImages = form.getValues("images") || []
       form.setValue("images", [...currentImages, ...uploadedUrls])
-      toast.success("Images uploaded successfully!")
+      toast.success("Files uploaded successfully!")
     } catch (error) {
-      console.error("Error in image upload:", error)
-      toast.error("Failed to upload images. Please try again.")
+      console.error("Error in file upload:", error)
+      toast.error("Failed to upload files. Please try again.")
     } finally {
       setIsUploading(false)
     }

@@ -12,18 +12,22 @@ interface ProductImageUploadProps {
 }
 
 export function ProductImageUpload({ form, isUploading, onUpload }: ProductImageUploadProps) {
+  const isVideo = (url: string) => {
+    return url.toLowerCase().match(/\.(mp4|webm|ogg)$/i);
+  };
+
   return (
     <FormField
       control={form.control}
       name="images"
       render={() => (
         <FormItem>
-          <FormLabel>Images</FormLabel>
+          <FormLabel>Media Files</FormLabel>
           <FormControl>
             <div className="flex items-center gap-4">
               <Input
                 type="file"
-                accept="image/*"
+                accept="image/*,video/*"
                 multiple
                 onChange={onUpload}
                 disabled={isUploading}
@@ -41,18 +45,27 @@ export function ProductImageUpload({ form, isUploading, onUpload }: ProductImage
                 ) : (
                   <ImagePlus className="h-4 w-4 mr-2" />
                 )}
-                Upload Images
+                Upload Images & Videos
               </Button>
             </div>
           </FormControl>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             {form.watch("images")?.map((url, index) => (
-              <img
-                key={index}
-                src={url}
-                alt={`Product image ${index + 1}`}
-                className="w-full h-32 object-cover rounded-md"
-              />
+              isVideo(url) ? (
+                <video
+                  key={index}
+                  src={url}
+                  className="w-full h-32 object-cover rounded-md"
+                  controls
+                />
+              ) : (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Product media ${index + 1}`}
+                  className="w-full h-32 object-cover rounded-md"
+                />
+              )
             ))}
           </div>
           <FormMessage />
