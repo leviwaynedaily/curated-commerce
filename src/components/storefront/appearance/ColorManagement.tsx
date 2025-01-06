@@ -54,13 +54,20 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
     );
   }
 
+  // Default empty color palette
+  const defaultColors = {
+    primary: [],
+    secondary: [],
+    accent: []
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Color Management</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8">
-        <SuggestedColorPalette logoUrl={logoUrl} />
+        <SuggestedColorPalette colors={defaultColors} logoUrl={logoUrl} />
         <HeaderSettings form={form} />
         <BrandColors form={form} onColorChange={handleColorChange} />
         <VerificationColors form={form} onColorChange={handleColorChange} />

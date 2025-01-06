@@ -9,8 +9,9 @@ interface SuggestedColorPaletteProps {
   logoUrl?: string | null;
 }
 
-export function SuggestedColorPalette({ colors, logoUrl }: SuggestedColorPaletteProps) {
-  if (!colors.primary.length && !colors.secondary.length && !colors.accent.length && !logoUrl) {
+export function SuggestedColorPalette({ colors = { primary: [], secondary: [], accent: [] }, logoUrl }: SuggestedColorPaletteProps) {
+  // If no colors and no logo, don't render anything
+  if (!colors?.primary?.length && !colors?.secondary?.length && !colors?.accent?.length && !logoUrl) {
     return null;
   }
 
@@ -22,50 +23,56 @@ export function SuggestedColorPalette({ colors, logoUrl }: SuggestedColorPalette
             <h3 className="text-lg font-medium">Suggested Color Palette</h3>
             
             <div className="space-y-4">
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Primary Colors</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  {colors.primary.map((color, index) => (
-                    <div key={index} className="flex flex-col items-center space-y-2">
-                      <div
-                        className="w-16 h-16 rounded-lg border"
-                        style={{ backgroundColor: color }}
-                      />
-                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
-                    </div>
-                  ))}
+              {colors?.primary?.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Primary Colors</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {colors.primary.map((color, index) => (
+                      <div key={index} className="flex flex-col items-center space-y-2">
+                        <div
+                          className="w-16 h-16 rounded-lg border"
+                          style={{ backgroundColor: color }}
+                        />
+                        <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Secondary Colors</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  {colors.secondary.map((color, index) => (
-                    <div key={index} className="flex flex-col items-center space-y-2">
-                      <div
-                        className="w-16 h-16 rounded-lg border"
-                        style={{ backgroundColor: color }}
-                      />
-                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
-                    </div>
-                  ))}
+              {colors?.secondary?.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Secondary Colors</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {colors.secondary.map((color, index) => (
+                      <div key={index} className="flex flex-col items-center space-y-2">
+                        <div
+                          className="w-16 h-16 rounded-lg border"
+                          style={{ backgroundColor: color }}
+                        />
+                        <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              <div className="space-y-2">
-                <h4 className="text-sm font-medium">Accent Colors</h4>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                  {colors.accent.map((color, index) => (
-                    <div key={index} className="flex flex-col items-center space-y-2">
-                      <div
-                        className="w-16 h-16 rounded-lg border"
-                        style={{ backgroundColor: color }}
-                      />
-                      <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
-                    </div>
-                  ))}
+              {colors?.accent?.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">Accent Colors</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                    {colors.accent.map((color, index) => (
+                      <div key={index} className="flex flex-col items-center space-y-2">
+                        <div
+                          className="w-16 h-16 rounded-lg border"
+                          style={{ backgroundColor: color }}
+                        />
+                        <p className="text-[11px] text-center font-mono truncate max-w-[90%]">{color}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
