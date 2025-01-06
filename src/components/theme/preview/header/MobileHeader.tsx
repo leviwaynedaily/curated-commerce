@@ -14,6 +14,9 @@ interface MobileHeaderProps {
   categories?: string[];
   selectedCategory?: string | null;
   currentSort?: string;
+  textPlacement?: string;
+  onTextPlacementChange?: (placement: string) => void;
+  onLogoClick?: () => void;
   onShowInstructions?: () => void;
 }
 
@@ -26,6 +29,7 @@ export function MobileHeader({
   categories = [],
   selectedCategory,
   currentSort,
+  onLogoClick,
   onShowInstructions,
 }: MobileHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
@@ -38,6 +42,7 @@ export function MobileHeader({
             src={previewData.logo_url}
             alt={previewData.name}
             className="h-8 w-auto cursor-pointer"
+            onClick={onLogoClick}
           />
         )}
       </div>
