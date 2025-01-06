@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge"
+import { Home, Truck } from "lucide-react"
 
 interface ProductGridProps {
   products: any[]
@@ -110,20 +111,33 @@ export function ProductGrid({
               {product.name}
             </h3>
 
-            <div 
-              className="inline-block rounded-full px-4 py-1.5"
-              style={{ 
-                backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
-                color: productPriceColor
-              }}
-            >
-              <span className="font-semibold">
-                {formatPrice(product.in_town_price)}
-              </span>
-              {product.shipping_price > 0 && (
-                <span className="text-xs ml-1 opacity-75">
-                  | {formatPrice(product.shipping_price)} ship
+            <div className="space-y-2">
+              <div 
+                className="inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+                style={{ 
+                  backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
+                  color: productPriceColor
+                }}
+              >
+                <Home className="h-4 w-4" />
+                <span className="font-semibold">
+                  In Town: {formatPrice(product.in_town_price)}
                 </span>
+              </div>
+
+              {product.shipping_price > 0 && (
+                <div 
+                  className="inline-flex items-center gap-2 rounded-full px-4 py-1.5"
+                  style={{ 
+                    backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
+                    color: productPriceColor
+                  }}
+                >
+                  <Truck className="h-4 w-4" />
+                  <span className="font-semibold">
+                    Ship: {formatPrice(product.shipping_price)}
+                  </span>
+                </div>
               )}
             </div>
 
