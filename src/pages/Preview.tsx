@@ -2,6 +2,8 @@ import { useSearchParams, useParams } from "react-router-dom";
 import { LivePreview } from "@/components/theme/LivePreview";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { useStorefront } from "@/hooks/useStorefront";
 
 export default function Preview() {
   const [searchParams] = useSearchParams();
@@ -49,6 +51,21 @@ export default function Preview() {
     getStorefrontId();
   }, [searchParams, slug]);
 
+  const { data: storefront } = useStorefront(storefrontId || '');
+
+  useEffect(() => {
+    if (storefront) {
+      console.log("Updating document title and favicon for storefront:", storefront.name);
+      // Update favicon if provided
+      if (storefront.favicon_url) {
+        const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
+        if (favicon) {
+          favicon.href = storefront.favicon_url;
+        }
+      }
+    }
+  }, [storefront]);
+
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen p-4 text-muted-foreground">
@@ -66,8 +83,18 @@ export default function Preview() {
   }
 
   return (
-    <div className="w-full h-screen overflow-hidden">
-      <LivePreview storefrontId={storefrontId} />
-    </div>
+    <>
+      {storefront && (
+        <Helmet>
+          <title>{storefront.page_title || storefront.name}</title>
+          {storefront.favicon_url && (
+            <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
+          )}
+        </Helmet>
+      )}
+      <div className="w-full h-screen overflow-hidden">
+        <LivePreview storefrontId={storefrontId} />
+      </div>
+    </>
   );
 }
