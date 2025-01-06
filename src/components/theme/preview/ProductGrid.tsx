@@ -91,7 +91,7 @@ export function ProductGrid({
   }, [productRefs.map(ref => ref.ref.inView)]);
 
   return (
-    <div className="space-y-4">
+    <div className="relative">
       <ProductCount 
         currentCount={products.length}
         totalCount={products.length + (hasNextPage ? 25 : 0)}
@@ -100,7 +100,7 @@ export function ProductGrid({
         endIndex={visibleRange.end}
       />
 
-      <div className={`grid ${getGridStyles()} auto-rows-auto`}>
+      <div className={`grid ${getGridStyles()} auto-rows-auto mt-2`}>
         {products?.map((product, index) => (
           <div key={product.id} ref={productRefs[index].ref.ref}>
             <ProductCard
@@ -143,5 +143,5 @@ export function ProductGrid({
         </div>
       )}
     </div>
-  )
+  );
 }
