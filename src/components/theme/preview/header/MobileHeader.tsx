@@ -1,8 +1,8 @@
 import { PreviewData } from "@/types/preview";
-import { ViewOptionsDropdown } from "../ViewOptionsDropdown";
 import { HeaderDropdown } from "./HeaderDropdown";
 import { Button } from "@/components/ui/button";
-import { ArrowDownUp, Info } from "lucide-react";
+import { ArrowDownUp, Info, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface MobileHeaderProps {
   previewData: PreviewData;
@@ -21,6 +21,8 @@ interface MobileHeaderProps {
 
 export function MobileHeader({
   previewData,
+  searchQuery = "",
+  onSearchChange = () => {},
   onSortChange,
   onCategoryChange,
   categories = [],
@@ -45,6 +47,17 @@ export function MobileHeader({
       </div>
 
       <div className="flex items-center gap-2">
+        <div className="relative">
+          <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+          <Input
+            type="search"
+            placeholder="Search..."
+            className="w-32 pl-8 h-9 bg-white/80"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+          />
+        </div>
+
         <HeaderDropdown
           categories={categories}
           selectedCategory={selectedCategory}
