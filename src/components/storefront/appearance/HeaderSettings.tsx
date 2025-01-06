@@ -10,7 +10,12 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
   const handleOpacityChange = (value: string) => {
     // Convert to number and clamp between 0 and 100
     const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
-    form.setValue("header_opacity", numValue, { shouldDirty: true });
+    console.log("Setting header opacity to:", numValue);
+    form.setValue("header_opacity", numValue, { 
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true 
+    });
   };
 
   return (

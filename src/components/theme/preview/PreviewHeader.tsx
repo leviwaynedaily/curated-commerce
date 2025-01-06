@@ -33,6 +33,7 @@ export function PreviewHeader({
   onTextPlacementChange = () => {},
   onShowInstructions,
 }: PreviewHeaderProps) {
+  console.log("PreviewHeader - header_opacity:", previewData.header_opacity);
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
 
@@ -46,7 +47,7 @@ export function PreviewHeader({
       }}
     >
       <div 
-        className="w-full py-2 px-4 md:px-8 backdrop-blur-md"
+        className="w-full py-2 px-4 md:px-8 backdrop-blur-md transition-all duration-300"
         style={{
           backgroundColor: `rgb(255 255 255 / ${opacity}%)`
         }}
