@@ -10,7 +10,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
   const handleOpacityChange = (value: string) => {
     // Convert to number and clamp between 0 and 100
     const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
-    form.setValue("header_opacity", numValue);
+    form.setValue("header_opacity", numValue, { shouldDirty: true });
   };
 
   return (
@@ -19,6 +19,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
       <FormField
         control={form.control}
         name="header_opacity"
+        defaultValue={30}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Header Opacity (%)</FormLabel>
@@ -28,12 +29,12 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                   type="number"
                   min={0}
                   max={100}
-                  value={field.value ?? 30}
+                  value={field.value}
                   onChange={(e) => handleOpacityChange(e.target.value)}
                   className="w-24"
                 />
                 <span className="text-sm text-muted-foreground">
-                  {field.value ?? 30}%
+                  {field.value}%
                 </span>
               </div>
             </FormControl>
