@@ -150,13 +150,12 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
 
             <div 
               className="bg-white/10 backdrop-blur-sm rounded-lg p-6 space-y-3"
-              style={{ borderLeft: `4px solid ${previewData.product_price_color}` }}
+              style={{ backgroundColor: `${previewData.product_price_button_color}40` }}
             >
               <div 
                 className="flex items-center gap-3"
                 style={{ color: previewData.product_price_color }}
               >
-                <span className="text-base font-medium">In Town:</span>
                 <span className="text-2xl font-bold">${product.in_town_price}</span>
               </div>
               {product.shipping_price > 0 && (
@@ -164,9 +163,37 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
                   className="flex items-center gap-3"
                   style={{ color: previewData.product_price_color }}
                 >
-                  <span className="text-base font-medium">Ship:</span>
                   <span className="text-2xl font-bold">${product.shipping_price}</span>
                 </div>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {product.images?.some((url: string) => !isVideo(url)) && (
+                <Button
+                  className="flex items-center gap-2"
+                  style={{ 
+                    backgroundColor: previewData.product_category_background_color,
+                    color: previewData.product_category_text_color
+                  }}
+                  onClick={() => handleDownload(product.images.find((url: string) => !isVideo(url)))}
+                >
+                  <Download className="h-4 w-4" />
+                  Download Image
+                </Button>
+              )}
+              {product.images?.some((url: string) => isVideo(url)) && (
+                <Button
+                  className="flex items-center gap-2"
+                  style={{ 
+                    backgroundColor: previewData.product_category_background_color,
+                    color: previewData.product_category_text_color
+                  }}
+                  onClick={() => handleDownload(product.images.find((url: string) => isVideo(url)))}
+                >
+                  <Download className="h-4 w-4" />
+                  Download Video
+                </Button>
               )}
             </div>
           </div>
