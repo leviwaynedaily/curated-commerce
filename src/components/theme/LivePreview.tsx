@@ -1,105 +1,101 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect } from "react";
 import { PreviewHeader } from "./preview/PreviewHeader";
 import { PreviewContent } from "./preview/PreviewContent";
-import { PreviewError } from "./preview/PreviewError";
-import { PreviewLoading } from "./preview/PreviewLoading";
 import { PreviewData } from "@/types/preview";
-import { useStorefront } from "@/hooks/useStorefront";
-import { supabase } from "@/integrations/supabase/client";
+import { VerificationPrompt } from "./preview/VerificationPrompt";
+import { PreviewInstructions } from "./preview/PreviewInstructions";
+import { PreviewLegalFooter } from "./preview/PreviewLegalFooter";
 
 interface LivePreviewProps {
-  storefrontId: string;
+  previewData: PreviewData;
+  onSearchChange?: (query: string) => void;
+  onSortChange?: (sort: string) => void;
+  onCategoryChange?: (category: string | null) => void;
+  categories?: string[];
+  selectedCategory?: string | null;
+  currentSort?: string;
+  textPlacement?: string;
+  onTextPlacementChange?: (placement: string) => void;
 }
 
-export function LivePreview({ storefrontId }: LivePreviewProps) {
-  const { data, isLoading, error, refetch } = useStorefront(storefrontId);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+export function LivePreview({
+  previewData,
+  onSearchChange,
+  onSortChange,
+  onCategoryChange,
+  categories,
+  selectedCategory,
+  currentSort,
+  textPlacement,
+  onTextPlacementChange,
+}: LivePreviewProps) {
+  const [isVerified, setIsVerified] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Subscribe to realtime updates for the storefront
-  useEffect(() => {
-    if (!storefrontId) return;
-
-    console.log("Setting up realtime subscription for storefront:", storefrontId);
-    
-    const channel = supabase
-      .channel('storefront-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'storefronts',
-          filter: `id=eq.${storefrontId}`
-        },
-        async (payload) => {
-          console.log("Received storefront update:", payload);
-          // Refetch the storefront data to update the preview
-          await refetch();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      console.log("Cleaning up realtime subscription");
-      supabase.removeChannel(channel);
-    };
-  }, [storefrontId, refetch]);
-
-  useEffect(() => {
-    if (!data) return;
-
-    const iframe = iframeRef.current;
-    if (!iframe) return;
-
-    const iframeDoc = iframe.contentDocument;
-    if (!iframeDoc) return;
-
-    // Update title
-    const title = data.page_title || data.name || "Store Preview";
-    iframeDoc.title = title;
-
-    // Update favicon
-    let faviconLink = iframeDoc.querySelector('link[rel="icon"]') as HTMLLinkElement;
-    if (!faviconLink) {
-      faviconLink = iframeDoc.createElement('link') as HTMLLinkElement;
-      faviconLink.rel = 'icon';
-      iframeDoc.head.appendChild(faviconLink);
+  const handleVerification = () => {
+    setIsVerified(true);
+    if (previewData.enable_instructions) {
+      setShowInstructions(true);
     }
-    faviconLink.href = data.favicon_url || '/favicon.ico';
+  };
 
-    // Update manifest
-    let manifestLink = iframeDoc.querySelector('link[rel="manifest"]') as HTMLLinkElement;
-    if (!manifestLink) {
-      manifestLink = iframeDoc.createElement('link') as HTMLLinkElement;
-      manifestLink.rel = 'manifest';
-      iframeDoc.head.appendChild(manifestLink);
-    }
-    manifestLink.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/serve-manifest?slug=${data.slug}`;
+  const handleRestartVerification = () => {
+    console.log("Restarting verification process");
+    setIsVerified(false);
+    setShowInstructions(false);
+  };
 
-    return () => {
-      if (iframeDoc) {
-        iframeDoc.title = "Store Preview";
-        if (faviconLink) faviconLink.href = '/favicon.ico';
-        if (manifestLink) manifestLink.href = '/manifest.json';
-      }
-    };
-  }, [data]);
+  const handleShowInstructions = () => {
+    setShowInstructions(true);
+  };
 
-  if (error) return <PreviewError error={error.message} />;
-  if (isLoading) return <PreviewLoading />;
-  if (!data) return null;
+  const handleContinue = () => {
+    setShowInstructions(false);
+  };
+
+  const shouldShowVerification = !isVerified && previewData.verification_type !== 'none';
+  const shouldShowInstructions = isVerified && showInstructions && previewData.enable_instructions;
 
   return (
-    <div className="w-full h-full bg-background overflow-auto">
-      <div className="w-full min-h-full flex flex-col">
-        <PreviewContent 
-          previewData={data}
-          showInstructions={showInstructions}
-          onCloseInstructions={() => setShowInstructions(false)}
-          onShowInstructions={() => setShowInstructions(true)}
-        />
-      </div>
+    <div 
+      className="h-full w-full bg-white overflow-auto"
+      style={{ backgroundColor: previewData.storefront_background_color }}
+    >
+      {shouldShowVerification ? (
+        <VerificationPrompt previewData={previewData} onVerify={handleVerification} />
+      ) : (
+        <>
+          <PreviewHeader
+            previewData={previewData}
+            searchQuery={searchQuery}
+            onSearchChange={(query) => {
+              setSearchQuery(query);
+              onSearchChange?.(query);
+            }}
+            onSortChange={onSortChange}
+            onCategoryChange={onCategoryChange}
+            categories={categories}
+            selectedCategory={selectedCategory}
+            currentSort={currentSort}
+            textPlacement={textPlacement}
+            onTextPlacementChange={onTextPlacementChange}
+            onShowInstructions={handleShowInstructions}
+            onRestartVerification={handleRestartVerification}
+          />
+          <PreviewContent
+            previewData={previewData}
+            searchQuery={searchQuery}
+            selectedCategory={selectedCategory}
+            currentSort={currentSort}
+            textPlacement={textPlacement}
+          />
+          <PreviewLegalFooter previewData={previewData} />
+        </>
+      )}
+      {shouldShowInstructions && (
+        <PreviewInstructions previewData={previewData} onContinue={handleContinue} />
+      )}
     </div>
   );
 }

@@ -49,12 +49,9 @@ export function PreviewHeader({
   const opacityHex = Math.round((opacity / 100) * 255).toString(16).padStart(2, '0');
 
   const handleLogoClick = () => {
-    console.log("Logo clicked - calling restart verification");
+    console.log("Logo clicked in PreviewHeader - calling restart verification");
     if (onRestartVerification) {
       onRestartVerification();
-    }
-    if (onLogoClick) {
-      onLogoClick();
     }
   };
 
