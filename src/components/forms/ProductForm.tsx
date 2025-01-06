@@ -20,7 +20,7 @@ interface ProductFormProps {
     description?: string
     in_town_price: number
     shipping_price: number
-    category?: string
+    category?: string[]
     images?: string[]
     status?: string
   }
@@ -39,7 +39,7 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
       description: product?.description ?? "",
       in_town_price: product?.in_town_price?.toString() ?? "",
       shipping_price: product?.shipping_price?.toString() ?? "",
-      category: product?.category ?? "",
+      category: product?.category ?? [],
       images: product?.images ?? [],
       status: (product?.status as "active" | "inactive") ?? "active",
     },
@@ -108,7 +108,7 @@ export function ProductForm({ storefrontId, product, onSuccess }: ProductFormPro
         description: values.description || null,
         in_town_price: Number(values.in_town_price),
         shipping_price: Number(values.shipping_price),
-        category: values.category || null,
+        category: values.category,
         storefront_id: storefrontId,
         images: values.images || [],
         status: values.status,

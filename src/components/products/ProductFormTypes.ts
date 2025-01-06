@@ -11,7 +11,7 @@ export const productFormSchema = z.object({
   shipping_price: z.string().refine((val) => !isNaN(Number(val)), {
     message: "Shipping price must be a valid number",
   }),
-  category: z.string().optional(),
+  category: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive"]).default("active"),
 })

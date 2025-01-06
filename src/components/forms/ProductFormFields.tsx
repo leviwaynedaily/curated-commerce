@@ -17,6 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
+import { X } from "lucide-react"
 
 interface ProductFormFieldsProps {
   form: UseFormReturn<ProductFormValues>
@@ -25,6 +27,30 @@ interface ProductFormFieldsProps {
 }
 
 export function ProductFormFields({ form, isUploading, onUpload }: ProductFormFieldsProps) {
+  const handleCategoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      const input = e.currentTarget
+      const value = input.value.trim()
+      
+      if (value) {
+        const currentCategories = form.getValues("category") || []
+        if (!currentCategories.includes(value)) {
+          form.setValue("category", [...currentCategories, value])
+        }
+        input.value = ''
+      }
+    }
+  }
+
+  const removeCategory = (categoryToRemove: string) => {
+    const currentCategories = form.getValues("category") || []
+    form.setValue(
+      "category",
+      currentCategories.filter(cat => cat !== categoryToRemove)
+    )
+  }
+
   return (
     <>
       <FormField
@@ -85,15 +111,38 @@ export function ProductFormFields({ form, isUploading, onUpload }: ProductFormFi
           )}
         />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4">
         <FormField
           control={form.control}
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Categories</FormLabel>
               <FormControl>
-                <Input placeholder="Product category" {...field} />
+                <div className="space-y-2">
+                  <Input
+                    placeholder="Type a category and press Enter or comma to add"
+                    onKeyDown={handleCategoryKeyDown}
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {field.value?.map((category) => (
+                      <Badge
+                        key={category}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
+                        {category}
+                        <button
+                          type="button"
+                          onClick={() => removeCategory(category)}
+                          className="ml-1 hover:text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
