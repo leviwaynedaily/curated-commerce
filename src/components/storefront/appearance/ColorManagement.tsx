@@ -16,16 +16,19 @@ interface ColorManagementProps {
 }
 
 export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagementProps) {
-  // Structure the predefined colors according to the expected format
   const predefinedColors = {
     primary: ["#FF5733", "#33FF57"],
     secondary: ["#3357FF", "#F1C40F"],
     accent: ["#8E44AD", "#D946EF"]
   };
 
-  const handleColorChange = (color: string) => {
-    // Handle color change logic here
-    console.log("Color changed to:", color);
+  const handleColorChange = (field: string, value: string) => {
+    console.log(`Color changed - field: ${field}, value: ${value}`);
+    form.setValue(field, value, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
   };
 
   return (
