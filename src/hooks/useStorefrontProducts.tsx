@@ -1,16 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const ITEMS_PER_PAGE = 25;
 
-export function useStorefrontProducts(storefrontId: string, page: number = 1) {
-  console.log("Fetching products for page:", page);
+export function useStorefrontProducts(storefrontId: string) {
+  console.log("Setting up infinite products query for storefront:", storefrontId);
   
-  return useQuery({
-    queryKey: ["preview-products", storefrontId, page],
-    queryFn: async () => {
-      console.log("Fetching products for preview", storefrontId);
-      const start = (page - 1) * ITEMS_PER_PAGE;
+  return useInfiniteQuery({
+    queryKey: ["preview-products", storefrontId],
+    queryFn: async ({ pageParam = 0 }) => {
+      console.log("Fetching products page:", pageParam);
+      const start = pageParam * ITEMS_PER_PAGE;
       const end = start + ITEMS_PER_PAGE - 1;
 
       const { data: products, error, count } = await supabase
@@ -26,14 +26,16 @@ export function useStorefrontProducts(storefrontId: string, page: number = 1) {
         throw error;
       }
 
-      console.log("Fetched products:", products);
-      console.log("Total count:", count);
-
+      console.log(`Fetched ${products?.length} products, total count:`, count);
       return {
-        products,
-        totalPages: Math.ceil((count || 0) / ITEMS_PER_PAGE),
-        currentPage: page
+        products: products || [],
+        totalCount: count || 0,
+        currentPage: pageParam,
       };
+    },
+    getNextPageParam: (lastPage, allPages) => {
+      const hasNextPage = lastPage.products.length === ITEMS_PER_PAGE;
+      return hasNextPage ? lastPage.currentPage + 1 : undefined;
     },
     enabled: !!storefrontId,
   });

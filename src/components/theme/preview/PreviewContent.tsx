@@ -1,11 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ProductGrid } from "./ProductGrid";
 import { ProductDetailView } from "./ProductDetailView";
 import { PreviewHeader } from "./PreviewHeader";
 import { PreviewLegalFooter } from "./PreviewLegalFooter";
-import { PreviewPagination } from "./PreviewPagination";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 import { PreviewData } from "@/types/preview";
 import { InstructionsModal } from "./modals/InstructionsModal";
 import { useSearchState } from "./hooks/useSearchState";
@@ -26,88 +24,27 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   const [isScrolled, setIsScrolled] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
-  const itemsPerPage = 12;
-
+  
   const { searchQuery, handleSearchChange } = useSearchState();
 
-  // Handle back navigation from product detail
-  const handleBackFromProduct = () => {
-    setSelectedProduct(null);
-    // Search params are preserved automatically by React Router
-  };
+  const { 
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading 
+  } = useStorefrontProducts(previewData.id);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        setShowInstructions(false);
-      }
-    };
-
-    if (showInstructions) {
-      document.addEventListener('mousedown', handleClickOutside);
+  const allProducts = data?.pages.flatMap(page => page.products) || [];
+  const filteredProducts = allProducts.filter(product => {
+    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
     }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showInstructions]);
-
-  const { data: products = [], isLoading } = useQuery({
-    queryKey: ["products", previewData.id, currentPage, searchQuery, currentSort, selectedCategory],
-    queryFn: async () => {
-      console.log("Fetching products for page:", currentPage);
-      const start = (currentPage - 1) * itemsPerPage;
-      const end = start + itemsPerPage - 1;
-
-      let query = supabase
-        .from("products")
-        .select("*", { count: "exact" })
-        .eq("storefront_id", previewData.id)
-        .eq("status", "active")
-        .range(start, end);
-
-      if (searchQuery) {
-        query = query.ilike("name", `%${searchQuery}%`);
-      }
-
-      if (selectedCategory) {
-        query = query.eq("category", selectedCategory);
-      }
-
-      switch (currentSort) {
-        case "oldest":
-          query = query.order("created_at", { ascending: true });
-          break;
-        case "price-asc":
-          query = query.order("in_town_price", { ascending: true });
-          break;
-        case "price-desc":
-          query = query.order("in_town_price", { ascending: false });
-          break;
-        default: // newest
-          query = query.order("created_at", { ascending: false });
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        console.error("Error fetching products:", error);
-        throw error;
-      }
-
-      return data || [];
-    },
+    if (selectedCategory && product.category !== selectedCategory) {
+      return false;
+    }
+    return true;
   });
-
-  if (selectedProduct) {
-    return (
-      <ProductDetailView
-        product={selectedProduct}
-        onBack={handleBackFromProduct}
-        previewData={previewData}
-      />
-    );
-  }
 
   return (
     <div 
@@ -121,7 +58,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
         onSearchChange={handleSearchChange}
         onSortChange={setCurrentSort}
         onCategoryChange={setSelectedCategory}
-        categories={Array.from(new Set(products.map(p => p.category).filter(Boolean)))}
+        categories={Array.from(new Set(allProducts.map(p => p.category).filter(Boolean)))}
         selectedCategory={selectedCategory}
         currentSort={currentSort}
         isScrolled={isScrolled}
@@ -145,7 +82,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
           </div>
         ) : (
           <ProductGrid
-            products={products}
+            products={filteredProducts}
             layout={layout}
             textPlacement={textPlacement}
             onProductClick={setSelectedProduct}
@@ -158,14 +95,12 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             productPriceButtonColor={previewData.product_price_button_color || "#F1F0FB"}
             productCategoryBackgroundColor={previewData.product_category_background_color || "#E5E7EB"}
             productCategoryTextColor={previewData.product_category_text_color || "#1A1F2C"}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+            fetchNextPage={fetchNextPage}
+            isDesktop={!window.matchMedia('(max-width: 768px)').matches}
           />
         )}
-
-        <PreviewPagination
-          currentPage={currentPage}
-          totalPages={Math.ceil(products.length / itemsPerPage)}
-          onPageChange={setCurrentPage}
-        />
       </main>
 
       <PreviewLegalFooter />
