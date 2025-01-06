@@ -9,7 +9,7 @@ import { PWAIcons } from "./PWAIcons";
 import { PWAScreenshots } from "./PWAScreenshots";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { PWAFormValues, pwaFormSchema } from "./types";
@@ -57,16 +57,26 @@ export function PWASettingsForm() {
         throw error;
       }
 
+      console.log("Fetched storefront data for PWA defaults:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
   });
 
+  const getDefaultShortName = (name: string) => {
+    const words = name.split(' ');
+    if (words.length === 1) return name;
+    if (words[0].length <= 3 && words.length > 1) {
+      return `${words[0]} ${words[1]}`;
+    }
+    return words[0];
+  };
+
   const form = useForm<PWAFormValues>({
     resolver: zodResolver(pwaFormSchema),
     defaultValues: {
       name: pwaSettings?.name || storefront?.name || "",
-      short_name: pwaSettings?.short_name || storefront?.name?.split(' ')[0] || "",
+      short_name: pwaSettings?.short_name || (storefront?.name ? getDefaultShortName(storefront.name) : ""),
       description: pwaSettings?.description || storefront?.description || "",
       start_url: pwaSettings?.start_url || "/",
       display: pwaSettings?.display || "standalone",
@@ -86,6 +96,17 @@ export function PWASettingsForm() {
     },
     mode: "onChange"
   });
+
+  useEffect(() => {
+    if (storefront && !pwaSettings) {
+      console.log("Updating form with storefront defaults");
+      form.setValue('name', storefront.name);
+      form.setValue('short_name', getDefaultShortName(storefront.name));
+      form.setValue('description', storefront.description || '');
+      form.setValue('theme_color', storefront.main_color || '#000000');
+      form.setValue('background_color', storefront.storefront_background_color || '#ffffff');
+    }
+  }, [storefront, pwaSettings, form]);
 
   const isValid = form.formState.isValid;
   const isDirty = form.formState.isDirty;
@@ -107,8 +128,8 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .upsert({
           ...values,
-          name: values.name || "", // Ensure name is never undefined
-          short_name: values.short_name || "", // Ensure short_name is never undefined
+          name: values.name || "",
+          short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
         });
 
@@ -146,14 +167,13 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .upsert({
           ...values,
-          name: values.name || "", // Ensure name is never undefined
-          short_name: values.short_name || "", // Ensure short_name is never undefined
+          name: values.name || "",
+          short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
         });
 
       if (error) throw error;
 
-      // Generate manifest preview
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`);
       const manifest = await response.json();
       setManifestJson(JSON.stringify(manifest, null, 2));
