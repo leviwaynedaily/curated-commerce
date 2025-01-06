@@ -75,7 +75,7 @@ export function ProductGrid({
       {products?.map((product) => (
         <div 
           key={product.id}
-          className={`group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-15px_rgba(0,0,0,0.3)] transform hover:scale-[1.02] rounded-lg ${getCardDimensions()}`}
+          className={`group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.4)] transform hover:scale-[1.02] rounded-lg ${getCardDimensions()}`}
           onClick={() => onProductClick(product)}
           style={{ backgroundColor: productCardBackgroundColor }}
         >
