@@ -16,12 +16,12 @@ export function ProductCount({
   endIndex
 }: ProductCountProps) {
   return (
-    <div className="absolute top-0 right-0 z-40 px-4 md:px-8">
-      <div className="inline-flex items-center gap-2 py-2 px-4 rounded-full bg-white/95 backdrop-blur-sm supports-[backdrop-filter]:bg-white/90 border shadow-sm">
+    <div className="fixed bottom-4 right-4 z-40">
+      <div className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full bg-white/95 backdrop-blur-sm supports-[backdrop-filter]:bg-white/90 border shadow-sm">
         {isFetchingNextPage ? (
-          <Loader2 className="h-4 w-4 animate-spin inline mr-2" />
+          <Loader2 className="h-3 w-3 animate-spin inline mr-1" />
         ) : null}
-        <span className="text-sm text-muted-foreground whitespace-nowrap">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
           Showing {startIndex + 1}-{Math.min(endIndex + 1, currentCount)} of {totalCount} products
         </span>
       </div>
