@@ -111,30 +111,30 @@ export function ProductGrid({
               {product.name}
             </h3>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-nowrap gap-2 justify-start">
               <div 
-                className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                className="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
                 style={{ 
                   backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
                   color: productPriceColor
                 }}
               >
-                <Home className="h-3.5 w-3.5" />
-                <span className="text-sm font-semibold whitespace-nowrap">
+                <Home className="h-3 w-3" />
+                <span className="text-xs font-semibold whitespace-nowrap">
                   {formatPrice(product.in_town_price)}
                 </span>
               </div>
 
               {product.shipping_price > 0 && (
                 <div 
-                  className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+                  className="inline-flex items-center gap-1 rounded-full px-2 py-0.5"
                   style={{ 
                     backgroundColor: productPriceButtonColor || `${productPriceColor}15`,
                     color: productPriceColor
                   }}
                 >
-                  <Truck className="h-3.5 w-3.5" />
-                  <span className="text-sm font-semibold whitespace-nowrap">
+                  <Truck className="h-3 w-3" />
+                  <span className="text-xs font-semibold whitespace-nowrap">
                     {formatPrice(product.shipping_price)}
                   </span>
                 </div>
