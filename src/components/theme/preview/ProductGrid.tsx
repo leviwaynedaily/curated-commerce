@@ -46,13 +46,13 @@ export function ProductGrid({
   const getCardDimensions = () => {
     switch (layout) {
       case 'small':
-        return 'w-full h-[320px]' // Reduced from 360px
+        return 'w-full h-[320px]'
       case 'large':
-        return 'w-full h-[440px]' // Reduced from 480px
+        return 'w-full h-[440px]'
       case 'list':
-        return 'w-full h-[180px] flex' // Reduced from 200px
+        return 'w-full h-[180px] flex'
       default: // medium
-        return 'w-full h-[380px]' // Reduced from 420px
+        return 'w-full h-[380px]'
     }
   }
 
@@ -65,6 +65,11 @@ export function ProductGrid({
     }).format(price)
   }
 
+  const isVideo = (url: string) => {
+    const extension = url.split('.').pop()?.toLowerCase();
+    return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
+  };
+
   return (
     <div className={`grid ${getGridStyles()} auto-rows-auto`}>
       {products?.map((product) => (
@@ -76,11 +81,23 @@ export function ProductGrid({
         >
           <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-3/5`}>
             {product.images?.[0] && (
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
-              />
+              isVideo(product.images[0]) ? (
+                <video
+                  src={product.images[0]}
+                  className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+                  muted
+                  playsInline
+                  loop
+                  onMouseEnter={(e) => e.currentTarget.play()}
+                  onMouseLeave={(e) => e.currentTarget.pause()}
+                />
+              ) : (
+                <img
+                  src={product.images[0]}
+                  alt={product.name}
+                  className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
+                />
+              )
             )}
             
             {product.category && (

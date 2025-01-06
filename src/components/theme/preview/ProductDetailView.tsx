@@ -32,7 +32,7 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
 
   const isVideo = (url: string) => {
     const extension = url.split('.').pop()?.toLowerCase();
-    return ['mp4', 'webm', 'ogg'].includes(extension || '');
+    return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
   };
 
   return (
