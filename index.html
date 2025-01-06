@@ -22,9 +22,11 @@
               const manifestData = await response.json();
               console.log('Successfully fetched manifest:', manifestData);
               
+              // Create manifest URL from data
               const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
               const manifestUrl = URL.createObjectURL(manifestBlob);
               
+              // Add manifest link to head
               const manifestLink = document.createElement('link');
               manifestLink.rel = 'manifest';
               manifestLink.href = manifestUrl;
