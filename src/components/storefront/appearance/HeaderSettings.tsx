@@ -40,6 +40,12 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     return () => subscription.unsubscribe();
   }, [form]);
 
+  // Get current values from form
+  const currentOpacity = form.watch("header_opacity") ?? 30;
+  const currentColor = form.watch("header_color") ?? "#FFFFFF";
+
+  console.log("Current header settings - opacity:", currentOpacity, "color:", currentColor);
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Header Settings</h3>
@@ -57,12 +63,12 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                       type="number"
                       min={0}
                       max={100}
-                      value={field.value}
+                      value={currentOpacity}
                       onChange={(e) => handleOpacityChange(e.target.value)}
                       className="w-24"
                     />
                     <span className="text-sm text-muted-foreground">
-                      {field.value}%
+                      {currentOpacity}%
                     </span>
                   </div>
                 </FormControl>
@@ -78,7 +84,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                 <FormControl>
                   <ColorPicker
                     colors={[]}
-                    selectedColor={field.value}
+                    selectedColor={currentColor}
                     onColorSelect={handleHeaderColorChange}
                   />
                 </FormControl>
