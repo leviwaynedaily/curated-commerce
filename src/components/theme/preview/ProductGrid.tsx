@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { useInView } from "react-intersection-observer"
@@ -44,25 +44,15 @@ export function ProductGrid({
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   
+  // Memoize the ref to prevent unnecessary re-renders
   const { ref: infiniteScrollRef, inView } = useInView({
-    threshold: 0.5,
+    threshold: 0,
+    rootMargin: '100px',
     skip: !hasNextPage || isFetchingNextPage || isDesktop,
   });
 
-  const { ref: visibilityRef, inView: isVisible } = useInView({
-    threshold: 0.1,
-    trackVisibility: true,
-    delay: 100
-  });
-
-  useEffect(() => {
-    if (inView && hasNextPage && !isDesktop) {
-      console.log("Infinite scroll trigger reached, loading more products");
-      fetchNextPage?.();
-    }
-  }, [inView, hasNextPage, fetchNextPage, isDesktop]);
-
-  const getGridStyles = () => {
+  // Memoize grid styles
+  const gridStyles = useMemo(() => {
     switch (layout) {
       case 'small':
         return 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3'
@@ -73,17 +63,51 @@ export function ProductGrid({
       default: // medium
         return 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
     }
-  }
+  }, [layout]);
 
-  useEffect(() => {
-    if (isVisible) {
-      const visibleProducts = products.length;
-      setVisibleRange({
-        start: 0,
-        end: Math.min(visibleProducts - 1, 11)
-      });
+  // Debounced scroll handler using useCallback
+  const handleScroll = useCallback(() => {
+    if (inView && hasNextPage && !isDesktop && !isFetchingNextPage) {
+      console.log("Infinite scroll trigger reached, loading more products");
+      fetchNextPage?.();
     }
-  }, [isVisible, products.length]);
+  }, [inView, hasNextPage, isDesktop, isFetchingNextPage, fetchNextPage]);
+
+  // Optimize scroll event listener
+  useEffect(() => {
+    handleScroll();
+  }, [handleScroll]);
+
+  // Memoize the product cards to prevent unnecessary re-renders
+  const productCards = useMemo(() => {
+    return products?.map((product) => (
+      <div key={product.id}>
+        <ProductCard
+          product={product}
+          layout={layout}
+          productCardBackgroundColor={productCardBackgroundColor}
+          productTitleTextColor={productTitleTextColor}
+          productDescriptionTextColor={productDescriptionTextColor}
+          productPriceColor={productPriceColor}
+          productPriceButtonColor={productPriceButtonColor}
+          productCategoryBackgroundColor={productCategoryBackgroundColor}
+          productCategoryTextColor={productCategoryTextColor}
+          onProductClick={onProductClick}
+        />
+      </div>
+    ));
+  }, [
+    products,
+    layout,
+    productCardBackgroundColor,
+    productTitleTextColor,
+    productDescriptionTextColor,
+    productPriceColor,
+    productPriceButtonColor,
+    productCategoryBackgroundColor,
+    productCategoryTextColor,
+    onProductClick
+  ]);
 
   return (
     <div className="relative">
@@ -95,26 +119,8 @@ export function ProductGrid({
         endIndex={visibleRange.end}
       />
 
-      <div 
-        ref={visibilityRef}
-        className={`grid ${getGridStyles()} auto-rows-auto mt-1`}
-      >
-        {products?.map((product, index) => (
-          <div key={product.id}>
-            <ProductCard
-              product={product}
-              layout={layout}
-              productCardBackgroundColor={productCardBackgroundColor}
-              productTitleTextColor={productTitleTextColor}
-              productDescriptionTextColor={productDescriptionTextColor}
-              productPriceColor={productPriceColor}
-              productPriceButtonColor={productPriceButtonColor}
-              productCategoryBackgroundColor={productCategoryBackgroundColor}
-              productCategoryTextColor={productCategoryTextColor}
-              onProductClick={onProductClick}
-            />
-          </div>
-        ))}
+      <div className={`grid ${gridStyles} auto-rows-auto mt-1`}>
+        {productCards}
       </div>
 
       {!isDesktop && hasNextPage && (
