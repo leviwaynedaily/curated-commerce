@@ -27,7 +27,9 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
   } = useStorefrontProducts(previewData.id || '');
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
-  const filteredProducts = allProducts.filter(product => {
+  
+  // Apply filters and sorting
+  const filteredAndSortedProducts = allProducts.filter(product => {
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
@@ -35,6 +37,15 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
       return false;
     }
     return true;
+  }).sort((a, b) => {
+    switch (currentSort) {
+      case "price-desc":
+        return (b.in_town_price || 0) - (a.in_town_price || 0);
+      case "price-asc":
+        return (a.in_town_price || 0) - (b.in_town_price || 0);
+      default:
+        return 0;
+    }
   });
 
   const handleProductClick = () => {
@@ -44,8 +55,8 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
 
   // Calculate total count based on current page data and whether there are more pages
   const totalCount = hasNextPage 
-    ? filteredProducts.length + ITEMS_PER_PAGE 
-    : filteredProducts.length;
+    ? filteredAndSortedProducts.length + ITEMS_PER_PAGE 
+    : filteredAndSortedProducts.length;
 
   return (
     <div 
@@ -64,7 +75,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
           </div>
         ) : (
           <ProductGrid
-            products={filteredProducts}
+            products={filteredAndSortedProducts}
             layout="small"
             textPlacement={textPlacement}
             onProductClick={handleProductClick}
@@ -81,7 +92,7 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             isFetchingNextPage={isFetchingNextPage}
             fetchNextPage={fetchNextPage}
             isDesktop={!window.matchMedia('(max-width: 768px)').matches}
-            currentCount={filteredProducts.length}
+            currentCount={filteredAndSortedProducts.length}
             totalCount={totalCount}
           />
         )}
