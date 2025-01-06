@@ -5,6 +5,7 @@ export interface PreviewData {
   logo_url?: string;
   page_title?: string;
   favicon_url?: string;
+  slug?: string;
   verification_type?: 'none' | 'age' | 'password' | 'both';
   verification_age_text?: string;
   verification_legal_text?: string;

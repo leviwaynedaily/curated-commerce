@@ -4,14 +4,14 @@ import { PreviewContent } from "./preview/PreviewContent";
 import { PreviewError } from "./preview/PreviewError";
 import { PreviewLoading } from "./preview/PreviewLoading";
 import { PreviewData } from "@/types/preview";
+import { useStorefront } from "@/hooks/useStorefront";
 
 interface LivePreviewProps {
-  data: PreviewData | null;
-  isLoading: boolean;
-  error: Error | null;
+  storefrontId: string;
 }
 
-export function LivePreview({ data, isLoading, error }: LivePreviewProps) {
+export function LivePreview({ storefrontId }: LivePreviewProps) {
+  const { data, isLoading, error } = useStorefront(storefrontId);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -28,18 +28,18 @@ export function LivePreview({ data, isLoading, error }: LivePreviewProps) {
     iframeDoc.title = title;
 
     // Update favicon
-    let faviconLink = iframeDoc.querySelector('link[rel="icon"]');
+    let faviconLink = iframeDoc.querySelector('link[rel="icon"]') as HTMLLinkElement;
     if (!faviconLink) {
-      faviconLink = iframeDoc.createElement('link');
+      faviconLink = iframeDoc.createElement('link') as HTMLLinkElement;
       faviconLink.rel = 'icon';
       iframeDoc.head.appendChild(faviconLink);
     }
     faviconLink.href = data.favicon_url || '/favicon.ico';
 
     // Update manifest
-    let manifestLink = iframeDoc.querySelector('link[rel="manifest"]');
+    let manifestLink = iframeDoc.querySelector('link[rel="manifest"]') as HTMLLinkElement;
     if (!manifestLink) {
-      manifestLink = iframeDoc.createElement('link');
+      manifestLink = iframeDoc.createElement('link') as HTMLLinkElement;
       manifestLink.rel = 'manifest';
       iframeDoc.head.appendChild(manifestLink);
     }
@@ -54,7 +54,7 @@ export function LivePreview({ data, isLoading, error }: LivePreviewProps) {
     };
   }, [data]);
 
-  if (error) return <PreviewError error={error} />;
+  if (error) return <PreviewError error={error.message} />;
   if (isLoading) return <PreviewLoading />;
   if (!data) return null;
 
@@ -78,8 +78,8 @@ export function LivePreview({ data, isLoading, error }: LivePreviewProps) {
             <body>
               <div id="root">
                 <div style="display: flex; flex-direction: column; min-height: 100vh;">
-                  ${PreviewHeader({ data })}
-                  ${PreviewContent({ data })}
+                  <PreviewHeader previewData={data} />
+                  <PreviewContent previewData={data} />
                 </div>
               </div>
             </body>
