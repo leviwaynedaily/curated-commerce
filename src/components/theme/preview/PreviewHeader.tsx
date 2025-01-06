@@ -34,10 +34,12 @@ export function PreviewHeader({
   onShowInstructions,
 }: PreviewHeaderProps) {
   console.log("PreviewHeader - header_opacity:", previewData.header_opacity);
+  console.log("PreviewHeader - header_color:", previewData.header_color);
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
 
   const opacity = previewData.header_opacity ?? 30;
+  const headerColor = previewData.header_color || "#FFFFFF";
 
   return (
     <header 
@@ -49,7 +51,7 @@ export function PreviewHeader({
       <div 
         className="w-full py-2 px-4 md:px-8 backdrop-blur-md transition-all duration-300"
         style={{
-          backgroundColor: `rgb(255 255 255 / ${opacity}%)`
+          backgroundColor: `${headerColor}${Math.round((opacity / 100) * 255).toString(16).padStart(2, '0')}`
         }}
       >
         <MobileHeader 
