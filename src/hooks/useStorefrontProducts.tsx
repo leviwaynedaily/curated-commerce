@@ -11,7 +11,7 @@ interface Product {
   in_town_price?: number;
   shipping_price?: number;
   images?: string[];
-  category?: string;
+  category?: string[];  // Updated to string[] to match database schema
   sort_order?: number;
   status?: string;
   created_at?: string;
