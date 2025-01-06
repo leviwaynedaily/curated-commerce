@@ -38,9 +38,21 @@ export function ProductCard({
     return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
   };
 
-  // Get the first image from the images array, ensuring it's properly parsed
-  const firstImage = Array.isArray(product.images) ? product.images[0] : null;
-  console.log("Product images:", product.images);
+  // Parse the images array from JSONB
+  let parsedImages = [];
+  try {
+    parsedImages = typeof product.images === 'string' 
+      ? JSON.parse(product.images) 
+      : (Array.isArray(product.images) ? product.images : []);
+  } catch (e) {
+    console.error("Error parsing images:", e);
+    parsedImages = [];
+  }
+
+  const firstImage = parsedImages[0];
+  console.log("Product:", product.id);
+  console.log("Raw images data:", product.images);
+  console.log("Parsed images:", parsedImages);
   console.log("First image:", firstImage);
 
   return (
