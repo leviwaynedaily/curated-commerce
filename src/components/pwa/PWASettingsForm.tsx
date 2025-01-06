@@ -124,6 +124,8 @@ export function PWASettingsForm() {
     setIsSaving(true);
     try {
       const values = form.getValues();
+      console.log("Saving PWA settings draft with values:", { ...values, storefront_id: currentStorefrontId });
+      
       const { error } = await supabase
         .from("pwa_settings")
         .upsert({
@@ -131,6 +133,8 @@ export function PWASettingsForm() {
           name: values.name || "",
           short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
+        }, {
+          onConflict: 'storefront_id'
         });
 
       if (error) throw error;
@@ -163,6 +167,8 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
+      console.log("Saving PWA settings with values:", { ...values, storefront_id: currentStorefrontId });
+      
       const { error } = await supabase
         .from("pwa_settings")
         .upsert({
@@ -170,6 +176,8 @@ export function PWASettingsForm() {
           name: values.name || "",
           short_name: values.short_name || "",
           storefront_id: currentStorefrontId,
+        }, {
+          onConflict: 'storefront_id'
         });
 
       if (error) throw error;
