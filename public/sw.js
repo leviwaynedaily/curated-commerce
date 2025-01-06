@@ -39,6 +39,11 @@ self.addEventListener('activate', (event) => {
 
 // Fetch event
 self.addEventListener('fetch', (event) => {
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   console.log('Service Worker: Fetching');
   event.respondWith(
     fetch(event.request)

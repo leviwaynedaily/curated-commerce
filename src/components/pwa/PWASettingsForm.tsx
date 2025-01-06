@@ -224,7 +224,8 @@ export function PWASettingsForm() {
       }
 
       console.log("PWA settings saved, generating manifest...");
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`, {
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const response = await fetch(`${supabaseUrl}/functions/v1/get-manifest?storefrontId=${currentStorefrontId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -257,7 +258,7 @@ export function PWASettingsForm() {
     }
   };
 
-  if (isPwaLoading || isStorefrontLoading) {
+  if (isPwaLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="h-8 w-8 animate-spin" />
