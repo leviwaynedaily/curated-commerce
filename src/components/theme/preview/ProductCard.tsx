@@ -38,6 +38,11 @@ export function ProductCard({
     return ['mp4', 'webm', 'ogg', 'mov'].includes(extension || '');
   };
 
+  // Get the first image from the images array, ensuring it's properly parsed
+  const firstImage = Array.isArray(product.images) ? product.images[0] : null;
+  console.log("Product images:", product.images);
+  console.log("First image:", firstImage);
+
   return (
     <div 
       className="group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.4)] transform hover:scale-[1.02] rounded-lg w-full h-[320px]"
@@ -45,10 +50,10 @@ export function ProductCard({
       style={{ backgroundColor: productCardBackgroundColor }}
     >
       <div className="relative w-full h-3/5">
-        {product.images?.[0] && (
-          isVideo(product.images[0]) ? (
+        {firstImage && (
+          isVideo(firstImage) ? (
             <video
-              src={product.images[0]}
+              src={firstImage}
               className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
               muted
               playsInline
@@ -58,14 +63,14 @@ export function ProductCard({
             />
           ) : (
             <img
-              src={product.images[0]}
+              src={firstImage}
               alt={product.name}
               className="absolute inset-0 w-full h-full object-cover rounded-t-lg"
             />
           )
         )}
         
-        {product.category && (
+        {product.category && product.category.length > 0 && (
           <div className="absolute top-3 left-3 z-10">
             <Badge 
               variant="outline"
@@ -76,7 +81,7 @@ export function ProductCard({
                 borderColor: 'transparent'
               }}
             >
-              {product.category}
+              {Array.isArray(product.category) ? product.category[0] : product.category}
             </Badge>
           </div>
         )}
