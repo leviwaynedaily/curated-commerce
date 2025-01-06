@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-const ITEMS_PER_PAGE = 25;
+export const ITEMS_PER_PAGE = 25;
 
 interface Product {
   id: string;
