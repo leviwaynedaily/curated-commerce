@@ -90,6 +90,7 @@ export default function Preview() {
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
           )}
+          <link rel="manifest" href={`/manifest.json?slug=${slug}`} />
         </Helmet>
       )}
       <div className="w-full h-screen overflow-hidden">

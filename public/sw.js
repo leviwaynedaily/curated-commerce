@@ -44,6 +44,29 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Special handling for manifest.json requests
+  if (event.request.url.includes('manifest.json')) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => response)
+        .catch(() => {
+          console.error('Failed to fetch manifest');
+          return new Response(JSON.stringify({
+            name: 'Storefront',
+            short_name: 'Store',
+            start_url: '/',
+            display: 'standalone',
+            background_color: '#ffffff',
+            theme_color: '#000000',
+            icons: []
+          }), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+        })
+    );
+    return;
+  }
+
   console.log('Service Worker: Fetching');
   event.respondWith(
     fetch(event.request)

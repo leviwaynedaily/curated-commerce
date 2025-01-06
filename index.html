@@ -6,9 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lovable</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#000000" />
     <script>
+      // Get storefront slug from URL
+      const path = window.location.pathname;
+      const slug = path.split('/')[1]; // Get first part of path after /
+      
+      if (slug) {
+        // Set manifest link dynamically
+        const manifestLink = document.createElement('link');
+        manifestLink.rel = 'manifest';
+        manifestLink.href = `/manifest.json?slug=${slug}`;
+        document.head.appendChild(manifestLink);
+      }
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
