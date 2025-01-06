@@ -9,6 +9,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface HeaderDropdownProps {
   categories: string[];
@@ -36,69 +42,77 @@ export function HeaderDropdown({
   mainColor,
 }: HeaderDropdownProps) {
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="bg-white/80 hover:bg-white/90 h-9 w-9"
+    <TooltipProvider>
+      <DropdownMenu modal={false}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="bg-white/80 hover:bg-white/90 h-9 w-9"
+              >
+                <Settings2 className="h-4 w-4" style={{ color: mainColor }} />
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>View Options</p>
+          </TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent 
+          className="w-56 bg-white/95 backdrop-blur-sm" 
+          onCloseAutoFocus={(e) => e.preventDefault()}
+          onInteractOutside={(e) => {
+            const target = e.target as Node;
+            const currentTarget = e.currentTarget as HTMLElement;
+            if (!currentTarget.contains(target)) {
+              currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
+            }
+          }}
         >
-          <Settings2 className="h-4 w-4" style={{ color: mainColor }} />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="w-56 bg-white/95 backdrop-blur-sm" 
-        onCloseAutoFocus={(e) => e.preventDefault()}
-        onInteractOutside={(e) => {
-          const target = e.target as Node;
-          const currentTarget = e.currentTarget as HTMLElement;
-          // Only close when clicking outside, not when selecting options
-          if (!currentTarget.contains(target)) {
-            currentTarget.dispatchEvent(new Event('close', { bubbles: true }));
-          }
-        }}
-      >
-        {categories.length > 0 && (
-          <>
-            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
-            <DropdownMenuRadioGroup value={selectedCategory || "all"} onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}>
-              <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
-              {categories.map((category) => (
-                <DropdownMenuRadioItem key={category} value={category}>
-                  {category}
-                </DropdownMenuRadioItem>
-              ))}
-            </DropdownMenuRadioGroup>
-            <DropdownMenuSeparator />
-          </>
-        )}
+          {categories.length > 0 && (
+            <>
+              <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
+              <DropdownMenuRadioGroup value={selectedCategory || "all"} onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}>
+                <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
+                {categories.map((category) => (
+                  <DropdownMenuRadioItem key={category} value={category}>
+                    {category}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+              <DropdownMenuSeparator />
+            </>
+          )}
 
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={currentSort} onValueChange={(value) => onSortChange?.(value)}>
-          <DropdownMenuRadioItem value="newest">Newest First</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="price-asc">Price: Low to High</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="price-desc">Price: High to Low</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
+          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={currentSort} onValueChange={(value) => onSortChange?.(value)}>
+            <DropdownMenuRadioItem value="newest">Newest First</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="price-asc">Price: Low to High</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="price-desc">Price: High to Low</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
 
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">View</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={layout} onValueChange={onLayoutChange}>
-          <DropdownMenuRadioItem value="list">List View</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="small">Small Grid</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="medium">Medium Grid</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="large">Large Grid</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">View</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={layout} onValueChange={onLayoutChange}>
+            <DropdownMenuRadioItem value="list">List View</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="small">Small Grid</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="medium">Medium Grid</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="large">Large Grid</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
 
-        <DropdownMenuSeparator />
-        
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Text Placement</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={textPlacement} onValueChange={onTextPlacementChange}>
-          <DropdownMenuRadioItem value="overlay">Text Overlay</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="below">Text Below</DropdownMenuRadioItem>
-        </DropdownMenuRadioGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Text Placement</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={textPlacement} onValueChange={onTextPlacementChange}>
+            <DropdownMenuRadioItem value="overlay">Text Overlay</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="below">Text Below</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </TooltipProvider>
   );
 }
