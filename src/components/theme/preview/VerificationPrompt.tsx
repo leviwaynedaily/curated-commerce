@@ -24,7 +24,8 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
     text: previewData.verification_text_color || '#1A1F2C',
     checkbox: previewData.verification_checkbox_color || '#D946EF',
     inputBorder: previewData.verification_input_border_color || '#E5E7EB',
-    nextText: previewData.verification_next_text_color || '#4CAF50'
+    nextText: previewData.verification_next_text_color || '#4CAF50',
+    background: previewData.storefront_background_color || '#FFFFFF'
   }
 
   console.log("Verification colors being used:", colors);
@@ -56,9 +57,10 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
 
   return (
     <div 
-      className="fixed inset-0 z-50 bg-black/20 backdrop-blur-md"
+      className="fixed inset-0 z-50 backdrop-blur-md"
       style={{
         WebkitBackdropFilter: 'blur(8px)',
+        backgroundColor: `${colors.background}CC` // CC adds 80% opacity
       }}
     >
       <div className="absolute inset-0 flex items-center justify-center">
