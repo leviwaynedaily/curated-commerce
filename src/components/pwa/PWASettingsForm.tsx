@@ -1,6 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
 import { Form } from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
 import { useQuery } from "@tanstack/react-query";
@@ -13,29 +12,7 @@ import { Loader2, AlertCircle } from "lucide-react";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-
-const pwaFormSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  short_name: z.string().min(2, "Short name must be at least 2 characters"),
-  description: z.string().optional(),
-  start_url: z.string().default("/"),
-  display: z.enum(["standalone", "fullscreen", "minimal-ui", "browser"]).default("standalone"),
-  orientation: z.enum(["portrait", "landscape", "any"]).default("any"),
-  theme_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
-  background_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Must be a valid hex color"),
-  icon_72x72: z.string().optional(),
-  icon_96x96: z.string().optional(),
-  icon_128x128: z.string().optional(),
-  icon_144x144: z.string().optional(),
-  icon_152x152: z.string().optional(),
-  icon_192x192: z.string().min(1, "A 192x192 icon is required for PWA"),
-  icon_384x384: z.string().optional(),
-  icon_512x512: z.string().optional(),
-  screenshot_mobile: z.string().optional(),
-  screenshot_desktop: z.string().optional(),
-});
-
-type PWAFormValues = z.infer<typeof pwaFormSchema>;
+import { PWAFormValues, pwaFormSchema } from "./types";
 
 export function PWASettingsForm() {
   const { toast } = useToast();
@@ -43,7 +20,6 @@ export function PWASettingsForm() {
   const [manifestJson, setManifestJson] = useState<string | null>(null);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  // Fetch both PWA settings and storefront data
   const { data: pwaSettings, isLoading: isPwaLoading } = useQuery({
     queryKey: ["pwa-settings", currentStorefrontId],
     queryFn: async () => {
@@ -74,7 +50,7 @@ export function PWASettingsForm() {
         .from("storefronts")
         .select("*")
         .eq("id", currentStorefrontId)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching storefront:", error);
@@ -131,6 +107,8 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .upsert({
           ...values,
+          name: values.name || "", // Ensure name is never undefined
+          short_name: values.short_name || "", // Ensure short_name is never undefined
           storefront_id: currentStorefrontId,
         });
 
@@ -168,6 +146,8 @@ export function PWASettingsForm() {
         .from("pwa_settings")
         .upsert({
           ...values,
+          name: values.name || "", // Ensure name is never undefined
+          short_name: values.short_name || "", // Ensure short_name is never undefined
           storefront_id: currentStorefrontId,
         });
 
