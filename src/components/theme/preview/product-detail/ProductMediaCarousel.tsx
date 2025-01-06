@@ -101,45 +101,6 @@ export function ProductMediaCarousel({ images, productName, onDownload, previewD
           </>
         )}
       </div>
-      <div className="grid grid-cols-4 gap-2">
-        {images.map((media, index) => (
-          <div
-            key={index}
-            className="aspect-square relative rounded-lg overflow-hidden group cursor-pointer"
-            onClick={() => emblaApi?.scrollTo(index)}
-          >
-            {isVideo(media) ? (
-              <video
-                src={media}
-                className="absolute inset-0 w-full h-full object-cover"
-                muted
-                playsInline
-              />
-            ) : (
-              <img
-                src={media}
-                alt={`${productName} ${index + 1}`}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            )}
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDownload(media);
-              }}
-              style={{ backgroundColor: previewData.product_category_background_color }}
-            >
-              <Download 
-                className="h-4 w-4"
-                style={{ color: previewData.product_category_text_color }}
-              />
-            </Button>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
