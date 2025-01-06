@@ -1,5 +1,5 @@
 import { Search, HelpCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HeaderDropdown } from "./HeaderDropdown";
@@ -40,6 +40,13 @@ export function DesktopHeader({
 }: DesktopHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
+  // Show search box if there's a query
+  useEffect(() => {
+    if (searchQuery) {
+      setShowSearch(true);
+    }
+  }, [searchQuery]);
+
   return (
     <div className="hidden md:flex items-center w-full relative h-20">
       {/* Left side - Help Icon */}
@@ -72,7 +79,7 @@ export function DesktopHeader({
       <div className="absolute right-0 flex items-center gap-2">
         {/* Search Icon/Input */}
         <div className="relative">
-          {showSearch ? (
+          {showSearch || searchQuery ? (
             <div className="absolute right-0 top-0 w-[200px] animate-slideDown">
               <Input
                 type="search"
