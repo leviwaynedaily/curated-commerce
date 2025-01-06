@@ -33,15 +33,29 @@ export function UserButton() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [session, setSession] = useState(null);
 
-  // Listen for auth state changes
+  // Listen for auth state changes with better error handling
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    const initSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) {
+          console.error("Error getting session:", error);
+          navigate('/login');
+          return;
+        }
+        setSession(data.session);
+      } catch (error) {
+        console.error("Session initialization error:", error);
+        navigate('/login');
+      }
+    };
+
+    initSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.id);
       setSession(session);
       if (!session) {
         navigate('/login');
@@ -54,21 +68,38 @@ export function UserButton() {
   const { data: user, refetch } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error("Error fetching user:", error);
+      try {
+        console.log("Fetching user data...");
+        const { data: { user }, error } = await supabase.auth.getUser();
+        if (error) {
+          console.error("Error fetching user:", error);
+          throw error;
+        }
+        console.log("User data fetched:", user?.id);
+        return user;
+      } catch (error) {
+        console.error("User query error:", error);
         throw error;
       }
-      return user;
     },
     enabled: !!session,
     retry: 1,
+    onError: (error) => {
+      console.error("User query failed:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load user data. Please try logging in again.",
+        variant: "destructive",
+      });
+      handleLogout();
+    },
   });
 
   const { data: business } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
       if (!user?.id) return null;
+      console.log("Fetching business data for user:", user.id);
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
@@ -76,6 +107,7 @@ export function UserButton() {
         .single();
 
       if (error) throw error;
+      console.log("Business data fetched:", data?.id);
       return data;
     },
     enabled: !!user?.id,
@@ -85,6 +117,7 @@ export function UserButton() {
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
       if (!business?.id) return [];
+      console.log("Fetching storefronts for business:", business.id);
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
@@ -92,14 +125,25 @@ export function UserButton() {
         .order("name");
 
       if (error) throw error;
+      console.log("Storefronts fetched:", data?.length);
       return data;
     },
     enabled: !!business?.id,
   });
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
+    try {
+      console.log("Logging out...");
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -165,6 +209,7 @@ export function UserButton() {
   };
 
   if (!session) {
+    console.log("No session, returning null");
     return null;
   }
 
