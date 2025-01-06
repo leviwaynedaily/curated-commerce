@@ -116,19 +116,19 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
               <Button
                 key={route.href}
                 variant={route.active ? "secondary" : "ghost"}
-                className="w-full justify-start text-left"
+                className="w-full justify-start"
                 onClick={route.onClick}
                 asChild={!route.onClick}
               >
                 {route.onClick ? (
                   <div className="flex w-full items-center">
                     <route.icon className="mr-2 h-4 w-4 shrink-0" />
-                    <span className="flex-1 truncate text-left">{route.label}</span>
+                    <span className="truncate">{route.label}</span>
                   </div>
                 ) : (
                   <Link to={route.href} className="flex w-full items-center">
                     <route.icon className="mr-2 h-4 w-4 shrink-0" />
-                    <span className="flex-1 truncate text-left">{route.label}</span>
+                    <span className="truncate">{route.label}</span>
                   </Link>
                 )}
               </Button>
