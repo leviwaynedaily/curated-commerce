@@ -103,31 +103,37 @@ export function PWASettingsForm() {
   // Update form when data is loaded
   useEffect(() => {
     if (!isPwaLoading && !isStorefrontLoading) {
-      console.log("Updating form with data:", { pwaSettings, storefront });
+      console.log("Checking if form should be populated:", { pwaSettings, storefront });
       
-      const newValues = {
-        name: pwaSettings?.name || storefront?.name || "",
-        short_name: pwaSettings?.short_name || (storefront?.name ? getDefaultShortName(storefront.name) : ""),
-        description: pwaSettings?.description || storefront?.description || "",
-        start_url: pwaSettings?.start_url || "/",
-        display: pwaSettings?.display || "standalone",
-        orientation: pwaSettings?.orientation || "any",
-        theme_color: pwaSettings?.theme_color || storefront?.main_color || "#000000",
-        background_color: pwaSettings?.background_color || storefront?.storefront_background_color || "#ffffff",
-        icon_72x72: pwaSettings?.icon_72x72 || "",
-        icon_96x96: pwaSettings?.icon_96x96 || "",
-        icon_128x128: pwaSettings?.icon_128x128 || "",
-        icon_144x144: pwaSettings?.icon_144x144 || "",
-        icon_152x152: pwaSettings?.icon_152x152 || "",
-        icon_192x192: pwaSettings?.icon_192x192 || "",
-        icon_384x384: pwaSettings?.icon_384x384 || "",
-        icon_512x512: pwaSettings?.icon_512x512 || "",
-        screenshot_mobile: pwaSettings?.screenshot_mobile || "",
-        screenshot_desktop: pwaSettings?.screenshot_desktop || "",
-      };
-
-      console.log("Setting form values to:", newValues);
-      form.reset(newValues);
+      // Only populate with storefront defaults if no PWA settings exist
+      if (!pwaSettings && storefront) {
+        console.log("No PWA settings found, using storefront defaults");
+        const defaultValues = {
+          name: storefront.name || "",
+          short_name: storefront.name ? getDefaultShortName(storefront.name) : "",
+          description: storefront.description || "",
+          start_url: "/",
+          display: "standalone" as const,
+          orientation: "any" as const,
+          theme_color: storefront.main_color || "#000000",
+          background_color: storefront.storefront_background_color || "#ffffff",
+          icon_72x72: "",
+          icon_96x96: "",
+          icon_128x128: "",
+          icon_144x144: "",
+          icon_152x152: "",
+          icon_192x192: "",
+          icon_384x384: "",
+          icon_512x512: "",
+          screenshot_mobile: "",
+          screenshot_desktop: "",
+        };
+        console.log("Setting form default values:", defaultValues);
+        form.reset(defaultValues);
+      } else if (pwaSettings) {
+        console.log("Using existing PWA settings");
+        form.reset(pwaSettings);
+      }
     }
   }, [pwaSettings, storefront, isPwaLoading, isStorefrontLoading, form]);
 
