@@ -21,8 +21,7 @@ interface Product {
 
 interface PageData {
   products: Product[];
-  totalCount: number;
-  currentPage: number;
+  nextPage: number | undefined;
 }
 
 export function useStorefrontProducts(storefrontId: string) {
@@ -31,9 +30,9 @@ export function useStorefrontProducts(storefrontId: string) {
   return useInfiniteQuery<PageData>({
     queryKey: ["preview-products", storefrontId],
     initialPageParam: 0,
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam = 0 }) => {
       console.log("Fetching products page:", pageParam);
-      const start = (pageParam as number) * ITEMS_PER_PAGE;
+      const start = pageParam * ITEMS_PER_PAGE;
       const end = start + ITEMS_PER_PAGE - 1;
 
       const { data: products, error, count } = await supabase
@@ -50,16 +49,14 @@ export function useStorefrontProducts(storefrontId: string) {
       }
 
       console.log(`Fetched ${products?.length} products, total count:`, count);
+      
+      const hasNextPage = products && products.length === ITEMS_PER_PAGE;
       return {
         products: products as Product[] || [],
-        totalCount: count || 0,
-        currentPage: pageParam as number,
+        nextPage: hasNextPage ? pageParam + 1 : undefined,
       };
     },
-    getNextPageParam: (lastPage, allPages) => {
-      const hasNextPage = lastPage.products.length === ITEMS_PER_PAGE;
-      return hasNextPage ? lastPage.currentPage + 1 : undefined;
-    },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
     enabled: !!storefrontId,
   });
 }

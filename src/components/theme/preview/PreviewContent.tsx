@@ -1,9 +1,6 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ProductGrid } from "./ProductGrid";
-import { ProductDetailView } from "./ProductDetailView";
-import { PreviewLegalFooter } from "./PreviewLegalFooter";
 import { PreviewData } from "@/types/preview";
-import { InstructionsModal } from "./modals/InstructionsModal";
 import { useSearchState } from "./hooks/useSearchState";
 import { useStorefrontProducts } from "@/hooks/useStorefrontProducts";
 
@@ -14,13 +11,10 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
-  const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("small");
   const [textPlacement, setTextPlacement] = useState("below");
   const [currentSort, setCurrentSort] = useState("newest");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const modalRef = useRef<HTMLDivElement>(null);
   
   const { searchQuery, handleSearchChange } = useSearchState();
 
@@ -63,7 +57,6 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             products={filteredProducts}
             layout={layout}
             textPlacement={textPlacement}
-            onProductClick={setSelectedProduct}
             mainColor={previewData.main_color || "#000000"}
             fontColor={previewData.font_color || "#FFFFFF"}
             productCardBackgroundColor={previewData.product_card_background_color || "#FFFFFF"}
@@ -80,16 +73,6 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
           />
         )}
       </main>
-
-      <PreviewLegalFooter />
-
-      {showInstructions && previewData.enable_instructions && (
-        <InstructionsModal
-          previewData={previewData}
-          onClose={() => setShowInstructions(false)}
-          modalRef={modalRef}
-        />
-      )}
     </div>
   );
 }
