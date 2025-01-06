@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Loader2 } from "lucide-react"
 import { useInView } from "react-intersection-observer"
@@ -42,6 +42,8 @@ export function ProductGrid({
   fetchNextPage,
   isDesktop = false
 }: ProductGridProps) {
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 }); // Default to first 12 items
+  
   const { ref: infiniteScrollRef, inView } = useInView({
     threshold: 0.5,
     skip: !hasNextPage || isFetchingNextPage || isDesktop,
@@ -67,29 +69,55 @@ export function ProductGrid({
     }
   }
 
+  // Create refs for each product card to track visibility
+  const productRefs = products.map(() => ({
+    ref: useInView({
+      threshold: 0.5,
+      triggerOnce: false,
+    }),
+  }));
+
+  // Update visible range whenever product visibility changes
+  useEffect(() => {
+    const visibleIndices = productRefs
+      .map((ref, index) => ({ isVisible: ref.ref.inView, index }))
+      .filter(item => item.isVisible)
+      .map(item => item.index);
+
+    if (visibleIndices.length > 0) {
+      setVisibleRange({
+        start: Math.min(...visibleIndices),
+        end: Math.max(...visibleIndices),
+      });
+    }
+  }, [productRefs.map(ref => ref.ref.inView)]);
+
   return (
     <div className="space-y-8">
       <ProductCount 
         currentCount={products.length}
         totalCount={products.length + (hasNextPage ? 25 : 0)}
         isFetchingNextPage={isFetchingNextPage || false}
+        startIndex={visibleRange.start}
+        endIndex={visibleRange.end}
       />
 
       <div className={`grid ${getGridStyles()} auto-rows-auto`}>
-        {products?.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            layout={layout}
-            productCardBackgroundColor={productCardBackgroundColor}
-            productTitleTextColor={productTitleTextColor}
-            productDescriptionTextColor={productDescriptionTextColor}
-            productPriceColor={productPriceColor}
-            productPriceButtonColor={productPriceButtonColor}
-            productCategoryBackgroundColor={productCategoryBackgroundColor}
-            productCategoryTextColor={productCategoryTextColor}
-            onProductClick={onProductClick}
-          />
+        {products?.map((product, index) => (
+          <div key={product.id} ref={productRefs[index].ref.ref}>
+            <ProductCard
+              product={product}
+              layout={layout}
+              productCardBackgroundColor={productCardBackgroundColor}
+              productTitleTextColor={productTitleTextColor}
+              productDescriptionTextColor={productDescriptionTextColor}
+              productPriceColor={productPriceColor}
+              productPriceButtonColor={productPriceButtonColor}
+              productCategoryBackgroundColor={productCategoryBackgroundColor}
+              productCategoryTextColor={productCategoryTextColor}
+              onProductClick={onProductClick}
+            />
+          </div>
         ))}
       </div>
 
