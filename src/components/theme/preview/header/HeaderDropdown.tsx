@@ -74,7 +74,19 @@ export function HeaderDropdown({
           {categories.length > 0 && (
             <>
               <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Category</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={selectedCategory || "all"} onValueChange={(value) => onCategoryChange?.(value === "all" ? null : value)}>
+              <DropdownMenuRadioGroup 
+                value={selectedCategory || "all"} 
+                onValueChange={(value) => {
+                  onCategoryChange?.(value === "all" ? null : value);
+                  // Prevent closing on selection
+                  setTimeout(() => {
+                    const trigger = document.querySelector('[role="menuitem"][data-state="on"]');
+                    if (trigger) {
+                      (trigger as HTMLElement).focus();
+                    }
+                  }, 0);
+                }}
+              >
                 <DropdownMenuRadioItem value="all">All Categories</DropdownMenuRadioItem>
                 {categories.map((category) => (
                   <DropdownMenuRadioItem key={category} value={category}>
@@ -87,7 +99,19 @@ export function HeaderDropdown({
           )}
 
           <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={currentSort} onValueChange={(value) => onSortChange?.(value)}>
+          <DropdownMenuRadioGroup 
+            value={currentSort} 
+            onValueChange={(value) => {
+              onSortChange?.(value);
+              // Prevent closing on selection
+              setTimeout(() => {
+                const trigger = document.querySelector('[role="menuitem"][data-state="on"]');
+                if (trigger) {
+                  (trigger as HTMLElement).focus();
+                }
+              }, 0);
+            }}
+          >
             <DropdownMenuRadioItem value="newest">Newest First</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="oldest">Oldest First</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="price-asc">Price: Low to High</DropdownMenuRadioItem>
@@ -97,7 +121,19 @@ export function HeaderDropdown({
           <DropdownMenuSeparator />
           
           <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">View</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={layout} onValueChange={onLayoutChange}>
+          <DropdownMenuRadioGroup 
+            value={layout} 
+            onValueChange={(value) => {
+              onLayoutChange?.(value);
+              // Prevent closing on selection
+              setTimeout(() => {
+                const trigger = document.querySelector('[role="menuitem"][data-state="on"]');
+                if (trigger) {
+                  (trigger as HTMLElement).focus();
+                }
+              }, 0);
+            }}
+          >
             <DropdownMenuRadioItem value="list">List View</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="small">Small Grid</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="medium">Medium Grid</DropdownMenuRadioItem>
@@ -107,7 +143,19 @@ export function HeaderDropdown({
           <DropdownMenuSeparator />
           
           <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Text Placement</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={textPlacement} onValueChange={onTextPlacementChange}>
+          <DropdownMenuRadioGroup 
+            value={textPlacement} 
+            onValueChange={(value) => {
+              onTextPlacementChange?.(value);
+              // Prevent closing on selection
+              setTimeout(() => {
+                const trigger = document.querySelector('[role="menuitem"][data-state="on"]');
+                if (trigger) {
+                  (trigger as HTMLElement).focus();
+                }
+              }, 0);
+            }}
+          >
             <DropdownMenuRadioItem value="overlay">Text Overlay</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="below">Text Below</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
