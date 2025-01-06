@@ -9,18 +9,19 @@ interface HeaderSettingsProps {
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
   const headerSettings = [
-    { field: "header_color", label: "Header Color", defaultValue: "#FFFFFF" },
-  ].map(({ field, label, defaultValue }) => ({
-    color: form.watch(field) || defaultValue,
-    label,
-    field,
-  }));
+    { 
+      field: "header_color", 
+      label: "Header Color", 
+      color: form.watch("header_color")
+    },
+  ];
 
-  console.log("HeaderSettings being rendered:", headerSettings);
+  console.log("HeaderSettings - Current header color:", form.watch("header_color"));
+  console.log("HeaderSettings - Current header opacity:", form.watch("header_opacity"));
 
-  const handleColorChange = (field: string, value: string) => {
-    console.log(`HeaderSettings - Setting ${field} to:`, value);
-    form.setValue(field, value, {
+  const handleColorChange = (color: string, field: string) => {
+    console.log(`HeaderSettings - Setting ${field} to:`, color);
+    form.setValue(field, color, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
@@ -42,7 +43,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                     type="number"
                     min={0}
                     max={100}
-                    value={form.watch("header_opacity") ?? 30}
+                    value={form.watch("header_opacity")}
                     onChange={(e) => {
                       const numValue = Math.min(Math.max(Number(e.target.value) || 0, 0), 100);
                       console.log("HeaderSettings - Setting opacity to:", numValue);
@@ -55,7 +56,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
                     className="w-24"
                   />
                   <span className="text-sm text-muted-foreground">
-                    {form.watch("header_opacity") ?? 30}%
+                    {form.watch("header_opacity")}%
                   </span>
                 </div>
               </FormControl>
@@ -82,7 +83,7 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
               id={field}
               type="color"
               value={color}
-              onChange={(e) => handleColorChange(field, e.target.value)}
+              onChange={(e) => handleColorChange(e.target.value, field)}
               className="sr-only"
             />
           ))}
