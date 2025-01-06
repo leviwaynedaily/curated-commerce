@@ -85,9 +85,8 @@ export function PreviewContent({
     return (
       <ProductDetailView
         product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
-        mainColor={previewData.main_color}
-        fontColor={previewData.font_color}
+        onBack={() => setSelectedProduct(null)}
+        previewData={previewData}
       />
     );
   }

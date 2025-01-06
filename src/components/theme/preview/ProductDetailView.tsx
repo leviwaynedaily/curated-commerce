@@ -33,7 +33,7 @@ export function ProductDetailView({ product, onBack, previewData }: ProductDetai
   return (
     <div 
       className="min-h-screen"
-      style={{ backgroundColor: previewData.storefront_background_color }}
+      style={{ backgroundColor: previewData?.storefront_background_color || '#F1F0FB' }}
     >
       <div className="container mx-auto px-4 py-8">
         <Button
