@@ -40,7 +40,7 @@ export function PreviewHeader({
 }: PreviewHeaderProps) {
   return (
     <header 
-      className={`sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300 bg-white/50 backdrop-blur-sm`}
+      className={`sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300 bg-transparent backdrop-blur-sm`}
     >
       <div className="w-full py-2 px-4 md:px-8">
         <MobileHeader 
