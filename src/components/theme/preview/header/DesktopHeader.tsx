@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, CircleHelp } from "lucide-react";
 import { HeaderDropdown } from "./HeaderDropdown";
+import { FilterDropdown } from "./FilterDropdown";
 import { useState } from "react";
 
 interface DesktopHeaderProps {
@@ -87,10 +88,14 @@ export function DesktopHeader({
           )}
         </div>
 
-        <HeaderDropdown
+        <FilterDropdown
           categories={categories}
           selectedCategory={selectedCategory}
           onCategoryChange={onCategoryChange}
+          mainColor={previewData.main_color}
+        />
+
+        <HeaderDropdown
           currentSort={currentSort}
           onSortChange={onSortChange}
           mainColor={previewData.main_color}
