@@ -41,19 +41,19 @@ export function PreviewContent({
     hasNextPage,
     isFetchingNextPage,
     isLoading 
-  } = useStorefrontProducts(previewData.id || '');
+  } = useStorefrontProducts({
+    storefrontId: previewData.id || '',
+    selectedCategory
+  });
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
   
   console.log("PreviewContent - currentSort:", currentSort);
   console.log("PreviewContent - searchQuery:", searchQuery);
   
-  // Apply filters and sorting
+  // Apply remaining filters (search and sorting)
   const filteredAndSortedProducts = allProducts.filter(product => {
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    if (selectedCategory && (!product.category || !product.category.includes(selectedCategory))) {
       return false;
     }
     return true;
@@ -108,7 +108,7 @@ export function PreviewContent({
         onSortChange={setCurrentSort}
         selectedCategory={selectedCategory}
         onCategoryChange={setSelectedCategory}
-        categories={categories}
+        categories={[...new Set(allProducts.flatMap(product => product.category || []))].filter(Boolean) as string[]}
         onLogoClick={onLogoClick}
         onShowInstructions={onShowInstructions}
       />
@@ -150,7 +150,7 @@ export function PreviewContent({
             fetchNextPage={fetchNextPage}
             isDesktop={!window.matchMedia('(max-width: 768px)').matches}
             currentCount={filteredAndSortedProducts.length}
-            totalCount={totalCount}
+            totalCount={data?.pages[0]?.products.length || 0}
           />
         )}
       </main>

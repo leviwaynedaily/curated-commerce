@@ -11,7 +11,7 @@ interface Product {
   in_town_price?: number;
   shipping_price?: number;
   images?: string[];
-  category?: string[];  // Updated to string[] to match database schema
+  category?: string[];
   sort_order?: number;
   status?: string;
   created_at?: string;
@@ -24,15 +24,22 @@ interface PageData {
   nextPage: number | undefined;
 }
 
-export function useStorefrontProducts(storefrontId: string) {
+interface UseStorefrontProductsProps {
+  storefrontId: string;
+  selectedCategory?: string | null;
+}
+
+export function useStorefrontProducts({ storefrontId, selectedCategory }: UseStorefrontProductsProps) {
   console.log("Initializing useStorefrontProducts with ID:", storefrontId);
+  console.log("Selected category:", selectedCategory);
 
   return useInfiniteQuery<PageData>({
-    queryKey: ["preview-products", storefrontId],
+    queryKey: ["preview-products", storefrontId, selectedCategory],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
       try {
         console.log("Fetching products page:", pageParam);
+        console.log("With category filter:", selectedCategory);
         
         // First check if we have an authenticated session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -48,13 +55,22 @@ export function useStorefrontProducts(storefrontId: string) {
         const start = Number(pageParam) * ITEMS_PER_PAGE;
         const end = start + ITEMS_PER_PAGE - 1;
 
-        const { data: products, error, count } = await supabase
+        let query = supabase
           .from("products")
           .select("*", { count: "exact" })
           .eq("storefront_id", storefrontId)
           .eq("status", "active")
-          .order("sort_order", { ascending: true })
-          .range(start, end);
+          .order("sort_order", { ascending: true });
+
+        // Add category filter if selected
+        if (selectedCategory) {
+          query = query.contains('category', [selectedCategory]);
+        }
+
+        // Add range for pagination
+        query = query.range(start, end);
+
+        const { data: products, error, count } = await query;
 
         if (error) {
           console.error("Error fetching products:", error);
