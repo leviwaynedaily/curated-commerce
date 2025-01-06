@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { HeaderDropdown } from "./HeaderDropdown";
 import { PreviewData } from "@/types/preview";
+import { ProductCount } from "../ProductCount";
 import {
   Tooltip,
   TooltipContent,
@@ -26,6 +27,11 @@ interface DesktopHeaderProps {
   onTextPlacementChange?: (placement: string) => void;
   onLogoClick?: () => void;
   onShowInstructions?: () => void;
+  totalCount?: number;
+  currentCount?: number;
+  isFetchingNextPage?: boolean;
+  startIndex?: number;
+  endIndex?: number;
 }
 
 export function DesktopHeader({
@@ -43,6 +49,11 @@ export function DesktopHeader({
   onTextPlacementChange,
   onLogoClick,
   onShowInstructions,
+  totalCount = 0,
+  currentCount = 0,
+  isFetchingNextPage = false,
+  startIndex = 0,
+  endIndex = 0,
 }: DesktopHeaderProps) {
   const [showSearch, setShowSearch] = useState(false);
 
@@ -55,29 +66,8 @@ export function DesktopHeader({
   return (
     <TooltipProvider>
       <div className="hidden md:flex items-center w-full relative h-16">
-        {/* Left side - Help Icon */}
-        <div className="absolute left-0">
-          {previewData.enable_instructions && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onShowInstructions}
-                  className="bg-white/80 hover:bg-white/90"
-                >
-                  <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>View Instructions</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
-        </div>
-        
-        {/* Centered Logo */}
-        <div className="flex-1 flex justify-center w-full">
+        {/* Left side - Logo */}
+        <div className="flex items-center">
           {previewData.logo_url && (
             <img 
               src={previewData.logo_url} 
@@ -89,7 +79,7 @@ export function DesktopHeader({
         </div>
 
         {/* Right Controls */}
-        <div className="absolute right-0 flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-2">
           {/* Search Icon/Input */}
           <div className="relative">
             {showSearch || searchQuery ? (
@@ -141,6 +131,36 @@ export function DesktopHeader({
             onTextPlacementChange={onTextPlacementChange}
             mainColor={previewData.main_color}
           />
+
+          {/* Help Icon */}
+          {previewData.enable_instructions && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={onShowInstructions}
+                  className="bg-white/80 hover:bg-white/90"
+                >
+                  <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>View Instructions</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {/* Product Count */}
+          <div className="ml-2">
+            <ProductCount
+              currentCount={currentCount}
+              totalCount={totalCount}
+              isFetchingNextPage={isFetchingNextPage}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
+          </div>
         </div>
       </div>
     </TooltipProvider>
