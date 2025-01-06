@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, KeyboardEvent } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -43,13 +43,22 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
     onVerify(password)
   }
 
+  const handleKeyPress = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      handleVerification()
+    }
+  }
+
   // Don't render until we have the necessary data
   if (!previewData || !previewData.verification_type) {
     return null;
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm"
+      onKeyDown={handleKeyPress}
+    >
       <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
         {previewData.verification_logo_url && (
           <img 
@@ -106,6 +115,12 @@ export function VerificationPrompt({ previewData, onVerify }: VerificationPrompt
                 onChange={(e) => {
                   setPassword(e.target.value)
                   setError(null)
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleVerification()
+                  }
                 }}
                 className="w-full"
                 style={{ 

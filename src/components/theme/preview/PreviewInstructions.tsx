@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { PreviewData } from "@/types/preview";
+import { KeyboardEvent } from "react";
 
 interface PreviewInstructionsProps {
   previewData: PreviewData;
@@ -7,8 +8,18 @@ interface PreviewInstructionsProps {
 }
 
 export function PreviewInstructions({ previewData, onContinue }: PreviewInstructionsProps) {
+  const handleKeyPress = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      onContinue();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm">
+    <div 
+      className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm"
+      onKeyDown={handleKeyPress}
+      tabIndex={0} // Make the div focusable
+    >
       <div className="h-full w-full flex items-center justify-center p-4">
         <div className="w-[400px] rounded-lg shadow-xl bg-white p-6 space-y-6">
           {previewData.logo_url && (
