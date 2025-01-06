@@ -15,7 +15,6 @@ interface PreviewContentProps {
 }
 
 export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewContentProps) {
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const [layout, setLayout] = useState("small");
   const [textPlacement, setTextPlacement] = useState("below");

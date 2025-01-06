@@ -3,14 +3,33 @@ import { supabase } from "@/integrations/supabase/client";
 
 const ITEMS_PER_PAGE = 25;
 
+interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  in_town_price: number;
+  shipping_price: number;
+  images: string[];
+  category?: string;
+  status: string;
+  sort_order: number;
+}
+
+interface PageData {
+  products: Product[];
+  totalCount: number;
+  currentPage: number;
+}
+
 export function useStorefrontProducts(storefrontId: string) {
   console.log("Setting up infinite products query for storefront:", storefrontId);
   
-  return useInfiniteQuery({
+  return useInfiniteQuery<PageData>({
     queryKey: ["preview-products", storefrontId],
-    queryFn: async ({ pageParam = 0 }) => {
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
       console.log("Fetching products page:", pageParam);
-      const start = pageParam * ITEMS_PER_PAGE;
+      const start = (pageParam as number) * ITEMS_PER_PAGE;
       const end = start + ITEMS_PER_PAGE - 1;
 
       const { data: products, error, count } = await supabase
@@ -30,7 +49,7 @@ export function useStorefrontProducts(storefrontId: string) {
       return {
         products: products || [],
         totalCount: count || 0,
-        currentPage: pageParam,
+        currentPage: pageParam as number,
       };
     },
     getNextPageParam: (lastPage, allPages) => {
