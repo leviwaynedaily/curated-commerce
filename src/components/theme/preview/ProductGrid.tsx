@@ -23,6 +23,8 @@ interface ProductGridProps {
   isFetchingNextPage?: boolean
   fetchNextPage?: () => void
   isDesktop?: boolean
+  currentCount: number
+  totalCount: number
 }
 
 export function ProductGrid({ 
@@ -40,7 +42,9 @@ export function ProductGrid({
   hasNextPage,
   isFetchingNextPage,
   fetchNextPage,
-  isDesktop = false
+  isDesktop = false,
+  currentCount,
+  totalCount
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   
@@ -112,11 +116,11 @@ export function ProductGrid({
   return (
     <div className="relative">
       <ProductCount 
-        currentCount={products.length}
-        totalCount={products.length + (hasNextPage ? 25 : 0)}
+        currentCount={currentCount}
+        totalCount={totalCount}
         isFetchingNextPage={isFetchingNextPage || false}
         startIndex={visibleRange.start}
-        endIndex={visibleRange.end}
+        endIndex={Math.min(visibleRange.end, currentCount - 1)}
       />
 
       <div className={`grid ${gridStyles} auto-rows-auto mt-1`}>

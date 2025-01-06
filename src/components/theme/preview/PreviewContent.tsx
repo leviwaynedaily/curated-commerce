@@ -43,6 +43,11 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
     console.log("Product clicked");
   };
 
+  // Calculate total count based on current page data and whether there are more pages
+  const totalCount = hasNextPage 
+    ? filteredProducts.length + ITEMS_PER_PAGE 
+    : filteredProducts.length;
+
   return (
     <div 
       className="min-h-full flex flex-col"
@@ -77,6 +82,8 @@ export function PreviewContent({ previewData, onReset, onLogoClick }: PreviewCon
             isFetchingNextPage={isFetchingNextPage}
             fetchNextPage={fetchNextPage}
             isDesktop={!window.matchMedia('(max-width: 768px)').matches}
+            currentCount={filteredProducts.length}
+            totalCount={totalCount}
           />
         )}
       </main>
