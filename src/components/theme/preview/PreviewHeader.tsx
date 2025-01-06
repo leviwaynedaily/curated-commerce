@@ -38,8 +38,12 @@ export function PreviewHeader({
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
 
-  const opacity = previewData.header_opacity ?? 30;
+  // Ensure we have valid values, using defaults if not provided
+  const opacity = typeof previewData.header_opacity === 'number' ? previewData.header_opacity : 30;
   const headerColor = previewData.header_color || "#FFFFFF";
+
+  // Convert opacity to hex for background color
+  const opacityHex = Math.round((opacity / 100) * 255).toString(16).padStart(2, '0');
 
   return (
     <header 
@@ -51,7 +55,7 @@ export function PreviewHeader({
       <div 
         className="w-full py-2 px-4 md:px-8 backdrop-blur-md transition-all duration-300"
         style={{
-          backgroundColor: `${headerColor}${Math.round((opacity / 100) * 255).toString(16).padStart(2, '0')}`
+          backgroundColor: `${headerColor}${opacityHex}`
         }}
       >
         <MobileHeader 
