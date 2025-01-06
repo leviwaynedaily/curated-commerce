@@ -94,13 +94,9 @@ export function PWASettingsForm() {
   });
 
   useEffect(() => {
-    if (!isPwaLoading) {
-      if (!pwaSettings) {
-        console.log("No PWA settings found, using defaults");
-      } else {
-        console.log("Using existing PWA settings");
-        form.reset(pwaSettings);
-      }
+    if (!isPwaLoading && pwaSettings) {
+      console.log("Setting form values from PWA settings");
+      form.reset(pwaSettings);
     }
   }, [pwaSettings, isPwaLoading, form]);
 
@@ -131,14 +127,18 @@ export function PWASettingsForm() {
     setIsSaving(true);
     try {
       const values = form.getValues();
-      console.log("Saving PWA settings draft with values:", { ...values, storefront_id: currentStorefrontId });
+      const dataToSave = {
+        ...values,
+        name: values.name || "", // Ensure name is never undefined
+        short_name: values.short_name || "", // Ensure short_name is never undefined
+        storefront_id: currentStorefrontId,
+      };
+      
+      console.log("Saving PWA settings draft with values:", dataToSave);
       
       const { error } = await supabase
         .from("pwa_settings")
-        .upsert({
-          ...values,
-          storefront_id: currentStorefrontId,
-        }, {
+        .upsert(dataToSave, {
           onConflict: 'storefront_id'
         });
 
@@ -172,8 +172,15 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
-      console.log("Saving PWA settings with values:", {
+      const dataToSave = {
         ...values,
+        name: values.name || "", // Ensure name is never undefined
+        short_name: values.short_name || "", // Ensure short_name is never undefined
+        storefront_id: currentStorefrontId,
+      };
+      
+      console.log("Saving PWA settings with values:", {
+        ...dataToSave,
         icons: {
           '72x72': values.icon_72x72 ? '✓' : '✗',
           '96x96': values.icon_96x96 ? '✓' : '✗',
@@ -192,10 +199,7 @@ export function PWASettingsForm() {
       
       const { error: saveError } = await supabase
         .from("pwa_settings")
-        .upsert({
-          ...values,
-          storefront_id: currentStorefrontId,
-        }, {
+        .upsert(dataToSave, {
           onConflict: 'storefront_id'
         });
 
