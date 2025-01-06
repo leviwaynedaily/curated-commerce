@@ -14,9 +14,7 @@ interface PreviewHeaderProps {
   currentSort?: string;
   isScrolled?: boolean;
   onLogoClick?: () => void;
-  layout?: string;
   textPlacement?: string;
-  onLayoutChange?: (layout: string) => void;
   onTextPlacementChange?: (placement: string) => void;
   onShowInstructions?: () => void;
 }
@@ -32,9 +30,7 @@ export function PreviewHeader({
   currentSort,
   isScrolled = false,
   onLogoClick,
-  layout = "medium",
   textPlacement = "below",
-  onLayoutChange = () => {},
   onTextPlacementChange = () => {},
   onShowInstructions,
 }: PreviewHeaderProps) {
@@ -52,8 +48,6 @@ export function PreviewHeader({
           categories={categories}
           selectedCategory={selectedCategory}
           currentSort={currentSort}
-          layout={layout}
-          onLayoutChange={onLayoutChange}
           textPlacement={textPlacement}
           onTextPlacementChange={onTextPlacementChange}
           onLogoClick={onLogoClick}
@@ -69,8 +63,6 @@ export function PreviewHeader({
           categories={categories}
           selectedCategory={selectedCategory}
           currentSort={currentSort}
-          layout={layout}
-          onLayoutChange={onLayoutChange}
           onLogoClick={onLogoClick}
           onShowInstructions={onShowInstructions}
         />

@@ -3,7 +3,6 @@ import { Home, Truck } from "lucide-react";
 
 interface ProductCardProps {
   product: any;
-  layout: string;
   productCardBackgroundColor: string;
   productTitleTextColor: string;
   productDescriptionTextColor: string;
@@ -16,7 +15,6 @@ interface ProductCardProps {
 
 export function ProductCard({
   product,
-  layout,
   productCardBackgroundColor,
   productTitleTextColor,
   productDescriptionTextColor,
@@ -26,19 +24,6 @@ export function ProductCard({
   productCategoryTextColor,
   onProductClick,
 }: ProductCardProps) {
-  const getCardDimensions = () => {
-    switch (layout) {
-      case 'small':
-        return 'w-full h-[320px]'
-      case 'large':
-        return 'w-full h-[440px]'
-      case 'list':
-        return 'w-full h-[180px] flex'
-      default: // medium
-        return 'w-full h-[380px]'
-    }
-  }
-
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -55,11 +40,11 @@ export function ProductCard({
 
   return (
     <div 
-      className={`group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.4)] transform hover:scale-[1.02] rounded-lg ${getCardDimensions()}`}
+      className="group relative overflow-hidden transition-all duration-300 hover:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.35)] shadow-[0_8px_30px_-12px_rgba(0,0,0,0.4)] transform hover:scale-[1.02] rounded-lg w-full h-[320px]"
       onClick={() => onProductClick(product)}
       style={{ backgroundColor: productCardBackgroundColor }}
     >
-      <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} h-3/5`}>
+      <div className="relative w-full h-3/5">
         {product.images?.[0] && (
           isVideo(product.images[0]) ? (
             <video
@@ -99,11 +84,8 @@ export function ProductCard({
       
       <div className="p-4 space-y-3">
         <h3 
-          className="font-bold line-clamp-1 transition-colors"
-          style={{ 
-            color: productTitleTextColor,
-            fontSize: layout === 'small' ? '0.875rem' : '1rem'
-          }}
+          className="font-bold line-clamp-1 transition-colors text-sm"
+          style={{ color: productTitleTextColor }}
         >
           {product.name}
         </h3>
