@@ -82,11 +82,11 @@ export function ProductGrid({
             style={{ backgroundColor: productCardBackgroundColor }}
           >
             {product.images?.[0] && (
-              <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer} bg-gray-50`}>
+              <div className={`relative ${layout === 'list' ? 'w-1/3' : 'w-full'} ${styles.imageContainer}`}>
                 <img
                   src={product.images[0]}
                   alt={product.name}
-                  className="absolute inset-0 w-full h-full object-contain p-2"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className={styles.overlay} />
               </div>
