@@ -48,7 +48,7 @@ export function MobileHeader({
   }, [searchQuery]);
 
   return (
-    <div className="flex md:hidden items-center w-full relative h-16">
+    <div className="flex md:hidden items-center w-full relative h-12">
       {/* Left side - Help Icon */}
       <div className="absolute left-0">
         {previewData.enable_instructions && (
@@ -56,7 +56,7 @@ export function MobileHeader({
             variant="ghost"
             size="icon"
             onClick={onShowInstructions}
-            className="bg-white/80 hover:bg-white/90 h-9 w-9"
+            className="bg-white/80 hover:bg-white/90 h-8 w-8"
           >
             <HelpCircle className="h-4 w-4" style={{ color: previewData.main_color }} />
           </Button>
@@ -69,7 +69,7 @@ export function MobileHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-10 object-contain cursor-pointer"
+            className="h-8 object-contain cursor-pointer"
             onClick={onLogoClick}
           />
         )}
@@ -86,7 +86,7 @@ export function MobileHeader({
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
-                className="pl-9 h-9 bg-white/80"
+                className="pl-9 h-8 bg-white/80"
                 autoFocus
                 onBlur={() => {
                   if (!searchQuery) {
@@ -100,7 +100,7 @@ export function MobileHeader({
             <Button 
               variant="ghost" 
               size="icon"
-              className="bg-white/80 hover:bg-white/90 h-9 w-9"
+              className="bg-white/80 hover:bg-white/90 h-8 w-8"
               onClick={() => setShowSearch(true)}
             >
               <Search className="h-4 w-4" style={{ color: previewData.main_color }} />

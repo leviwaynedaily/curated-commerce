@@ -48,7 +48,7 @@ export function DesktopHeader({
   }, [searchQuery]);
 
   return (
-    <div className="hidden md:flex items-center w-full relative h-20">
+    <div className="hidden md:flex items-center w-full relative h-16">
       {/* Left side - Help Icon */}
       <div className="absolute left-0">
         {previewData.enable_instructions && (
@@ -69,7 +69,7 @@ export function DesktopHeader({
           <img 
             src={previewData.logo_url} 
             alt={previewData.name}
-            className="h-16 object-contain cursor-pointer"
+            className="h-12 object-contain cursor-pointer"
             onClick={onLogoClick}
           />
         )}

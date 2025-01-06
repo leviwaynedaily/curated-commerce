@@ -44,7 +44,7 @@ export function PreviewHeader({
         isScrolled ? 'bg-white/50 backdrop-blur-md shadow-sm' : 'bg-white/50 backdrop-blur-md'
       }`}
     >
-      <div className="w-full py-4 px-4 md:px-8">
+      <div className="w-full py-2 px-4 md:px-8">
         <MobileHeader 
           previewData={previewData}
           searchQuery={searchQuery}
