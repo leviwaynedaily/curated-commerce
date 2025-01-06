@@ -14,29 +14,43 @@
       if (slug) {
         const fetchManifest = async () => {
           try {
-            const response = await fetch(`/api/pwa-settings/${slug}`, {
+            console.log('Attempting to fetch manifest for slug:', slug);
+            const manifestUrl = `/api/pwa-settings/${slug}`;
+            console.log('Manifest URL:', manifestUrl);
+            
+            const response = await fetch(manifestUrl, {
               headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               }
             });
             
+            console.log('Manifest fetch response status:', response.status);
+            console.log('Manifest fetch response headers:', Object.fromEntries(response.headers.entries()));
+            
             if (!response.ok) {
-              throw new Error(`Manifest fetch failed: ${response.status}`);
+              throw new Error(`Manifest fetch failed: ${response.status} ${response.statusText}`);
             }
             
             const manifestData = await response.json();
+            console.log('Manifest data received:', manifestData);
+            
             const manifestBlob = new Blob([JSON.stringify(manifestData)], { 
               type: 'application/json'
             });
-            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const manifestBlobUrl = URL.createObjectURL(manifestBlob);
+            console.log('Created manifest blob URL:', manifestBlobUrl);
             
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
-            manifestLink.href = manifestUrl;
+            manifestLink.href = manifestBlobUrl;
             document.head.appendChild(manifestLink);
+            console.log('Manifest link added to document head');
           } catch (error) {
-            console.error('Error fetching manifest:', error.message);
+            console.error('Error fetching manifest:', error);
+            console.log('Current location:', window.location.href);
+            console.log('Base URL:', window.location.origin);
+            console.log('Full manifest URL:', new URL(`/api/pwa-settings/${slug}`, window.location.origin).href);
           }
         };
         
@@ -46,8 +60,11 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful:', registration);
+            })
             .catch(err => {
-              console.error('ServiceWorker registration failed:', err.message);
+              console.error('ServiceWorker registration failed:', err);
             });
         });
       }
