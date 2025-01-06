@@ -1,46 +1,26 @@
 import { UseFormReturn } from "react-hook-form";
 import { FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ColorPicker } from "./ColorPicker";
-import { useEffect, useState } from "react";
+import { ColorGrid } from "./ColorGrid";
 
 interface HeaderSettingsProps {
   form: UseFormReturn<any>;
 }
 
 export function HeaderSettings({ form }: HeaderSettingsProps) {
-  const [opacity, setOpacity] = useState<number>(30);
-  const [color, setColor] = useState<string>("#FFFFFF");
+  const headerSettings = [
+    { field: "header_color", label: "Header Color", defaultValue: "#FFFFFF" },
+  ].map(({ field, label, defaultValue }) => ({
+    color: form.watch(field) || defaultValue,
+    label,
+    field,
+  }));
 
-  // Initialize values from form
-  useEffect(() => {
-    const currentValues = form.getValues();
-    console.log("HeaderSettings - Initializing with form values:", {
-      header_opacity: currentValues.header_opacity,
-      header_color: currentValues.header_color
-    });
-    
-    setOpacity(currentValues.header_opacity ?? 30);
-    setColor(currentValues.header_color ?? "#FFFFFF");
-  }, []);
+  console.log("HeaderSettings being rendered:", headerSettings);
 
-  const handleOpacityChange = (value: string) => {
-    const numValue = Math.min(Math.max(Number(value) || 0, 0), 100);
-    console.log("HeaderSettings - Setting opacity to:", numValue);
-    
-    setOpacity(numValue);
-    form.setValue("header_opacity", numValue, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
-  };
-
-  const handleHeaderColorChange = (newColor: string) => {
-    console.log("HeaderSettings - Setting color to:", newColor);
-    
-    setColor(newColor);
-    form.setValue("header_color", newColor, {
+  const handleColorChange = (field: string, value: string) => {
+    console.log(`HeaderSettings - Setting ${field} to:`, value);
+    form.setValue(field, value, {
       shouldDirty: true,
       shouldTouch: true,
       shouldValidate: true
@@ -51,47 +31,61 @@ export function HeaderSettings({ form }: HeaderSettingsProps) {
     <div className="space-y-4">
       <h3 className="text-lg font-medium">Header Settings</h3>
       <div className="grid gap-4">
-        <div className="flex items-start gap-6">
-          <FormField
-            control={form.control}
-            name="header_opacity"
-            render={() => (
-              <FormItem className="flex-1">
-                <FormControl>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={opacity}
-                      onChange={(e) => handleOpacityChange(e.target.value)}
-                      className="w-24"
-                    />
-                    <span className="text-sm text-muted-foreground">
-                      {opacity}%
-                    </span>
-                  </div>
-                </FormControl>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="header_color"
-            render={() => (
-              <FormItem className="flex-1">
-                <FormControl>
-                  <ColorPicker
-                    colors={[]}
-                    selectedColor={color}
-                    onColorSelect={handleHeaderColorChange}
-                    label=""
+        <FormField
+          control={form.control}
+          name="header_opacity"
+          render={() => (
+            <FormItem>
+              <FormControl>
+                <div className="flex items-center gap-4">
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={form.watch("header_opacity") ?? 30}
+                    onChange={(e) => {
+                      const numValue = Math.min(Math.max(Number(e.target.value) || 0, 0), 100);
+                      console.log("HeaderSettings - Setting opacity to:", numValue);
+                      form.setValue("header_opacity", numValue, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true
+                      });
+                    }}
+                    className="w-24"
                   />
-                </FormControl>
-              </FormItem>
-            )}
+                  <span className="text-sm text-muted-foreground">
+                    {form.watch("header_opacity") ?? 30}%
+                  </span>
+                </div>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+
+        <div className="space-y-4">
+          <ColorGrid
+            colors={headerSettings}
+            onColorClick={(color, field) => {
+              if (field) {
+                const inputElement = document.getElementById(field);
+                if (inputElement) {
+                  console.log(`Triggering click on input for field: ${field}`);
+                  inputElement.click();
+                }
+              }
+            }}
           />
+          {headerSettings.map(({ field, color }) => (
+            <Input
+              key={field}
+              id={field}
+              type="color"
+              value={color}
+              onChange={(e) => handleColorChange(field, e.target.value)}
+              className="sr-only"
+            />
+          ))}
         </div>
       </div>
     </div>
