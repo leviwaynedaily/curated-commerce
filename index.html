@@ -16,9 +16,12 @@
         // Fetch PWA settings and set manifest
         const fetchManifest = async () => {
           try {
+            console.log('Fetching PWA manifest for storefront:', slug);
             const response = await fetch(`/api/pwa-settings/${slug}`);
             if (response.ok) {
               const manifestData = await response.json();
+              console.log('Successfully fetched manifest:', manifestData);
+              
               const manifestBlob = new Blob([JSON.stringify(manifestData)], { type: 'application/json' });
               const manifestUrl = URL.createObjectURL(manifestBlob);
               
@@ -26,6 +29,9 @@
               manifestLink.rel = 'manifest';
               manifestLink.href = manifestUrl;
               document.head.appendChild(manifestLink);
+              console.log('Manifest link added to document head');
+            } else {
+              console.error('Failed to fetch manifest:', response.status, response.statusText);
             }
           } catch (error) {
             console.error('Error fetching manifest:', error);
@@ -33,18 +39,22 @@
         };
         
         fetchManifest();
+      } else {
+        console.log('No storefront slug found in URL, skipping manifest fetch');
       }
 
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js')
             .then(registration => {
-              console.log('ServiceWorker registration successful');
+              console.log('ServiceWorker registration successful with scope:', registration.scope);
             })
             .catch(err => {
-              console.log('ServiceWorker registration failed: ', err);
+              console.error('ServiceWorker registration failed: ', err);
             });
         });
+      } else {
+        console.warn('Service workers are not supported in this browser');
       }
     </script>
   </head>
