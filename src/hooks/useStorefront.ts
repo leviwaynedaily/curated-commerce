@@ -7,6 +7,11 @@ export function useStorefront(storefrontId: string) {
   return useQuery({
     queryKey: ["storefront", storefrontId],
     queryFn: async () => {
+      if (!storefrontId) {
+        console.error("No storefront ID provided");
+        throw new Error("No storefront ID provided");
+      }
+
       console.log("Fetching storefront data for ID:", storefrontId);
       
       try {
@@ -37,6 +42,7 @@ export function useStorefront(storefrontId: string) {
       }
     },
     retry: 1,
+    enabled: !!storefrontId,
     staleTime: 0,
   });
 }

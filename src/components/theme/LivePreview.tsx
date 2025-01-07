@@ -15,32 +15,51 @@ export function LivePreview() {
 
   useEffect(() => {
     const fetchStorefrontId = async () => {
-      if (storefrontId) {
-        setTargetId(storefrontId);
-        return;
-      }
-      
-      if (slug) {
-        try {
-          console.log("Looking up storefront by slug:", slug);
+      try {
+        // Clear any previous errors
+        setError(null);
+
+        // If we have a storefrontId from URL params (preview mode), use that
+        if (storefrontId) {
+          console.log("Preview mode - Using storefront ID from URL:", storefrontId);
+          setTargetId(storefrontId);
+          return;
+        }
+        
+        // If we have a slug (public access mode), look up the storefront
+        if (slug) {
+          console.log("Public access mode - Looking up storefront by slug:", slug);
           const { data, error } = await supabase
             .from("storefronts")
             .select("id")
             .eq("slug", slug)
+            .eq("is_published", true)
             .maybeSingle();
 
           if (error) {
             console.error("Error fetching storefront:", error);
-            setError("Failed to load storefront");
+            setError("Store not found");
+            setTargetId(null);
             return;
           }
 
-          console.log("Found storefront ID for slug:", data?.id);
-          setTargetId(data?.id || null);
-        } catch (error) {
-          console.error("Failed to fetch storefront:", error);
-          setError("Failed to load storefront");
+          if (!data) {
+            console.error("No storefront found for slug:", slug);
+            setError("Store not found");
+            setTargetId(null);
+            return;
+          }
+
+          console.log("Found storefront ID for slug:", data.id);
+          setTargetId(data.id);
+        } else {
+          setError("No store specified");
+          setTargetId(null);
         }
+      } catch (err) {
+        console.error("Error in fetchStorefrontId:", err);
+        setError("Failed to load store");
+        setTargetId(null);
       }
     };
 
@@ -55,8 +74,6 @@ export function LivePreview() {
       setError("Failed to load storefront data");
     }
   }, [storefrontError]);
-
-  // Remove manifest link handling from here since it's now handled by the PWA settings
 
   if (error) {
     return <PreviewError error={error} />;
