@@ -12,9 +12,18 @@ interface ImageUploadProps {
   path: string;
   storefrontId?: string;
   enforceFilename?: string;
+  onImageLoad?: (dimensions: { width: number; height: number } | null) => void;
 }
 
-export function ImageUpload({ value, onChange, bucket, path, storefrontId, enforceFilename }: ImageUploadProps) {
+export function ImageUpload({ 
+  value, 
+  onChange, 
+  bucket, 
+  path, 
+  storefrontId, 
+  enforceFilename,
+  onImageLoad 
+}: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -41,6 +50,18 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId, enfor
         variant: "destructive",
       });
       return;
+    }
+
+    // Check image dimensions if onImageLoad is provided
+    if (onImageLoad) {
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+      await new Promise((resolve) => {
+        img.onload = () => {
+          onImageLoad({ width: img.width, height: img.height });
+          resolve(null);
+        };
+      });
     }
 
     try {
@@ -94,6 +115,9 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId, enfor
 
   const handleRemove = async () => {
     onChange(null);
+    if (onImageLoad) {
+      onImageLoad(null);
+    }
     if (storefrontId) {
       await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
     }
@@ -132,6 +156,12 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId, enfor
               src={value}
               alt="Uploaded image"
               className="w-full h-full object-contain"
+              onLoad={(e) => {
+                if (onImageLoad) {
+                  const img = e.target as HTMLImageElement;
+                  onImageLoad({ width: img.naturalWidth, height: img.naturalHeight });
+                }
+              }}
             />
           </div>
           <Button
