@@ -30,29 +30,17 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // First get the storefront ID
-    const { data: storefront, error: storefrontError } = await supabaseClient
-      .from('storefronts')
-      .select('id')
-      .eq('slug', slug)
-      .maybeSingle()
-
-    if (storefrontError || !storefront) {
-      console.error('Error or no storefront found:', storefrontError)
-      return new Response(
-        JSON.stringify({ error: 'Storefront not found' }),
-        { 
-          status: 404,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    // Then get the manifest using the storefront ID
+    // Get manifest directly from manifests table by joining with storefronts
     const { data: manifest, error: manifestError } = await supabaseClient
       .from('manifests')
       .select('manifest_json')
-      .eq('storefront_id', storefront.id)
+      .eq('storefront_id', (
+        await supabaseClient
+          .from('storefronts')
+          .select('id')
+          .eq('slug', slug)
+          .maybeSingle()
+      )?.data?.id)
       .maybeSingle()
 
     if (manifestError) {
@@ -67,7 +55,7 @@ Deno.serve(async (req) => {
     }
 
     if (!manifest) {
-      console.error('No manifest found for storefront')
+      console.error('No manifest found for slug:', slug)
       return new Response(
         JSON.stringify({ error: 'Manifest not found' }),
         { 
