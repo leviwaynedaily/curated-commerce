@@ -58,12 +58,14 @@ self.addEventListener('fetch', (event) => {
           })
           .then(async response => {
             if (!response.ok) {
+              console.error('Failed to fetch storefront:', response.status);
               throw new Error('Failed to fetch storefront');
             }
             const storefronts = await response.json();
             console.log('Storefronts response:', storefronts);
             
             if (!storefronts || storefronts.length === 0) {
+              console.error('No storefront found for slug:', slug);
               throw new Error('No storefront found for slug: ' + slug);
             }
             
