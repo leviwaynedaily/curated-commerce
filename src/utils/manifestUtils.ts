@@ -24,10 +24,13 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
       type: 'application/json'
     });
 
-    // Save to storage
+    // Save to storage using storefront ID in the path
+    const manifestPath = `${storefrontId}/manifest/manifest.json`;
+    console.log("Saving manifest to storage path:", manifestPath);
+    
     const { error: storageError } = await supabase.storage
       .from('storefront-assets')
-      .upload(`${storefrontId}/manifest/manifest.json`, manifestBlob, {
+      .upload(manifestPath, manifestBlob, {
         contentType: 'application/json',
         upsert: true
       });

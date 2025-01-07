@@ -30,11 +30,25 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // Extract the storefront ID from the URL if present
+  const url = new URL(event.request.url);
+  const storefrontId = url.searchParams.get('storefrontId');
+  
   if (event.request.url.includes('/manifest/manifest.json')) {
     console.log('Intercepting manifest request:', event.request.url);
+    console.log('Storefront ID from URL:', storefrontId);
+    
+    if (!storefrontId) {
+      console.error('No storefront ID provided in manifest request');
+      return;
+    }
+    
+    // Construct the correct manifest URL using the storefront ID
+    const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+    console.log('Fetching manifest from:', manifestUrl);
     
     event.respondWith(
-      fetch(event.request)
+      fetch(manifestUrl)
         .then(async response => {
           console.log('Manifest fetch response:', response.status, response.statusText);
           
