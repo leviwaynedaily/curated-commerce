@@ -30,7 +30,7 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/api/pwa-settings/')) {
+  if (event.request.url.includes('/manifest/manifest.json')) {
     console.log('Intercepting manifest request:', event.request.url);
     
     event.respondWith(

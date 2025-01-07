@@ -19,7 +19,8 @@
             const targetId = storefrontId || slug;
             console.log('Attempting to fetch manifest for:', targetId);
             
-            const manifestUrl = `/api/pwa-settings/${targetId}`;
+            // Get manifest URL from storage
+            const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${targetId}/manifest/manifest.json`;
             console.log('Manifest URL:', manifestUrl);
             
             const response = await fetch(manifestUrl);
@@ -37,15 +38,9 @@
               return;
             }
             
-            const manifestBlob = new Blob([JSON.stringify(manifestData)], { 
-              type: 'application/json'
-            });
-            const manifestBlobUrl = URL.createObjectURL(manifestBlob);
-            console.log('Created manifest blob URL:', manifestBlobUrl);
-            
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
-            manifestLink.href = manifestBlobUrl;
+            manifestLink.href = manifestUrl;
             document.head.appendChild(manifestLink);
             console.log('Manifest link added to document head');
           } catch (error) {
