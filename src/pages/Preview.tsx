@@ -137,7 +137,7 @@ export default function Preview() {
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
           )}
           {manifestUrl && (
-            <link rel="manifest" href={manifestUrl} />
+            <link rel="manifest" href={manifestUrl} crossOrigin="use-credentials" />
           )}
         </Helmet>
       )}

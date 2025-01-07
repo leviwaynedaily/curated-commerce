@@ -25,11 +25,10 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
       throw storageError;
     }
 
-    // Get the public URL for the manifest
-    const { data: { publicUrl } } = supabase.storage
-      .from('storefront-assets')
-      .getPublicUrl(manifestPath);
+    console.log("Storage response:", storageData);
 
+    // Get the public URL for the manifest - using the direct storage URL format
+    const publicUrl = `${supabase.storageUrl}/object/public/storefront-assets/${manifestPath}`;
     console.log("Generated manifest URL:", publicUrl);
 
     // Save the manifest data to the manifests table
