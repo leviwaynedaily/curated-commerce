@@ -11,7 +11,6 @@ export default function Preview() {
   const [searchParams] = useSearchParams();
   const { slug } = useParams();
   const [storefrontId, setStorefrontId] = useState<string | null>(null);
-  const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -62,41 +61,6 @@ export default function Preview() {
     getStorefrontId();
   }, [searchParams, slug]);
 
-  // Fetch manifest URL when storefrontId is available
-  useEffect(() => {
-    const fetchManifestUrl = async () => {
-      if (!storefrontId) return;
-
-      try {
-        console.log("Fetching PWA settings for storefront:", storefrontId);
-        const { data, error } = await supabase
-          .from("pwa_settings")
-          .select("manifest_url")
-          .eq("storefront_id", storefrontId)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error fetching manifest URL:", error);
-          return;
-        }
-
-        if (data?.manifest_url) {
-          console.log("Found manifest URL:", data.manifest_url);
-          // Add timestamp to bust cache and ensure latest version
-          const manifestUrlWithTimestamp = `${data.manifest_url}?t=${Date.now()}`;
-          console.log("Using manifest URL with cache busting:", manifestUrlWithTimestamp);
-          setManifestUrl(manifestUrlWithTimestamp);
-        } else {
-          console.log("No manifest URL found for storefront");
-        }
-      } catch (err) {
-        console.error("Error fetching manifest URL:", err);
-      }
-    };
-
-    fetchManifestUrl();
-  }, [storefrontId]);
-
   const { data: storefront, isLoading: isStorefrontLoading } = useStorefront(storefrontId || '');
 
   useEffect(() => {
@@ -135,9 +99,6 @@ export default function Preview() {
           <title>{storefront.page_title || storefront.name}</title>
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
-          )}
-          {manifestUrl && (
-            <link rel="manifest" href={manifestUrl} crossOrigin="use-credentials" />
           )}
         </Helmet>
       )}
