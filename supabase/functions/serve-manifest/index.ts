@@ -62,72 +62,26 @@ serve(async (req) => {
     }
 
     console.log('Found storefront:', storefront.id);
-    console.log('Fetching PWA settings for storefront:', storefront.id);
+    console.log('Fetching manifest for storefront:', storefront.id);
     
-    const { data: pwaSettings, error: pwaError } = await supabase
-      .from('pwa_settings')
-      .select('*')
+    const { data: manifest, error: manifestError } = await supabase
+      .from('manifests')
+      .select('manifest_json')
       .eq('storefront_id', storefront.id)
       .single();
 
-    if (pwaError || !pwaSettings) {
-      console.error('PWA settings not found for storefront:', storefront.id);
+    if (manifestError || !manifest) {
+      console.error('Manifest not found for storefront:', storefront.id);
       return new Response(
-        JSON.stringify({ error: 'PWA settings not found' }),
+        JSON.stringify({ error: 'Manifest not found' }),
         { status: 404, headers: corsHeaders }
       );
     }
 
-    console.log('Found PWA settings, constructing manifest');
-
-    const icons = [
-      pwaSettings.icon_72x72 && { src: pwaSettings.icon_72x72, sizes: '72x72', type: 'image/png' },
-      pwaSettings.icon_96x96 && { src: pwaSettings.icon_96x96, sizes: '96x96', type: 'image/png' },
-      pwaSettings.icon_128x128 && { src: pwaSettings.icon_128x128, sizes: '128x128', type: 'image/png' },
-      pwaSettings.icon_144x144 && { src: pwaSettings.icon_144x144, sizes: '144x144', type: 'image/png' },
-      pwaSettings.icon_152x152 && { src: pwaSettings.icon_152x152, sizes: '152x152', type: 'image/png' },
-      pwaSettings.icon_192x192 && { src: pwaSettings.icon_192x192, sizes: '192x192', type: 'image/png' },
-      pwaSettings.icon_384x384 && { src: pwaSettings.icon_384x384, sizes: '384x384', type: 'image/png' },
-      pwaSettings.icon_512x512 && { src: pwaSettings.icon_512x512, sizes: '512x512', type: 'image/png' },
-    ].filter(Boolean);
-
-    console.log('Available icons:', icons.map(icon => icon.sizes));
-
-    const screenshots = [];
-    if (pwaSettings.screenshot_mobile) {
-      screenshots.push({
-        src: pwaSettings.screenshot_mobile,
-        sizes: '360x640',
-        type: 'image/png',
-        form_factor: 'narrow'
-      });
-    }
-    if (pwaSettings.screenshot_desktop) {
-      screenshots.push({
-        src: pwaSettings.screenshot_desktop,
-        sizes: '1920x1080',
-        type: 'image/png',
-        form_factor: 'wide'
-      });
-    }
-
-    const manifest = {
-      name: pwaSettings.name,
-      short_name: pwaSettings.short_name,
-      description: pwaSettings.description,
-      start_url: pwaSettings.start_url || '/',
-      display: pwaSettings.display || 'standalone',
-      orientation: pwaSettings.orientation || 'any',
-      theme_color: pwaSettings.theme_color || '#000000',
-      background_color: pwaSettings.background_color || '#ffffff',
-      icons,
-      screenshots: screenshots.length > 0 ? screenshots : undefined,
-    };
-
-    console.log('Generated manifest:', manifest);
+    console.log('Found manifest, serving');
 
     return new Response(
-      JSON.stringify(manifest),
+      JSON.stringify(manifest.manifest_json),
       { headers: corsHeaders }
     );
   } catch (error) {
