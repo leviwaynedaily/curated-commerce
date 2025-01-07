@@ -12,7 +12,7 @@ export default function Preview() {
   const { slug } = useParams();
   const [storefrontId, setStorefrontId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [manifestData, setManifestData] = useState<any>(null);
+  const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -74,7 +74,7 @@ export default function Preview() {
         console.log("Fetching PWA settings for storefront:", storefrontId);
         const { data, error } = await supabase
           .from("pwa_settings")
-          .select("*")
+          .select("manifest_url")
           .eq("storefront_id", storefrontId)
           .maybeSingle();
 
@@ -83,44 +83,11 @@ export default function Preview() {
           return;
         }
 
-        if (data) {
-          console.log("Found PWA settings:", data);
-          // Generate manifest data from PWA settings
-          const manifestData = {
-            name: data.name,
-            short_name: data.short_name,
-            description: data.description,
-            start_url: data.start_url || "/",
-            display: data.display || "standalone",
-            orientation: data.orientation || "any",
-            theme_color: data.theme_color || "#000000",
-            background_color: data.background_color || "#ffffff",
-            icons: [
-              data.icon_72x72 && { src: data.icon_72x72, sizes: "72x72", type: "image/png" },
-              data.icon_96x96 && { src: data.icon_96x96, sizes: "96x96", type: "image/png" },
-              data.icon_128x128 && { src: data.icon_128x128, sizes: "128x128", type: "image/png" },
-              data.icon_144x144 && { src: data.icon_144x144, sizes: "144x144", type: "image/png" },
-              data.icon_152x152 && { src: data.icon_152x152, sizes: "152x152", type: "image/png" },
-              data.icon_192x192 && { src: data.icon_192x192, sizes: "192x192", type: "image/png" },
-              data.icon_384x384 && { src: data.icon_384x384, sizes: "384x384", type: "image/png" },
-              data.icon_512x512 && { src: data.icon_512x512, sizes: "512x512", type: "image/png" },
-            ].filter(Boolean),
-            screenshots: [
-              data.screenshot_mobile && {
-                src: data.screenshot_mobile,
-                sizes: "640x1136",
-                type: "image/png",
-                form_factor: "narrow"
-              },
-              data.screenshot_desktop && {
-                src: data.screenshot_desktop,
-                sizes: "1920x1080",
-                type: "image/png",
-                form_factor: "wide"
-              }
-            ].filter(Boolean)
-          };
-          setManifestData(manifestData);
+        if (data?.manifest_url) {
+          console.log("Found manifest URL:", data.manifest_url);
+          setManifestUrl(data.manifest_url);
+        } else {
+          console.log("No manifest URL found in PWA settings");
         }
       } catch (err) {
         console.error("Error in fetchPWASettings:", err);
@@ -169,13 +136,8 @@ export default function Preview() {
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
           )}
-          {manifestData && (
-            <link 
-              rel="manifest" 
-              href={`data:application/json;charset=utf-8,${encodeURIComponent(
-                JSON.stringify(manifestData)
-              )}`} 
-            />
+          {manifestUrl && (
+            <link rel="manifest" href={manifestUrl} />
           )}
         </Helmet>
       )}
