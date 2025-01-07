@@ -7,53 +7,6 @@
     <title>Lovable</title>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#000000" />
-    <script>
-      const path = window.location.pathname;
-      const searchParams = new URLSearchParams(window.location.search);
-      const storefrontId = searchParams.get('storefrontId');
-      const slug = path.split('/')[1];
-      
-      if (slug || storefrontId) {
-        const fetchManifestUrl = async () => {
-          try {
-            const targetId = storefrontId || slug;
-            console.log('Fetching manifest URL for:', targetId);
-            
-            // Query pwa_settings directly to get the manifest_url
-            const response = await fetch(
-              `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${targetId}&select=manifest_url`,
-              {
-                headers: {
-                  'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo',
-                  'Accept': 'application/json'
-                }
-              }
-            );
-            
-            if (!response.ok) {
-              throw new Error(`Failed to fetch manifest URL: ${response.status}`);
-            }
-            
-            const [settings] = await response.json();
-            console.log('PWA settings received:', settings);
-            
-            if (settings?.manifest_url) {
-              console.log('Adding manifest link with URL:', settings.manifest_url);
-              const manifestLink = document.createElement('link');
-              manifestLink.rel = 'manifest';
-              manifestLink.href = settings.manifest_url;
-              document.head.appendChild(manifestLink);
-            } else {
-              console.log('No manifest URL found in PWA settings');
-            }
-          } catch (error) {
-            console.error('Error fetching manifest URL:', error);
-          }
-        };
-        
-        fetchManifestUrl();
-      }
-    </script>
   </head>
   <body>
     <div id="root"></div>
