@@ -26,6 +26,11 @@ export function PWAIconUpload({ form, name, size, description }: PWAIconUploadPr
     const currentStorefrontId = localStorage.getItem('lastStorefrontId');
     if (!currentStorefrontId) {
       console.error("No storefront selected");
+      toast({
+        title: "Error",
+        description: "No storefront selected. Please select a storefront first.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -45,7 +50,10 @@ export function PWAIconUpload({ form, name, size, description }: PWAIconUploadPr
           onConflict: 'storefront_id'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error auto-saving PWA settings draft:", error);
+        throw error;
+      }
 
       toast({
         title: "Success",
@@ -76,7 +84,7 @@ export function PWAIconUpload({ form, name, size, description }: PWAIconUploadPr
       <p className="text-xs text-muted-foreground">{description}</p>
       
       {isDimensionsIncorrect && (
-        <Alert variant="warning" className="mt-2">
+        <Alert variant="destructive" className="mt-2">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
             Image dimensions ({imageDimensions.width}x{imageDimensions.height}) do not match the recommended size ({size}).
