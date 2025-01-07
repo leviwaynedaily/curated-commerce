@@ -49,7 +49,7 @@ self.addEventListener('fetch', (event) => {
         const slug = pathSegments[pathSegments.length - 1];
         console.log('Extracted slug from path:', slug);
         
-        // First try to get the storefront ID from the slug
+        // Get the storefront ID from the slug
         event.respondWith(
           fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${slug}&select=id`, {
             headers: {
@@ -70,29 +70,10 @@ self.addEventListener('fetch', (event) => {
             storefrontId = storefronts[0].id;
             console.log('Found storefront ID:', storefrontId);
             
-            // Now fetch the PWA settings with the storefront ID
-            return fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${storefrontId}&select=manifest_url`, {
-              headers: {
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo'
-              }
-            });
-          })
-          .then(async response => {
-            if (!response.ok) {
-              throw new Error('Failed to fetch PWA settings');
-            }
-            const settings = await response.json();
-            console.log('PWA settings response:', settings);
-            
-            if (settings && settings[0] && settings[0].manifest_url) {
-              console.log('Found manifest URL in settings:', settings[0].manifest_url);
-              return fetch(settings[0].manifest_url);
-            }
-            
-            // Fallback to constructed URL if no manifest_url in settings
-            console.log('No manifest URL in settings, using fallback path');
-            const fallbackUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
-            return fetch(fallbackUrl);
+            // Use the hardcoded URL pattern with the storefront ID
+            const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+            console.log('Using manifest URL:', manifestUrl);
+            return fetch(manifestUrl);
           })
           .then(async response => {
             console.log('Manifest fetch response:', response.status, response.statusText);
