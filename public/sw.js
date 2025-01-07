@@ -51,19 +51,22 @@ self.addEventListener('fetch', (event) => {
         // Validate slug before proceeding
         if (!slug || slug.trim() === '') {
           console.error('Invalid or empty slug');
-          return new Response(JSON.stringify({ error: 'Invalid slug' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-          });
+          return event.respondWith(
+            new Response(JSON.stringify({ error: 'Invalid slug' }), {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            })
+          );
         }
 
         console.log('Using slug to fetch storefront:', slug);
         
         // Get the storefront ID from the slug
         event.respondWith(
-          fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${encodeURIComponent(slug)}&select=id`, {
+          fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?select=id&slug=eq.${encodeURIComponent(slug)}`, {
             headers: {
-              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo'
+              'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo',
+              'Accept': 'application/json'
             }
           })
           .then(async response => {
@@ -133,7 +136,15 @@ self.addEventListener('fetch', (event) => {
     }
     
     console.error('No storefront ID or slug found in manifest request');
-    return;
+    return event.respondWith(
+      new Response(
+        JSON.stringify({ error: 'No storefront ID or slug provided' }), 
+        { 
+          status: 400, 
+          headers: { 'Content-Type': 'application/json' }
+        }
+      )
+    );
   }
   
   // Handle non-manifest requests
