@@ -42,6 +42,38 @@ export type Database = {
         }
         Relationships: []
       }
+      manifests: {
+        Row: {
+          created_at: string | null
+          id: string
+          manifest_json: Json
+          storefront_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          manifest_json: Json
+          storefront_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          manifest_json?: Json
+          storefront_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "manifests_storefront_id_fkey"
+            columns: ["storefront_id"]
+            isOneToOne: false
+            referencedRelation: "storefronts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       messages: {
         Row: {
           created_at: string | null

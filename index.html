@@ -19,26 +19,14 @@
             const targetId = storefrontId || slug;
             console.log('Attempting to fetch manifest for:', targetId);
             
-            // Construct the manifest URL based on whether we have a storefrontId or slug
-            const manifestUrl = storefrontId 
-              ? `/api/pwa-settings/${storefrontId}`
-              : `/api/pwa-settings/${slug}`;
-              
+            const manifestUrl = `/api/pwa-settings/${targetId}`;
             console.log('Manifest URL:', manifestUrl);
             
-            const response = await fetch(manifestUrl, {
-              headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-              },
-              credentials: 'same-origin'
-            });
-            
+            const response = await fetch(manifestUrl);
             console.log('Manifest fetch response status:', response.status);
-            console.log('Manifest fetch response headers:', Object.fromEntries(response.headers.entries()));
             
             if (!response.ok) {
-              throw new Error(`Manifest fetch failed: ${response.status} ${response.statusText}`);
+              throw new Error(`Manifest fetch failed: ${response.status}`);
             }
             
             const manifestData = await response.json();
@@ -62,8 +50,6 @@
             console.log('Manifest link added to document head');
           } catch (error) {
             console.error('Error fetching manifest:', error);
-            console.log('Current location:', window.location.href);
-            console.log('Base URL:', window.location.origin);
           }
         };
         

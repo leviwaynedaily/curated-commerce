@@ -33,22 +33,10 @@ self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/api/pwa-settings/')) {
     console.log('Intercepting manifest request:', event.request.url);
     
-    // Create a new request with the correct headers
-    const manifestRequest = new Request(event.request.url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      credentials: 'same-origin',
-      mode: 'cors'
-    });
-
     event.respondWith(
-      fetch(manifestRequest)
+      fetch(event.request)
         .then(async response => {
           console.log('Manifest fetch response:', response.status, response.statusText);
-          console.log('Response headers:', Object.fromEntries(response.headers.entries()));
           
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
@@ -69,7 +57,6 @@ self.addEventListener('fetch', (event) => {
             }
           } catch (error) {
             console.error('Invalid JSON in manifest response:', error);
-            console.log('Response text:', await response.clone().text());
           }
 
           return response;

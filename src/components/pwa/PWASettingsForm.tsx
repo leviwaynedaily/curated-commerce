@@ -8,10 +8,11 @@ import { PWABasicInfo } from "./PWABasicInfo";
 import { PWAIcons } from "./PWAIcons";
 import { PWAScreenshots } from "./PWAScreenshots";
 import { Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PWAFormValues, pwaFormSchema } from "./types";
 import { PWAFormValidation } from "./PWAFormValidation";
 import { PWAFormActions } from "./PWAFormActions";
+import { PWAManifestPreview } from "./PWAManifestPreview";
+import { saveManifest } from "@/utils/manifestUtils";
 import { useState, useEffect } from "react";
 
 export function PWASettingsForm() {
@@ -40,29 +41,7 @@ export function PWASettingsForm() {
         throw error;
       }
 
-      if (!data) {
-        console.log("No PWA settings found, will use defaults");
-      } else {
-        console.log("Successfully fetched PWA settings:", {
-          name: data.name,
-          short_name: data.short_name,
-          icons: {
-            '72x72': data.icon_72x72 ? '✓' : '✗',
-            '96x96': data.icon_96x96 ? '✓' : '✗',
-            '128x128': data.icon_128x128 ? '✓' : '✗',
-            '144x144': data.icon_144x144 ? '✓' : '✗',
-            '152x152': data.icon_152x152 ? '✓' : '✗',
-            '192x192': data.icon_192x192 ? '✓' : '✗',
-            '384x384': data.icon_384x384 ? '✓' : '✗',
-            '512x512': data.icon_512x512 ? '✓' : '✗',
-          },
-          screenshots: {
-            mobile: data.screenshot_mobile ? '✓' : '✗',
-            desktop: data.screenshot_desktop ? '✓' : '✗',
-          }
-        });
-      }
-
+      console.log("PWA settings fetched:", data);
       return data;
     },
     enabled: !!currentStorefrontId,
@@ -107,13 +86,6 @@ export function PWASettingsForm() {
     form.getValues("icon_512x512"),
   ].every(Boolean);
 
-  console.log("Form validation state:", {
-    hasRequiredFields,
-    isDirty: form.formState.isDirty,
-    errors: form.formState.errors,
-    values: form.getValues(),
-  });
-
   const saveDraft = async () => {
     if (!currentStorefrontId) {
       toast({
@@ -129,12 +101,10 @@ export function PWASettingsForm() {
       const values = form.getValues();
       const dataToSave = {
         ...values,
-        name: values.name || "", // Ensure name is never undefined
-        short_name: values.short_name || "", // Ensure short_name is never undefined
         storefront_id: currentStorefrontId,
       };
       
-      console.log("Saving PWA settings draft with values:", dataToSave);
+      console.log("Saving PWA settings draft:", dataToSave);
       
       const { error } = await supabase
         .from("pwa_settings")
@@ -172,30 +142,13 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
+      // Save PWA settings
       const dataToSave = {
         ...values,
-        name: values.name || "", // Ensure name is never undefined
-        short_name: values.short_name || "", // Ensure short_name is never undefined
         storefront_id: currentStorefrontId,
       };
       
-      console.log("Saving PWA settings with values:", {
-        ...dataToSave,
-        icons: {
-          '72x72': values.icon_72x72 ? '✓' : '✗',
-          '96x96': values.icon_96x96 ? '✓' : '✗',
-          '128x128': values.icon_128x128 ? '✓' : '✗',
-          '144x144': values.icon_144x144 ? '✓' : '✗',
-          '152x152': values.icon_152x152 ? '✓' : '✗',
-          '192x192': values.icon_192x192 ? '✓' : '✗',
-          '384x384': values.icon_384x384 ? '✓' : '✗',
-          '512x512': values.icon_512x512 ? '✓' : '✗',
-        },
-        screenshots: {
-          mobile: values.screenshot_mobile ? '✓' : '✗',
-          desktop: values.screenshot_desktop ? '✓' : '✗',
-        }
-      });
+      console.log("Saving PWA settings:", dataToSave);
       
       const { error: saveError } = await supabase
         .from("pwa_settings")
@@ -203,23 +156,48 @@ export function PWASettingsForm() {
           onConflict: 'storefront_id'
         });
 
-      if (saveError) {
-        console.error("Error saving PWA settings:", saveError);
-        throw saveError;
-      }
+      if (saveError) throw saveError;
 
-      console.log("PWA settings saved, generating manifest...");
-      const { data: manifestData, error: manifestError } = await supabase.functions.invoke('get-manifest', {
-        method: 'POST',
-        body: { storefrontId: currentStorefrontId }
-      });
+      // Generate manifest JSON
+      const manifestData = {
+        name: values.name,
+        short_name: values.short_name,
+        description: values.description,
+        start_url: values.start_url || "/",
+        display: values.display || "standalone",
+        orientation: values.orientation || "any",
+        theme_color: values.theme_color || "#000000",
+        background_color: values.background_color || "#ffffff",
+        icons: [
+          values.icon_72x72 && { src: values.icon_72x72, sizes: "72x72", type: "image/png" },
+          values.icon_96x96 && { src: values.icon_96x96, sizes: "96x96", type: "image/png" },
+          values.icon_128x128 && { src: values.icon_128x128, sizes: "128x128", type: "image/png" },
+          values.icon_144x144 && { src: values.icon_144x144, sizes: "144x144", type: "image/png" },
+          values.icon_152x152 && { src: values.icon_152x152, sizes: "152x152", type: "image/png" },
+          values.icon_192x192 && { src: values.icon_192x192, sizes: "192x192", type: "image/png" },
+          values.icon_384x384 && { src: values.icon_384x384, sizes: "384x384", type: "image/png" },
+          values.icon_512x512 && { src: values.icon_512x512, sizes: "512x512", type: "image/png" },
+        ].filter(Boolean),
+        screenshots: [
+          values.screenshot_mobile && {
+            src: values.screenshot_mobile,
+            sizes: "640x1136",
+            type: "image/png",
+            form_factor: "narrow"
+          },
+          values.screenshot_desktop && {
+            src: values.screenshot_desktop,
+            sizes: "1920x1080",
+            type: "image/png",
+            form_factor: "wide"
+          }
+        ].filter(Boolean)
+      };
+
+      // Save manifest to the database
+      await saveManifest(currentStorefrontId, manifestData);
       
-      if (manifestError) {
-        console.error("Manifest generation failed:", manifestError);
-        throw new Error(`Failed to generate manifest: ${manifestError.message}`);
-      }
-
-      console.log("Generated manifest:", manifestData);
+      // Update the preview
       setManifestJson(JSON.stringify(manifestData, null, 2));
 
       toast({
@@ -261,20 +239,7 @@ export function PWASettingsForm() {
           hasRequiredFields={hasRequiredFields}
         />
 
-        {manifestJson && (
-          <Card>
-            <CardHeader className="py-2">
-              <CardTitle className="text-sm font-medium">Generated Manifest</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="bg-secondary/5 p-2 rounded-lg overflow-x-auto">
-                <code className="text-[10px] font-mono whitespace-pre-wrap break-all leading-tight">
-                  {manifestJson}
-                </code>
-              </pre>
-            </CardContent>
-          </Card>
-        )}
+        <PWAManifestPreview manifestJson={manifestJson} />
       </form>
     </Form>
   );
