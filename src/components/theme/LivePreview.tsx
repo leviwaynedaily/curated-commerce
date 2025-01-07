@@ -1,92 +1,77 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
 import { PreviewContent } from "./preview/PreviewContent";
-import { PreviewData } from "@/types/preview";
-import { VerificationPrompt } from "./preview/VerificationPrompt";
-import { PreviewInstructions } from "./preview/PreviewInstructions";
-import { PreviewLegalFooter } from "./preview/PreviewLegalFooter";
+import { PreviewError } from "./preview/PreviewError";
+import { PreviewLoading } from "./preview/PreviewLoading";
 import { useStorefront } from "@/hooks/useStorefront";
+import { supabase } from "@/integrations/supabase/client";
 
-interface LivePreviewProps {
-  storefrontId: string;
-  previewData?: PreviewData;
-  onSearchChange?: (query: string) => void;
-  onSortChange?: (sort: string) => void;
-  onCategoryChange?: (category: string | null) => void;
-  categories?: string[];
-  selectedCategory?: string | null;
-  currentSort?: string;
-  textPlacement?: string;
-  onTextPlacementChange?: (placement: string) => void;
-}
+export function LivePreview() {
+  const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+  const storefrontId = searchParams.get("storefrontId");
+  const [error, setError] = useState<string | null>(null);
 
-export function LivePreview({
-  storefrontId,
-  previewData: initialPreviewData,
-  onSearchChange,
-  onSortChange,
-  onCategoryChange,
-  categories,
-  selectedCategory,
-  currentSort,
-  textPlacement,
-  onTextPlacementChange,
-}: LivePreviewProps) {
-  const [isVerified, setIsVerified] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  // First try to get storefront ID from URL params, then try to look it up by slug
+  const targetId = storefrontId || (slug ? await getStorefrontIdBySlug(slug) : null);
   
-  // Fetch storefront data if not provided
-  const { data: fetchedPreviewData, isLoading } = useStorefront(storefrontId);
-  const previewData = initialPreviewData || fetchedPreviewData;
+  const { data: previewData, isLoading, error: storefrontError } = useStorefront(targetId || "");
 
-  if (isLoading || !previewData) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    if (storefrontError) {
+      console.error("Error loading storefront:", storefrontError);
+      setError("Failed to load storefront data");
+    }
+  }, [storefrontError]);
+
+  // Handle manifest link
+  useEffect(() => {
+    if (previewData?.id) {
+      // Remove any existing manifest link
+      const existingManifest = document.querySelector('link[rel="manifest"]');
+      if (existingManifest) {
+        existingManifest.remove();
+      }
+
+      // Add new manifest link if PWA is configured
+      const manifestUrl = `${window.location.origin}/manifest.json?id=${previewData.id}`;
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = manifestUrl;
+      document.head.appendChild(link);
+    }
+  }, [previewData?.id]);
+
+  if (error) {
+    return <PreviewError message={error} />;
   }
 
-  const handleVerification = () => {
-    setIsVerified(true);
-    if (previewData.enable_instructions) {
-      setShowInstructions(true);
+  if (isLoading || !previewData) {
+    return <PreviewLoading />;
+  }
+
+  return <PreviewContent previewData={previewData} />;
+}
+
+// Helper function to get storefront ID from slug
+async function getStorefrontIdBySlug(slug: string): Promise<string | null> {
+  try {
+    console.log("Looking up storefront by slug:", slug);
+    const { data, error } = await supabase
+      .from("storefronts")
+      .select("id")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error fetching storefront:", error);
+      return null;
     }
-  };
 
-  const handleRestartVerification = () => {
-    console.log("Restarting verification process");
-    setIsVerified(false);
-    setShowInstructions(false);
-  };
-
-  const handleShowInstructions = () => {
-    setShowInstructions(true);
-  };
-
-  const handleContinue = () => {
-    setShowInstructions(false);
-  };
-
-  const shouldShowVerification = !isVerified && previewData.verification_type !== 'none';
-  const shouldShowInstructions = isVerified && showInstructions && previewData.enable_instructions;
-
-  return (
-    <div 
-      className="h-full w-full bg-white overflow-auto relative"
-      style={{ backgroundColor: previewData.storefront_background_color }}
-    >
-      <PreviewContent
-        previewData={previewData}
-        searchQuery={searchQuery}
-        selectedCategory={selectedCategory}
-        currentSort={currentSort}
-        textPlacement={textPlacement}
-        onLogoClick={handleRestartVerification}
-        showInstructions={shouldShowInstructions}
-        onCloseInstructions={handleContinue}
-        onShowInstructions={handleShowInstructions}
-      />
-      
-      {shouldShowVerification && (
-        <VerificationPrompt previewData={previewData} onVerify={handleVerification} />
-      )}
-    </div>
-  );
+    console.log("Found storefront ID for slug:", data?.id);
+    return data?.id || null;
+  } catch (error) {
+    console.error("Failed to fetch storefront:", error);
+    return null;
+  }
 }
