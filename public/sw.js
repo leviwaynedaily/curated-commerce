@@ -44,50 +44,68 @@ self.addEventListener('fetch', (event) => {
       console.error('No storefront ID found in manifest request');
       return;
     }
-    
-    // Construct the manifest URL using the storefront ID
-    const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
-    console.log('Fetching manifest from:', manifestUrl);
-    
+
+    // First try to get the manifest URL from PWA settings
     event.respondWith(
-      fetch(manifestUrl)
-        .then(async response => {
-          console.log('Manifest fetch response:', response.status, response.statusText);
+      fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${storefrontId}&select=manifest_url`, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo'
+        }
+      })
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch PWA settings');
+        }
+        const settings = await response.json();
+        console.log('PWA settings response:', settings);
+        
+        if (settings && settings[0] && settings[0].manifest_url) {
+          console.log('Found manifest URL in settings:', settings[0].manifest_url);
+          return fetch(settings[0].manifest_url);
+        }
+        
+        // Fallback to constructed URL if no manifest_url in settings
+        console.log('No manifest URL in settings, using fallback path');
+        const fallbackUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+        return fetch(fallbackUrl);
+      })
+      .then(async response => {
+        console.log('Manifest fetch response:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          throw new Error(`Manifest fetch failed: ${response.status}`);
+        }
+
+        // Clone the response before reading it
+        const responseToCache = response.clone();
+
+        try {
+          // Try to parse the JSON to validate it
+          const jsonData = await responseToCache.json();
+          console.log('Successfully parsed manifest JSON:', jsonData);
           
-          if (!response.ok) {
-            throw new Error(`Manifest fetch failed: ${response.status}`);
-          }
+          // Cache the valid response
+          const cache = await caches.open('manifest-cache');
+          await cache.put(event.request, response.clone());
+          console.log('Cached valid manifest response');
+        } catch (error) {
+          console.error('Invalid JSON in manifest response:', error);
+        }
 
-          // Clone the response before reading it
-          const responseToCache = response.clone();
-
-          try {
-            // Try to parse the JSON to validate it
-            const jsonData = await responseToCache.json();
-            console.log('Successfully parsed manifest JSON:', jsonData);
-            
-            // Cache the valid response
-            const cache = await caches.open('manifest-cache');
-            await cache.put(event.request, response.clone());
-            console.log('Cached valid manifest response');
-          } catch (error) {
-            console.error('Invalid JSON in manifest response:', error);
-          }
-
-          return response;
-        })
-        .catch(error => {
-          console.error('Error fetching manifest:', error);
-          return caches.match(event.request)
-            .then(cachedResponse => {
-              if (cachedResponse) {
-                console.log('Using cached manifest');
-                return cachedResponse;
-              }
-              console.error('No cached manifest available');
-              throw error;
-            });
-        })
+        return response;
+      })
+      .catch(error => {
+        console.error('Error fetching manifest:', error);
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            if (cachedResponse) {
+              console.log('Using cached manifest');
+              return cachedResponse;
+            }
+            console.error('No cached manifest available');
+            throw error;
+          });
+      })
     );
   } else {
     event.respondWith(
