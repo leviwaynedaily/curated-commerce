@@ -65,23 +65,25 @@ export default function Preview() {
 
   // Generate manifest content based on storefront data
   const manifestContent = storefront ? {
-    name: storefront.name,
-    short_name: storefront.name,
+    name: storefront.name || '',
+    short_name: storefront.name || '',
     description: storefront.description || "Welcome to our store",
-    start_url: `/${storefront.slug}`,
+    start_url: `/${storefront.slug || ''}`,
     display: "standalone",
     background_color: storefront.storefront_background_color || "#ffffff",
     theme_color: storefront.main_color || "#000000",
     icons: [
       {
-        src: "/icons/icon-192x192.png",
+        src: storefront.favicon_url || "/icons/icon-192x192.png",
         sizes: "192x192",
-        type: "image/png"
+        type: "image/png",
+        purpose: "any maskable"
       },
       {
-        src: "/icons/icon-512x512.png",
+        src: storefront.favicon_url || "/icons/icon-512x512.png",
         sizes: "512x512",
-        type: "image/png"
+        type: "image/png",
+        purpose: "any maskable"
       }
     ]
   } : null;
@@ -89,11 +91,18 @@ export default function Preview() {
   useEffect(() => {
     if (storefront) {
       console.log("Updating document title and favicon for storefront:", storefront.name);
+      document.title = storefront.page_title || storefront.name || '';
+      
       // Update favicon if provided
       if (storefront.favicon_url) {
         const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
         if (favicon) {
           favicon.href = storefront.favicon_url;
+        } else {
+          const newFavicon = document.createElement('link');
+          newFavicon.rel = 'icon';
+          newFavicon.href = storefront.favicon_url;
+          document.head.appendChild(newFavicon);
         }
       }
     }
@@ -129,6 +138,9 @@ export default function Preview() {
               JSON.stringify(manifestContent)
             )}`}
           />
+          <meta name="theme-color" content={storefront.main_color || "#000000"} />
+          <meta name="background-color" content={storefront.storefront_background_color || "#ffffff"} />
+          <meta name="description" content={storefront.description || "Welcome to our store"} />
         </Helmet>
       )}
       <LivePreview />
