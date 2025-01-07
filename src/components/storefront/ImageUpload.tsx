@@ -27,6 +27,8 @@ export function ImageUpload({
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  // Add timestamp state to force image refresh
+  const [imageTimestamp, setImageTimestamp] = useState(Date.now());
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -92,6 +94,8 @@ export function ImageUpload({
         .getPublicUrl(filePath);
       
       onChange(publicUrl);
+      // Update timestamp to force image refresh
+      setImageTimestamp(Date.now());
 
       if (storefrontId) {
         await queryClient.invalidateQueries({ queryKey: ["storefront", storefrontId] });
@@ -153,7 +157,8 @@ export function ImageUpload({
         <div className="relative w-32 h-32">
           <div className="absolute inset-0 w-full h-full bg-white dark:bg-white rounded-md p-2">
             <img
-              src={value}
+              key={imageTimestamp} // Add key prop to force refresh
+              src={`${value}?t=${imageTimestamp}`} // Add timestamp to URL to prevent caching
               alt="Uploaded image"
               className="w-full h-full object-contain"
               onLoad={(e) => {
