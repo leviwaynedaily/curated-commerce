@@ -47,19 +47,29 @@ self.addEventListener('fetch', (event) => {
       // Look up the storefront ID using the slug from the path
       if (pathSegments.length > 0) {
         const slug = pathSegments[pathSegments.length - 1];
-        console.log('Extracted slug from path:', slug);
+        
+        // Validate slug before proceeding
+        if (!slug || slug.trim() === '') {
+          console.error('Invalid or empty slug');
+          return new Response(JSON.stringify({ error: 'Invalid slug' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+
+        console.log('Using slug to fetch storefront:', slug);
         
         // Get the storefront ID from the slug
         event.respondWith(
-          fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${slug}&select=id`, {
+          fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${encodeURIComponent(slug)}&select=id`, {
             headers: {
               'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDQ1OTg5NzgsImV4cCI6MjAyMDE3NDk3OH0.LvZzOTYqHHWK8mFj51li8OVyxeODHXGxEHUXGwDx_zo'
             }
           })
           .then(async response => {
             if (!response.ok) {
-              console.error('Failed to fetch storefront:', response.status);
-              throw new Error('Failed to fetch storefront');
+              console.error('Failed to fetch storefront:', response.status, response.statusText);
+              throw new Error(`Failed to fetch storefront: ${response.status}`);
             }
             const storefronts = await response.json();
             console.log('Storefronts response:', storefronts);
@@ -70,11 +80,16 @@ self.addEventListener('fetch', (event) => {
             }
             
             storefrontId = storefronts[0].id;
+            if (!storefrontId) {
+              console.error('Invalid storefront ID received');
+              throw new Error('Invalid storefront ID');
+            }
+            
             console.log('Found storefront ID:', storefrontId);
             
             // Use the hardcoded URL pattern with the storefront ID
             const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
-            console.log('Using manifest URL:', manifestUrl);
+            console.log('Fetching manifest from URL:', manifestUrl);
             return fetch(manifestUrl);
           })
           .then(async response => {
@@ -104,15 +119,13 @@ self.addEventListener('fetch', (event) => {
           })
           .catch(error => {
             console.error('Error in manifest fetch chain:', error);
-            return caches.match(event.request)
-              .then(cachedResponse => {
-                if (cachedResponse) {
-                  console.log('Using cached manifest');
-                  return cachedResponse;
-                }
-                console.error('No cached manifest available');
-                throw error;
-              });
+            return new Response(
+              JSON.stringify({ error: error.message }), 
+              { 
+                status: 500, 
+                headers: { 'Content-Type': 'application/json' }
+              }
+            );
           })
         );
         return;
