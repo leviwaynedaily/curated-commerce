@@ -180,6 +180,7 @@ export type Database = {
           icon_72x72: string | null
           icon_96x96: string | null
           id: string
+          manifest_url: string | null
           name: string
           orientation: Database["public"]["Enums"]["pwa_orientation"] | null
           screenshot_desktop: string | null
@@ -204,6 +205,7 @@ export type Database = {
           icon_72x72?: string | null
           icon_96x96?: string | null
           id?: string
+          manifest_url?: string | null
           name: string
           orientation?: Database["public"]["Enums"]["pwa_orientation"] | null
           screenshot_desktop?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           icon_72x72?: string | null
           icon_96x96?: string | null
           id?: string
+          manifest_url?: string | null
           name?: string
           orientation?: Database["public"]["Enums"]["pwa_orientation"] | null
           screenshot_desktop?: string | null

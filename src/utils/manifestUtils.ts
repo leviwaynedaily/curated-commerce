@@ -4,21 +4,6 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
   console.log("Saving manifest for storefront:", storefrontId);
   
   try {
-    // Save to database
-    const { error: dbError } = await supabase
-      .from("manifests")
-      .upsert({
-        storefront_id: storefrontId,
-        manifest_json: manifestData
-      }, {
-        onConflict: 'storefront_id'
-      });
-
-    if (dbError) {
-      console.error("Error saving manifest to database:", dbError);
-      throw dbError;
-    }
-
     // Create manifest.json file
     const manifestBlob = new Blob([JSON.stringify(manifestData, null, 2)], {
       type: 'application/json'
@@ -40,7 +25,41 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
       throw storageError;
     }
 
-    console.log("Manifest saved successfully");
+    // Get the public URL for the manifest
+    const { data: { publicUrl } } = supabase.storage
+      .from('storefront-assets')
+      .getPublicUrl(manifestPath);
+
+    console.log("Generated manifest URL:", publicUrl);
+
+    // Save to database with the manifest URL
+    const { error: dbError } = await supabase
+      .from("manifests")
+      .upsert({
+        storefront_id: storefrontId,
+        manifest_json: manifestData
+      }, {
+        onConflict: 'storefront_id'
+      });
+
+    if (dbError) {
+      console.error("Error saving manifest to database:", dbError);
+      throw dbError;
+    }
+
+    // Update PWA settings with the manifest URL
+    const { error: pwaError } = await supabase
+      .from("pwa_settings")
+      .update({ manifest_url: publicUrl })
+      .eq('storefront_id', storefrontId);
+
+    if (pwaError) {
+      console.error("Error updating PWA settings with manifest URL:", pwaError);
+      throw pwaError;
+    }
+
+    console.log("Manifest saved successfully with URL:", publicUrl);
+    return publicUrl;
   } catch (error) {
     console.error("Error in saveManifest:", error);
     throw error;
