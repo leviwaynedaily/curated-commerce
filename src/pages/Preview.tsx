@@ -82,8 +82,9 @@ export default function Preview() {
 
         if (data?.manifest_url) {
           console.log("Found manifest URL:", data.manifest_url);
-          // Ensure we're using the full URL from Supabase storage
+          // Add timestamp to bust cache and ensure latest version
           const manifestUrlWithTimestamp = `${data.manifest_url}?t=${Date.now()}`;
+          console.log("Using manifest URL with cache busting:", manifestUrlWithTimestamp);
           setManifestUrl(manifestUrlWithTimestamp);
         } else {
           console.log("No manifest URL found for storefront");
