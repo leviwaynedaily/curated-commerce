@@ -1,94 +1,103 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { corsHeaders } from '../_shared/cors.ts'
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Content-Type': 'application/json',
-  'Cache-Control': 'no-cache'
-};
-
-serve(async (req) => {
-  console.log('Serve manifest function called:', {
-    method: req.method,
-    url: req.url,
-    headers: Object.fromEntries(req.headers.entries())
-  });
-
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const url = new URL(req.url);
-    const slug = url.searchParams.get('slug');
+    const url = new URL(req.url)
+    const slug = url.searchParams.get('slug')
 
     if (!slug) {
-      console.error('No slug provided in request');
+      console.error('No slug provided in request')
       return new Response(
-        JSON.stringify({ error: 'Storefront slug is required' }),
-        { status: 400, headers: corsHeaders }
-      );
+        JSON.stringify({ error: 'No slug provided' }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
-    console.log('Processing manifest request for slug:', slug);
+    console.log(`Fetching manifest for storefront with slug: ${slug}`)
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
 
-    if (!supabaseUrl || !supabaseKey) {
-      console.error('Missing Supabase environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Server configuration error' }),
-        { status: 500, headers: corsHeaders }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    console.log('Fetching storefront data for slug:', slug);
-    const { data: storefront, error: storefrontError } = await supabase
+    // Get storefront ID from slug
+    const { data: storefront, error: storefrontError } = await supabaseClient
       .from('storefronts')
       .select('id')
       .eq('slug', slug)
-      .single();
+      .maybeSingle()
 
     if (storefrontError || !storefront) {
-      console.error('Storefront not found for slug:', slug);
+      console.error('Error fetching storefront:', storefrontError)
       return new Response(
         JSON.stringify({ error: 'Storefront not found' }),
-        { status: 404, headers: corsHeaders }
-      );
+        { 
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
-    console.log('Found storefront:', storefront.id);
-    console.log('Fetching manifest for storefront:', storefront.id);
-    
-    const { data: manifest, error: manifestError } = await supabase
+    // Get manifest from manifests table
+    const { data: manifest, error: manifestError } = await supabaseClient
       .from('manifests')
       .select('manifest_json')
       .eq('storefront_id', storefront.id)
-      .single();
+      .maybeSingle()
 
-    if (manifestError || !manifest) {
-      console.error('Manifest not found for storefront:', storefront.id);
+    if (manifestError) {
+      console.error('Error fetching manifest:', manifestError)
       return new Response(
-        JSON.stringify({ error: 'Manifest not found' }),
-        { status: 404, headers: corsHeaders }
-      );
+        JSON.stringify({ error: 'Error fetching manifest' }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
     }
 
-    console.log('Found manifest, serving');
+    if (!manifest) {
+      console.error('No manifest found for storefront')
+      return new Response(
+        JSON.stringify({ error: 'Manifest not found' }),
+        { 
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      )
+    }
 
+    console.log('Successfully retrieved manifest')
+    
+    // Return the stored manifest
     return new Response(
       JSON.stringify(manifest.manifest_json),
-      { headers: corsHeaders }
-    );
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+
   } catch (error) {
-    console.error('Error in serve-manifest function:', error);
+    console.error('Unexpected error:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
-      { status: 500, headers: corsHeaders }
-    );
+      JSON.stringify({ error: 'Internal server error' }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    )
   }
-});
+})
