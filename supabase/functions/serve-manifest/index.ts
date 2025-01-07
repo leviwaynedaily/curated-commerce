@@ -1,7 +1,13 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
 
-Deno.serve(async (req) => {
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Content-Type': 'application/json',
+}
+
+serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -35,21 +41,10 @@ Deno.serve(async (req) => {
       .from('storefronts')
       .select('id')
       .eq('slug', slug)
-      .maybeSingle()
+      .single()
 
-    if (storefrontError) {
+    if (storefrontError || !storefront) {
       console.error('Error fetching storefront:', storefrontError)
-      return new Response(
-        JSON.stringify({ error: 'Error fetching storefront' }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    if (!storefront) {
-      console.error('No storefront found for slug:', slug)
       return new Response(
         JSON.stringify({ error: 'Storefront not found' }),
         { 
@@ -64,21 +59,10 @@ Deno.serve(async (req) => {
       .from('manifests')
       .select('manifest_json')
       .eq('storefront_id', storefront.id)
-      .maybeSingle()
+      .single()
 
-    if (manifestError) {
+    if (manifestError || !manifest) {
       console.error('Error fetching manifest:', manifestError)
-      return new Response(
-        JSON.stringify({ error: 'Error fetching manifest' }),
-        { 
-          status: 500,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      )
-    }
-
-    if (!manifest) {
-      console.error('No manifest found for storefront:', storefront.id)
       return new Response(
         JSON.stringify({ error: 'Manifest not found' }),
         { 
