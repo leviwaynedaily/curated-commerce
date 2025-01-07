@@ -9,24 +9,21 @@ import { supabase } from "@/integrations/supabase/client";
 export function LivePreview() {
   const { slug } = useParams();
   const [searchParams] = useSearchParams();
-  const storefrontId = searchParams.get("storefrontId");
+  const storefrontId = searchParams.get('storefrontId');
   const [error, setError] = useState<string | null>(null);
   const [targetId, setTargetId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStorefrontId = async () => {
       try {
-        // Clear any previous errors
-        setError(null);
-
-        // If we have a storefrontId from URL params (preview mode), use that
+        // Preview mode
         if (storefrontId) {
-          console.log("Preview mode - Using storefront ID from URL:", storefrontId);
+          console.log("Preview mode - Using storefront ID:", storefrontId);
           setTargetId(storefrontId);
           return;
         }
         
-        // If we have a slug (public access mode), look up the storefront
+        // Public access mode
         if (slug) {
           console.log("Public access mode - Looking up storefront by slug:", slug);
           const { data, error } = await supabase
@@ -36,30 +33,23 @@ export function LivePreview() {
             .eq("is_published", true)
             .maybeSingle();
 
-          if (error) {
-            console.error("Error fetching storefront:", error);
+          if (error || !data) {
+            console.error("Store not found for slug:", slug);
             setError("Store not found");
-            setTargetId(null);
-            return;
-          }
-
-          if (!data) {
-            console.error("No storefront found for slug:", slug);
-            setError("Store not found");
-            setTargetId(null);
             return;
           }
 
           console.log("Found storefront ID for slug:", data.id);
           setTargetId(data.id);
-        } else {
-          setError("No store specified");
-          setTargetId(null);
+          return;
         }
+
+        // This should never happen due to routing
+        console.error("No storefront identifier provided");
+        setError("Store not found");
       } catch (err) {
-        console.error("Error in fetchStorefrontId:", err);
-        setError("Failed to load store");
-        setTargetId(null);
+        console.error("Error loading store:", err);
+        setError("Store not found");
       }
     };
 
@@ -71,7 +61,7 @@ export function LivePreview() {
   useEffect(() => {
     if (storefrontError) {
       console.error("Error loading storefront:", storefrontError);
-      setError("Failed to load storefront data");
+      setError("Store not found");
     }
   }, [storefrontError]);
 
