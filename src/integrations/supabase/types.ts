@@ -68,7 +68,7 @@ export type Database = {
           {
             foreignKeyName: "manifests_storefront_id_fkey"
             columns: ["storefront_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "storefronts"
             referencedColumns: ["id"]
           },
