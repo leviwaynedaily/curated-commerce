@@ -141,9 +141,7 @@ export default function Preview() {
           )}
         </Helmet>
       )}
-      <div className="w-full h-screen overflow-hidden">
-        <LivePreview storefrontId={storefrontId} />
-      </div>
+      <LivePreview />
     </>
   );
 }

@@ -11,9 +11,42 @@ export function LivePreview() {
   const [searchParams] = useSearchParams();
   const storefrontId = searchParams.get("storefrontId");
   const [error, setError] = useState<string | null>(null);
+  const [targetId, setTargetId] = useState<string | null>(null);
 
-  // First try to get storefront ID from URL params, then try to look it up by slug
-  const targetId = storefrontId || (slug ? await getStorefrontIdBySlug(slug) : null);
+  // Fetch storefront ID by slug if needed
+  useEffect(() => {
+    const fetchStorefrontId = async () => {
+      if (storefrontId) {
+        setTargetId(storefrontId);
+        return;
+      }
+      
+      if (slug) {
+        try {
+          console.log("Looking up storefront by slug:", slug);
+          const { data, error } = await supabase
+            .from("storefronts")
+            .select("id")
+            .eq("slug", slug)
+            .maybeSingle();
+
+          if (error) {
+            console.error("Error fetching storefront:", error);
+            setError("Failed to load storefront");
+            return;
+          }
+
+          console.log("Found storefront ID for slug:", data?.id);
+          setTargetId(data?.id || null);
+        } catch (error) {
+          console.error("Failed to fetch storefront:", error);
+          setError("Failed to load storefront");
+        }
+      }
+    };
+
+    fetchStorefrontId();
+  }, [slug, storefrontId]);
   
   const { data: previewData, isLoading, error: storefrontError } = useStorefront(targetId || "");
 
@@ -43,7 +76,7 @@ export function LivePreview() {
   }, [previewData?.id]);
 
   if (error) {
-    return <PreviewError message={error} />;
+    return <PreviewError error={error} />;
   }
 
   if (isLoading || !previewData) {
@@ -51,27 +84,4 @@ export function LivePreview() {
   }
 
   return <PreviewContent previewData={previewData} />;
-}
-
-// Helper function to get storefront ID from slug
-async function getStorefrontIdBySlug(slug: string): Promise<string | null> {
-  try {
-    console.log("Looking up storefront by slug:", slug);
-    const { data, error } = await supabase
-      .from("storefronts")
-      .select("id")
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (error) {
-      console.error("Error fetching storefront:", error);
-      return null;
-    }
-
-    console.log("Found storefront ID for slug:", data?.id);
-    return data?.id || null;
-  } catch (error) {
-    console.error("Failed to fetch storefront:", error);
-    return null;
-  }
 }
