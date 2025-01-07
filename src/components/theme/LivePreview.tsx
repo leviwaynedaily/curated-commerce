@@ -13,7 +13,6 @@ export function LivePreview() {
   const [error, setError] = useState<string | null>(null);
   const [targetId, setTargetId] = useState<string | null>(null);
 
-  // Fetch storefront ID by slug if needed
   useEffect(() => {
     const fetchStorefrontId = async () => {
       if (storefrontId) {
@@ -57,23 +56,7 @@ export function LivePreview() {
     }
   }, [storefrontError]);
 
-  // Handle manifest link
-  useEffect(() => {
-    if (previewData?.id) {
-      // Remove any existing manifest link
-      const existingManifest = document.querySelector('link[rel="manifest"]');
-      if (existingManifest) {
-        existingManifest.remove();
-      }
-
-      // Add new manifest link if PWA is configured
-      const manifestUrl = `${window.location.origin}/manifest.json?id=${previewData.id}`;
-      const link = document.createElement('link');
-      link.rel = 'manifest';
-      link.href = manifestUrl;
-      document.head.appendChild(link);
-    }
-  }, [previewData?.id]);
+  // Remove manifest link handling from here since it's now handled by the PWA settings
 
   if (error) {
     return <PreviewError error={error} />;

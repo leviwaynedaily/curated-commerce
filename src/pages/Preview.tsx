@@ -12,7 +12,6 @@ export default function Preview() {
   const { slug } = useParams();
   const [storefrontId, setStorefrontId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -62,41 +61,6 @@ export default function Preview() {
     getStorefrontId();
   }, [searchParams, slug]);
 
-  // Fetch PWA settings when storefrontId is available
-  useEffect(() => {
-    const fetchPWASettings = async () => {
-      if (!storefrontId) {
-        console.log("No storefront ID available for PWA settings");
-        return;
-      }
-
-      try {
-        console.log("Fetching PWA settings for storefront:", storefrontId);
-        const { data, error } = await supabase
-          .from("pwa_settings")
-          .select("manifest_url")
-          .eq("storefront_id", storefrontId)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error fetching PWA settings:", error);
-          return;
-        }
-
-        if (data?.manifest_url) {
-          console.log("Found manifest URL:", data.manifest_url);
-          setManifestUrl(data.manifest_url);
-        } else {
-          console.log("No manifest URL found in PWA settings");
-        }
-      } catch (err) {
-        console.error("Error in fetchPWASettings:", err);
-      }
-    };
-
-    fetchPWASettings();
-  }, [storefrontId]);
-
   const { data: storefront, isLoading: isStorefrontLoading } = useStorefront(storefrontId || '');
 
   useEffect(() => {
@@ -135,9 +99,6 @@ export default function Preview() {
           <title>{storefront.page_title || storefront.name}</title>
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
-          )}
-          {manifestUrl && (
-            <link rel="manifest" href={manifestUrl} />
           )}
         </Helmet>
       )}
