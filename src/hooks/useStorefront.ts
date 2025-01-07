@@ -7,10 +7,6 @@ export function useStorefront(storefrontId: string) {
   return useQuery({
     queryKey: ["storefront", storefrontId],
     queryFn: async () => {
-      if (!storefrontId) {
-        throw new Error("Store not found");
-      }
-
       console.log("Fetching storefront data for ID:", storefrontId);
       
       try {
@@ -22,23 +18,25 @@ export function useStorefront(storefrontId: string) {
 
         if (error) {
           console.error("Error fetching storefront:", error);
-          throw new Error("Store not found");
+          toast.error("Failed to load storefront data");
+          throw error;
         }
 
         if (!data) {
           console.error("No storefront found with ID:", storefrontId);
-          throw new Error("Store not found");
+          toast.error("Storefront not found");
+          throw new Error("Storefront not found");
         }
 
         console.log("Successfully fetched storefront data:", data);
         return data as PreviewData;
       } catch (error) {
         console.error("Failed to fetch storefront:", error);
-        throw new Error("Store not found");
+        toast.error("Failed to load storefront data. Please try refreshing the page.");
+        throw error;
       }
     },
     retry: 1,
-    enabled: !!storefrontId,
     staleTime: 0,
   });
 }

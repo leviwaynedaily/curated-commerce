@@ -12,8 +12,8 @@ export default function Preview() {
   const { slug } = useParams();
   const [storefrontId, setStorefrontId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [pwaSettings, setPwaSettings] = useState<any>(null);
 
   useEffect(() => {
     const getStorefrontId = async () => {
@@ -64,14 +64,17 @@ export default function Preview() {
 
   // Fetch PWA settings when storefrontId is available
   useEffect(() => {
-    const fetchPwaSettings = async () => {
-      if (!storefrontId) return;
+    const fetchPWASettings = async () => {
+      if (!storefrontId) {
+        console.log("No storefront ID available for PWA settings");
+        return;
+      }
 
       try {
         console.log("Fetching PWA settings for storefront:", storefrontId);
         const { data, error } = await supabase
           .from("pwa_settings")
-          .select("*")
+          .select("manifest_url")
           .eq("storefront_id", storefrontId)
           .maybeSingle();
 
@@ -80,108 +83,30 @@ export default function Preview() {
           return;
         }
 
-        console.log("PWA settings fetched:", data);
-        setPwaSettings(data);
+        if (data?.manifest_url) {
+          console.log("Found manifest URL:", data.manifest_url);
+          setManifestUrl(data.manifest_url);
+        } else {
+          console.log("No manifest URL found in PWA settings");
+        }
       } catch (err) {
-        console.error("Error fetching PWA settings:", err);
+        console.error("Error in fetchPWASettings:", err);
       }
     };
 
-    fetchPwaSettings();
+    fetchPWASettings();
   }, [storefrontId]);
 
   const { data: storefront, isLoading: isStorefrontLoading } = useStorefront(storefrontId || '');
 
-  // Generate manifest content based on PWA settings and storefront data
-  const manifestContent = storefront && pwaSettings ? {
-    name: pwaSettings.name || storefront.name || '',
-    short_name: pwaSettings.short_name || storefront.name || '',
-    description: pwaSettings.description || storefront.description || "Welcome to our store",
-    start_url: pwaSettings.start_url || `/${storefront.slug || ''}`,
-    display: pwaSettings.display || "standalone",
-    background_color: pwaSettings.background_color || storefront.storefront_background_color || "#ffffff",
-    theme_color: pwaSettings.theme_color || storefront.main_color || "#000000",
-    icons: [
-      pwaSettings.icon_72x72 && {
-        src: pwaSettings.icon_72x72,
-        sizes: "72x72",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_96x96 && {
-        src: pwaSettings.icon_96x96,
-        sizes: "96x96",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_128x128 && {
-        src: pwaSettings.icon_128x128,
-        sizes: "128x128",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_144x144 && {
-        src: pwaSettings.icon_144x144,
-        sizes: "144x144",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_152x152 && {
-        src: pwaSettings.icon_152x152,
-        sizes: "152x152",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_192x192 && {
-        src: pwaSettings.icon_192x192,
-        sizes: "192x192",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_384x384 && {
-        src: pwaSettings.icon_384x384,
-        sizes: "384x384",
-        type: "image/png",
-        purpose: "any maskable"
-      },
-      pwaSettings.icon_512x512 && {
-        src: pwaSettings.icon_512x512,
-        sizes: "512x512",
-        type: "image/png",
-        purpose: "any maskable"
-      }
-    ].filter(Boolean),
-    screenshots: [
-      pwaSettings.screenshot_mobile && {
-        src: pwaSettings.screenshot_mobile,
-        sizes: "640x1136",
-        type: "image/png",
-        form_factor: "narrow"
-      },
-      pwaSettings.screenshot_desktop && {
-        src: pwaSettings.screenshot_desktop,
-        sizes: "1920x1080",
-        type: "image/png",
-        form_factor: "wide"
-      }
-    ].filter(Boolean)
-  } : null;
-
   useEffect(() => {
     if (storefront) {
       console.log("Updating document title and favicon for storefront:", storefront.name);
-      document.title = storefront.page_title || storefront.name || '';
-      
       // Update favicon if provided
       if (storefront.favicon_url) {
         const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
         if (favicon) {
           favicon.href = storefront.favicon_url;
-        } else {
-          const newFavicon = document.createElement('link');
-          newFavicon.rel = 'icon';
-          newFavicon.href = storefront.favicon_url;
-          document.head.appendChild(newFavicon);
         }
       }
     }
@@ -205,24 +130,20 @@ export default function Preview() {
 
   return (
     <>
-      {storefront && manifestContent && (
+      {storefront && (
         <Helmet>
           <title>{storefront.page_title || storefront.name}</title>
           {storefront.favicon_url && (
             <link rel="icon" type="image/x-icon" href={storefront.favicon_url} />
           )}
-          <link 
-            rel="manifest" 
-            href={`data:application/json;charset=utf-8,${encodeURIComponent(
-              JSON.stringify(manifestContent)
-            )}`}
-          />
-          <meta name="theme-color" content={pwaSettings?.theme_color || storefront.main_color || "#000000"} />
-          <meta name="background-color" content={pwaSettings?.background_color || storefront.storefront_background_color || "#ffffff"} />
-          <meta name="description" content={pwaSettings?.description || storefront.description || "Welcome to our store"} />
+          {manifestUrl && (
+            <link rel="manifest" href={manifestUrl} />
+          )}
         </Helmet>
       )}
-      <LivePreview />
+      <div className="w-full h-screen overflow-hidden">
+        <LivePreview storefrontId={storefrontId} />
+      </div>
     </>
   );
 }

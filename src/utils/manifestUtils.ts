@@ -13,7 +13,7 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
     const manifestPath = `${storefrontId}/manifest/manifest.json`;
     console.log("Saving manifest to storage path:", manifestPath);
     
-    const { error: storageError, data: storageData } = await supabase.storage
+    const { error: storageError } = await supabase.storage
       .from('storefront-assets')
       .upload(manifestPath, manifestBlob, {
         contentType: 'application/json',
@@ -25,13 +25,14 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
       throw storageError;
     }
 
-    console.log("Storage response:", storageData);
+    // Get the public URL for the manifest
+    const { data: { publicUrl } } = supabase.storage
+      .from('storefront-assets')
+      .getPublicUrl(manifestPath);
 
-    // Get the public URL for the manifest - using the direct storage URL format
-    const publicUrl = `${supabase.storageUrl}/object/public/storefront-assets/${manifestPath}`;
     console.log("Generated manifest URL:", publicUrl);
 
-    // Save the manifest data to the manifests table
+    // Save to database with the manifest URL
     const { error: dbError } = await supabase
       .from("manifests")
       .upsert({
@@ -49,10 +50,7 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
     // Update PWA settings with the manifest URL
     const { error: pwaError } = await supabase
       .from("pwa_settings")
-      .update({ 
-        manifest_url: publicUrl,
-        updated_at: new Date().toISOString()
-      })
+      .update({ manifest_url: publicUrl })
       .eq('storefront_id', storefrontId);
 
     if (pwaError) {
