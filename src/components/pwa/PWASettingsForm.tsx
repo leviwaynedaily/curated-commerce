@@ -102,6 +102,8 @@ export function PWASettingsForm() {
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
+        name: values.name || "", // Ensure required field is never undefined
+        short_name: values.short_name || "", // Ensure required field is never undefined
       };
       
       console.log("Saving PWA settings draft:", dataToSave);
@@ -146,6 +148,8 @@ export function PWASettingsForm() {
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
+        name: values.name || "", // Ensure required field is never undefined
+        short_name: values.short_name || "", // Ensure required field is never undefined
       };
       
       console.log("Saving PWA settings:", dataToSave);
