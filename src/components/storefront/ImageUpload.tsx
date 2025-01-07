@@ -25,7 +25,16 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId, enfor
 
     // Check file type
     const fileType = file.type.toLowerCase();
-    if (!fileType.match(/^image\/(png|jpeg|jpg|svg\+xml|x-icon|vnd.microsoft.icon)$/)) {
+    
+    // If enforceFilename is used (for PWA icons), only allow PNG
+    if (enforceFilename && fileType !== 'image/png') {
+      toast({
+        title: "Invalid file type",
+        description: "PWA icons must be PNG files. Please convert your image to PNG format.",
+        variant: "destructive",
+      });
+      return;
+    } else if (!fileType.match(/^image\/(png|jpeg|jpg|svg\+xml|x-icon|vnd.microsoft.icon)$/)) {
       toast({
         title: "Invalid file type",
         description: "Please upload a PNG, JPEG, SVG, or ICO file",
@@ -95,7 +104,7 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId, enfor
       <div className="flex items-center gap-4">
         <input
           type="file"
-          accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/x-icon,image/vnd.microsoft.icon"
+          accept={enforceFilename ? "image/png" : "image/png,image/jpeg,image/jpg,image/svg+xml,image/x-icon,image/vnd.microsoft.icon"}
           onChange={handleUpload}
           disabled={isUploading}
           className="hidden"
