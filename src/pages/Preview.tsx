@@ -68,6 +68,7 @@ export default function Preview() {
       if (!storefrontId) return;
 
       try {
+        console.log("Fetching PWA settings for storefront:", storefrontId);
         const { data, error } = await supabase
           .from("pwa_settings")
           .select("manifest_url")
@@ -81,7 +82,11 @@ export default function Preview() {
 
         if (data?.manifest_url) {
           console.log("Found manifest URL:", data.manifest_url);
-          setManifestUrl(data.manifest_url);
+          // Ensure we're using the full URL from Supabase storage
+          const manifestUrlWithTimestamp = `${data.manifest_url}?t=${Date.now()}`;
+          setManifestUrl(manifestUrlWithTimestamp);
+        } else {
+          console.log("No manifest URL found for storefront");
         }
       } catch (err) {
         console.error("Error fetching manifest URL:", err);
