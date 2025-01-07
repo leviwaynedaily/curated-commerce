@@ -11,9 +11,10 @@ interface ImageUploadProps {
   bucket: string;
   path: string;
   storefrontId?: string;
+  enforceFilename?: string;
 }
 
-export function ImageUpload({ value, onChange, bucket, path, storefrontId }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, bucket, path, storefrontId, enforceFilename }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -36,18 +37,22 @@ export function ImageUpload({ value, onChange, bucket, path, storefrontId }: Ima
     try {
       setIsUploading(true);
 
-      const fileExt = fileType === 'image/svg+xml' ? 'svg' : 
+      // Use enforced filename if provided, otherwise generate a random one
+      const filename = enforceFilename || `${Math.random()}.${fileType === 'image/svg+xml' ? 'svg' : 
                      fileType.includes('icon') ? 'ico' : 
-                     file.name.split('.').pop();
+                     file.name.split('.').pop()}`;
                      
       const filePath = storefrontId 
-        ? `${storefrontId}/${path}/${Math.random()}.${fileExt}`
-        : `${path}/${Math.random()}.${fileExt}`;
+        ? `${storefrontId}/${path}/${filename}`
+        : `${path}/${filename}`;
+
+      console.log("Uploading file to path:", filePath);
 
       const { error: uploadError, data } = await supabase.storage
         .from(bucket)
         .upload(filePath, file, {
-          contentType: fileType
+          contentType: fileType,
+          upsert: true // Always overwrite if enforceFilename is used
         });
 
       if (uploadError) throw uploadError;

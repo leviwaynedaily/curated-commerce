@@ -66,6 +66,7 @@ export function PWAIconUpload({ form, name, size, description }: PWAIconUploadPr
         bucket="storefront-assets"
         path={`pwa/icons/${size}`}
         storefrontId={localStorage.getItem('lastStorefrontId') || undefined}
+        enforceFilename={`${size}.png`}
       />
     </div>
   );
