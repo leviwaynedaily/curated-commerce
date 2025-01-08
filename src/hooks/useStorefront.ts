@@ -3,12 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { toast } from "sonner";
 
-export function useStorefront(storefrontId: string) {
+export function useStorefront(storefrontId: string | undefined | null) {
   return useQuery({
     queryKey: ["storefront", storefrontId],
     queryFn: async () => {
       console.log("Fetching storefront data for ID:", storefrontId);
       
+      if (!storefrontId) {
+        console.log("No storefront ID provided");
+        return null;
+      }
+
       try {
         const { data, error } = await supabase
           .from("storefronts")
@@ -38,5 +43,6 @@ export function useStorefront(storefrontId: string) {
     },
     retry: 1,
     staleTime: 0,
+    enabled: !!storefrontId, // Only run query if storefrontId exists
   });
 }
