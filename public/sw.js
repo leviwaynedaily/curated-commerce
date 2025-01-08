@@ -38,26 +38,26 @@ self.addEventListener('fetch', (event) => {
           const storefrontId = url.searchParams.get('storefrontId');
           
           if (!storefrontId) {
-            console.error('No storefront ID provided in manifest request');
+            console.error('Manifest Request: No storefront ID provided');
             return new Response(JSON.stringify({ error: 'No storefront ID provided' }), {
               status: 400,
               headers: { 'Content-Type': 'application/json' }
             });
           }
           
+          console.log('Manifest Request: Fetching for storefront', storefrontId);
           const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
-          console.log('Fetching manifest from:', manifestUrl);
           
           // Try cache first
           const cache = await caches.open('manifest-cache');
           const cachedResponse = await cache.match(event.request);
           
           if (cachedResponse) {
-            console.log('Using cached manifest');
+            console.log('Manifest Request: Using cached manifest');
             return cachedResponse;
           }
           
-          // If not in cache, fetch from network
+          console.log('Manifest Request: Fetching from storage:', manifestUrl);
           const response = await fetch(manifestUrl);
           
           if (!response.ok) {
@@ -70,13 +70,13 @@ self.addEventListener('fetch', (event) => {
           // Validate JSON before caching
           const jsonData = await responseToCache.json();
           if (jsonData) {
+            console.log('Manifest Request: Successfully fetched manifest:', jsonData);
             await cache.put(event.request, response.clone());
-            console.log('Cached manifest response');
           }
           
           return response;
         } catch (error) {
-          console.error('Error handling manifest request:', error);
+          console.error('Manifest Request Error:', error);
           return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
