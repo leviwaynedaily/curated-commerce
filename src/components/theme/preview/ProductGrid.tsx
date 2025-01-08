@@ -108,11 +108,16 @@ export function ProductGrid({
       </div>
 
       {/* Loading indicator */}
-      <div ref={ref} className="w-full flex justify-center py-8">
+      <div 
+        ref={ref} 
+        className={`w-full flex justify-center py-8 transition-opacity duration-300 ${isFetchingNextPage ? 'opacity-100' : 'opacity-0'}`}
+      >
         {isFetchingNextPage && (
-          <div className="flex flex-col items-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="text-sm text-gray-500">Loading more products...</span>
+          <div className="flex flex-col items-center gap-2 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-sm">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <span className="text-sm text-gray-600">Loading more products...</span>
+            </div>
           </div>
         )}
       </div>
