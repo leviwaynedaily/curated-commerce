@@ -8,19 +8,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#000000" />
     <script>
-      const path = window.location.pathname;
       const searchParams = new URLSearchParams(window.location.search);
       const storefrontId = searchParams.get('storefrontId');
-      const slug = path.split('/')[1];
       
-      if (slug || storefrontId) {
+      if (storefrontId) {
         const fetchManifest = async () => {
           try {
-            const targetId = storefrontId || slug;
-            console.log('Attempting to fetch manifest for:', targetId);
+            console.log('Attempting to fetch manifest for:', storefrontId);
             
-            // Get manifest URL from storage
-            const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${targetId}/manifest/manifest.json`;
+            const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
             console.log('Manifest URL:', manifestUrl);
             
             const response = await fetch(manifestUrl);

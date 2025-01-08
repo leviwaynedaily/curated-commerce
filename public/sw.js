@@ -30,44 +30,39 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Extract the storefront ID from the URL if present
-  const url = new URL(event.request.url);
-  const storefrontId = url.searchParams.get('storefrontId');
-  
   if (event.request.url.includes('/manifest/manifest.json')) {
     console.log('Intercepting manifest request:', event.request.url);
-    console.log('Storefront ID from URL:', storefrontId);
+    
+    const url = new URL(event.request.url);
+    const storefrontId = url.searchParams.get('storefrontId');
     
     if (!storefrontId) {
       console.error('No storefront ID provided in manifest request');
       return;
     }
     
-    // Construct the correct manifest URL using the storefront ID
     const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
     console.log('Fetching manifest from:', manifestUrl);
     
     event.respondWith(
       fetch(manifestUrl)
         .then(async response => {
-          console.log('Manifest fetch response:', response.status, response.statusText);
+          console.log('Manifest fetch response:', response.status);
           
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
           }
 
-          // Clone the response before reading it
           const responseToCache = response.clone();
 
           try {
-            // Try to parse the JSON to validate it
             const jsonData = await responseToCache.json();
-            console.log('Successfully parsed manifest JSON:', jsonData);
+            console.log('Successfully parsed manifest JSON');
             
             if (jsonData) {
               const cache = await caches.open('manifest-cache');
               await cache.put(event.request, response.clone());
-              console.log('Cached valid manifest response');
+              console.log('Cached manifest response');
             }
           } catch (error) {
             console.error('Invalid JSON in manifest response:', error);
