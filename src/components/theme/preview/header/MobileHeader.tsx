@@ -94,13 +94,8 @@ export function MobileHeader({
       </div>
 
       {showSearch && (
-        <div 
-          className="w-full px-4 py-2 border-t border-gray-100 bg-white shadow-lg"
-          style={{
-            borderColor: `${previewData.main_color}20`,
-          }}
-        >
-          <div className="relative">
+        <div className="w-full bg-white shadow-lg">
+          <div className="relative p-4">
             <Input
               type="search"
               placeholder="Search..."
@@ -113,7 +108,7 @@ export function MobileHeader({
               }}
             />
             <Search 
-              className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
+              className="absolute left-7 top-1/2 h-5 w-5 -translate-y-1/2"
               style={{ color: previewData.main_color }}
             />
           </div>
