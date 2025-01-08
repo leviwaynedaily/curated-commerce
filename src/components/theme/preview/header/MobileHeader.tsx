@@ -36,8 +36,8 @@ export function MobileHeader({
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="flex items-center justify-between md:hidden py-4">
-      <div className="flex items-center gap-2">
+    <div className="relative flex items-center justify-between md:hidden py-4">
+      <div className={`flex items-center gap-2 transition-opacity duration-200 ${showSearch ? 'opacity-0' : 'opacity-100'}`}>
         {previewData.logo_url && (
           <img
             src={previewData.logo_url}
