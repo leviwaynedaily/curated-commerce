@@ -26,49 +26,42 @@ export function StorefrontSwitcher() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  // First check authentication and get business data
-  const { data: business, isLoading: isLoadingBusiness, error: businessError, refetch: refetchBusiness } = useQuery({
-    queryKey: ["business"],
+  // First check authentication
+  const { data: session } = useQuery({
+    queryKey: ["session"],
     queryFn: async () => {
-      try {
-        console.log("Checking authentication and fetching business data");
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-        
-        if (authError) {
-          console.error("Auth error:", authError);
-          throw authError;
-        }
-
-        if (!user) {
-          console.log("No authenticated user found");
-          navigate("/login");
-          return null;
-        }
-
-        console.log("Fetching business for user:", user.id);
-        const { data, error } = await supabase
-          .from("businesses")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle()
-
-        if (error) {
-          console.error("Error fetching business:", error)
-          throw error
-        }
-
-        console.log("Fetched business data:", data);
-        return data
-      } catch (error) {
-        console.error("Failed to fetch business data:", error);
-        throw error;
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error("Session error:", error)
+        return null
       }
+      return session
     },
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
   })
 
-  // Then fetch storefronts only if we have business data
+  // Then fetch business data only if we have a session
+  const { data: business, isLoading: isLoadingBusiness, error: businessError, refetch: refetchBusiness } = useQuery({
+    queryKey: ["business", session?.user?.id],
+    queryFn: async () => {
+      if (!session?.user?.id) return null
+
+      console.log("Fetching business for user:", session.user.id)
+      const { data, error } = await supabase
+        .from("businesses")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .maybeSingle()
+
+      if (error) {
+        console.error("Error fetching business:", error)
+        throw error
+      }
+
+      return data
+    },
+    enabled: !!session?.user?.id,
+  })
+
   const { data: storefronts, isLoading: isLoadingStorefronts, error: storefrontsError, refetch: refetchStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {

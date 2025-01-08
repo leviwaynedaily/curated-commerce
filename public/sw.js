@@ -31,57 +31,58 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   if (event.request.url.includes('/manifest/manifest.json')) {
-    console.log('Intercepting manifest request:', event.request.url);
-    
-    const url = new URL(event.request.url);
-    const storefrontId = url.searchParams.get('storefrontId');
-    
-    if (!storefrontId) {
-      console.error('No storefront ID provided in manifest request');
-      return;
-    }
-    
-    const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
-    console.log('Fetching manifest from:', manifestUrl);
-    
     event.respondWith(
-      fetch(manifestUrl)
-        .then(async response => {
-          console.log('Manifest fetch response:', response.status);
+      (async () => {
+        try {
+          const url = new URL(event.request.url);
+          const storefrontId = url.searchParams.get('storefrontId');
+          
+          if (!storefrontId) {
+            console.error('No storefront ID provided in manifest request');
+            return new Response(JSON.stringify({ error: 'No storefront ID provided' }), {
+              status: 400,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+          
+          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+          console.log('Fetching manifest from:', manifestUrl);
+          
+          // Try cache first
+          const cache = await caches.open('manifest-cache');
+          const cachedResponse = await cache.match(event.request);
+          
+          if (cachedResponse) {
+            console.log('Using cached manifest');
+            return cachedResponse;
+          }
+          
+          // If not in cache, fetch from network
+          const response = await fetch(manifestUrl);
           
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
           }
-
+          
+          // Clone the response before caching
           const responseToCache = response.clone();
-
-          try {
-            const jsonData = await responseToCache.json();
-            console.log('Successfully parsed manifest JSON');
-            
-            if (jsonData) {
-              const cache = await caches.open('manifest-cache');
-              await cache.put(event.request, response.clone());
-              console.log('Cached manifest response');
-            }
-          } catch (error) {
-            console.error('Invalid JSON in manifest response:', error);
+          
+          // Validate JSON before caching
+          const jsonData = await responseToCache.json();
+          if (jsonData) {
+            await cache.put(event.request, response.clone());
+            console.log('Cached manifest response');
           }
-
+          
           return response;
-        })
-        .catch(error => {
-          console.error('Error fetching manifest:', error);
-          return caches.match(event.request)
-            .then(cachedResponse => {
-              if (cachedResponse) {
-                console.log('Using cached manifest');
-                return cachedResponse;
-              }
-              console.error('No cached manifest available');
-              throw error;
-            });
-        })
+        } catch (error) {
+          console.error('Error handling manifest request:', error);
+          return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+      })()
     );
   } else {
     event.respondWith(
