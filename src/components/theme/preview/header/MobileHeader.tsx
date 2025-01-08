@@ -36,88 +36,89 @@ export function MobileHeader({
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="relative flex items-center justify-between md:hidden py-4">
-      <div className={`flex items-center gap-2 transition-opacity duration-200 ${showSearch ? 'opacity-0' : 'opacity-100'}`}>
-        {previewData.logo_url && (
-          <img
-            src={previewData.logo_url}
-            alt={previewData.name}
-            className="h-10 w-auto cursor-pointer"
-            onClick={onLogoClick}
-          />
-        )}
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className="relative flex items-center">
-          {showSearch ? (
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-[calc(100vw-120px)] pl-10 h-11 text-base rounded-full shadow-lg"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                autoFocus
-                onBlur={() => {
-                  if (!searchQuery) {
-                    setShowSearch(false);
-                  }
-                }}
-                style={{
-                  backgroundColor: `${previewData.main_color}10`,
-                  borderColor: previewData.main_color,
-                }}
-              />
-              <Search 
-                className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
-                style={{ color: previewData.main_color }}
-              />
-            </div>
-          ) : (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowSearch(true)}
-              style={{ 
-                backgroundColor: `${previewData.main_color}10`,
-                color: previewData.main_color
-              }}
-              className="hover:bg-opacity-20 h-11 w-11"
-            >
-              <Search className="h-6 w-6" />
-            </Button>
+    <div className="md:hidden">
+      <div className="flex items-center justify-between py-4">
+        <div className="flex items-center gap-2">
+          {previewData.logo_url && (
+            <img
+              src={previewData.logo_url}
+              alt={previewData.name}
+              className="h-10 w-auto cursor-pointer"
+              onClick={onLogoClick}
+            />
           )}
         </div>
 
-        <FilterDropdown
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={onCategoryChange}
-          mainColor={previewData.main_color}
-        />
-
-        <HeaderDropdown
-          currentSort={currentSort}
-          onSortChange={onSortChange}
-          mainColor={previewData.main_color}
-        />
-
-        {previewData.enable_instructions && (
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
-            onClick={onShowInstructions}
+            onClick={() => setShowSearch(!showSearch)}
             style={{ 
               backgroundColor: `${previewData.main_color}10`,
               color: previewData.main_color
             }}
             className="hover:bg-opacity-20 h-11 w-11"
           >
-            <CircleHelp className="h-6 w-6" />
+            <Search className="h-6 w-6" />
           </Button>
-        )}
+
+          <FilterDropdown
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={onCategoryChange}
+            mainColor={previewData.main_color}
+          />
+
+          <HeaderDropdown
+            currentSort={currentSort}
+            onSortChange={onSortChange}
+            mainColor={previewData.main_color}
+          />
+
+          {previewData.enable_instructions && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onShowInstructions}
+              style={{ 
+                backgroundColor: `${previewData.main_color}10`,
+                color: previewData.main_color
+              }}
+              className="hover:bg-opacity-20 h-11 w-11"
+            >
+              <CircleHelp className="h-6 w-6" />
+            </Button>
+          )}
+        </div>
       </div>
+
+      {showSearch && (
+        <div 
+          className="w-full px-4 py-2 border-t border-gray-100 bg-white shadow-lg"
+          style={{
+            borderColor: `${previewData.main_color}20`,
+          }}
+        >
+          <div className="relative">
+            <Input
+              type="search"
+              placeholder="Search..."
+              className="w-full pl-10 h-11 text-base rounded-full bg-white"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
+              autoFocus
+              style={{
+                borderColor: previewData.main_color,
+              }}
+            />
+            <Search 
+              className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2"
+              style={{ color: previewData.main_color }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
