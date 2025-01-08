@@ -16,7 +16,7 @@
           try {
             console.log('Attempting to fetch manifest for:', storefrontId);
             
-            const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+            const manifestUrl = `/manifest/manifest.json?storefrontId=${storefrontId}`;
             console.log('Manifest URL:', manifestUrl);
             
             const response = await fetch(manifestUrl);
