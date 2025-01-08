@@ -53,7 +53,7 @@ export function DesktopHeader({
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-64 pl-8 h-9"
+                className="w-80 pl-10 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 autoFocus
@@ -68,7 +68,7 @@ export function DesktopHeader({
                 }}
               />
               <Search 
-                className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2" 
+                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
                 style={{ color: previewData.main_color }}
               />
             </div>
