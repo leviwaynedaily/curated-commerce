@@ -32,14 +32,17 @@ export function FilterDropdown({
             backgroundColor: `${mainColor}10`,
             color: mainColor
           }}
-          className="hover:bg-opacity-20 h-11 w-11" // Increased from h-9 w-9 to h-11 w-11
+          className="hover:bg-opacity-20 h-11 w-11"
         >
-          <Filter className="h-6 w-6" /> {/* Increased icon size */}
+          <Filter className="h-6 w-6" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48"> {/* Increased width */}
+      <DropdownMenuContent 
+        align="end" 
+        className="w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg backdrop-blur-lg"
+      >
         <DropdownMenuItem
-          className="text-base py-3" // Increased text size and padding
+          className="text-base py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
           onClick={() => onCategoryChange?.(null)}
         >
           All Categories
@@ -47,7 +50,7 @@ export function FilterDropdown({
         {categories.map((category) => (
           <DropdownMenuItem
             key={category}
-            className="text-base py-3" // Increased text size and padding
+            className="text-base py-3 hover:bg-gray-100 dark:hover:bg-gray-700"
             onClick={() => onCategoryChange?.(category)}
           >
             {category}
