@@ -4,13 +4,25 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
   console.log("Saving manifest for storefront:", storefrontId);
   
   try {
+    // First get the storefront slug
+    const { data: storefront, error: storefrontError } = await supabase
+      .from("storefronts")
+      .select("slug")
+      .eq("id", storefrontId)
+      .single();
+
+    if (storefrontError || !storefront) {
+      console.error("Error fetching storefront:", storefrontError);
+      throw storefrontError;
+    }
+
     // Create manifest.json file
     const manifestBlob = new Blob([JSON.stringify(manifestData, null, 2)], {
       type: 'application/json'
     });
 
-    // Save to storage using storefront ID in the path
-    const manifestPath = `${storefrontId}/manifest/manifest.json`;
+    // Save to storage using storefront slug in the path
+    const manifestPath = `${storefront.slug}/manifest/manifest.json`;
     console.log("Saving manifest to storage path:", manifestPath);
     
     const { error: storageError } = await supabase.storage

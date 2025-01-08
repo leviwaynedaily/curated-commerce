@@ -35,18 +35,18 @@ self.addEventListener('fetch', (event) => {
       (async () => {
         try {
           const url = new URL(event.request.url);
-          const storefrontId = url.searchParams.get('storefrontId');
+          const slug = url.searchParams.get('slug');
           
-          if (!storefrontId) {
-            console.error('Manifest Request: No storefront ID provided');
-            return new Response(JSON.stringify({ error: 'No storefront ID provided' }), {
+          if (!slug) {
+            console.error('Manifest Request: No slug provided');
+            return new Response(JSON.stringify({ error: 'No slug provided' }), {
               status: 400,
               headers: { 'Content-Type': 'application/json' }
             });
           }
           
-          console.log('Manifest Request: Fetching for storefront', storefrontId);
-          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${storefrontId}/manifest/manifest.json`;
+          console.log('Manifest Request: Fetching for storefront with slug:', slug);
+          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${slug}/manifest/manifest.json`;
           
           // Try cache first
           const cache = await caches.open('manifest-cache');

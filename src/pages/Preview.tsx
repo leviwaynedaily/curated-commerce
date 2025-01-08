@@ -72,22 +72,16 @@ export default function Preview() {
 
       try {
         console.log("Fetching PWA settings for storefront:", storefrontId);
-        const { data, error } = await supabase
-          .from("pwa_settings")
-          .select("manifest_url")
-          .eq("storefront_id", storefrontId)
-          .maybeSingle();
+        const { data: storefront } = await supabase
+          .from("storefronts")
+          .select("slug")
+          .eq("id", storefrontId)
+          .single();
 
-        if (error) {
-          console.error("Error fetching PWA settings:", error);
-          return;
-        }
-
-        if (data?.manifest_url) {
-          console.log("Found manifest URL:", data.manifest_url);
-          setManifestUrl(data.manifest_url);
-        } else {
-          console.log("No manifest URL found in PWA settings");
+        if (storefront?.slug) {
+          const manifestUrl = `/manifest/manifest.json?slug=${storefront.slug}`;
+          console.log("Setting manifest URL:", manifestUrl);
+          setManifestUrl(manifestUrl);
         }
       } catch (err) {
         console.error("Error in fetchPWASettings:", err);
