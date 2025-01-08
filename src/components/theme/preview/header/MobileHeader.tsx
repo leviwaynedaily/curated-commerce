@@ -36,26 +36,26 @@ export function MobileHeader({
   const [showSearch, setShowSearch] = useState(false);
 
   return (
-    <div className="flex items-center justify-between md:hidden">
+    <div className="flex items-center justify-between md:hidden py-4">
       <div className="flex items-center gap-2">
         {previewData.logo_url && (
           <img
             src={previewData.logo_url}
             alt={previewData.name}
-            className="h-8 w-auto cursor-pointer"
+            className="h-10 w-auto cursor-pointer" // Increased from h-8 to h-10
             onClick={onLogoClick}
           />
         )}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3"> {/* Increased gap from 2 to 3 */}
         <div className="relative flex items-center">
           {showSearch ? (
             <div className="absolute right-0 top-1/2 -translate-y-1/2 flex items-center">
               <Input
                 type="search"
                 placeholder="Search..."
-                className="w-32 pl-8 h-9"
+                className="w-40 pl-10 h-11 text-base" // Increased width, height and font size
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 autoFocus
@@ -70,7 +70,7 @@ export function MobileHeader({
                 }}
               />
               <Search 
-                className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2" 
+                className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2" // Increased icon size
                 style={{ color: previewData.main_color }}
               />
             </div>
@@ -83,9 +83,9 @@ export function MobileHeader({
                 backgroundColor: `${previewData.main_color}10`,
                 color: previewData.main_color
               }}
-              className="hover:bg-opacity-20 h-9 w-9"
+              className="hover:bg-opacity-20 h-11 w-11" // Increased from h-9 w-9 to h-11 w-11
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-6 w-6" /> {/* Increased icon size */}
             </Button>
           )}
         </div>
@@ -112,9 +112,9 @@ export function MobileHeader({
               backgroundColor: `${previewData.main_color}10`,
               color: previewData.main_color
             }}
-            className="hover:bg-opacity-20 h-9 w-9"
+            className="hover:bg-opacity-20 h-11 w-11" // Increased from h-9 w-9 to h-11 w-11
           >
-            <CircleHelp className="h-5 w-5" />
+            <CircleHelp className="h-6 w-6" /> {/* Increased icon size */}
           </Button>
         )}
       </div>

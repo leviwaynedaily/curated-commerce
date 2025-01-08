@@ -1,78 +1,59 @@
-import { ArrowDownUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import { SlidersHorizontal } from "lucide-react";
 
 interface HeaderDropdownProps {
   currentSort?: string;
   onSortChange?: (sort: string) => void;
-  mainColor?: string;
+  mainColor: string;
 }
 
-export function HeaderDropdown({
-  currentSort,
-  onSortChange,
-  mainColor,
-}: HeaderDropdownProps) {
-  console.log("HeaderDropdown - currentSort:", currentSort);
-
-  const handleSortChange = (sort: string) => {
-    console.log("Changing sort to:", sort);
-    onSortChange?.(sort);
-  };
-
-  const isActive = currentSort && currentSort !== "newest";
-
+export function HeaderDropdown({ currentSort, onSortChange, mainColor }: HeaderDropdownProps) {
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
           style={{ 
-            backgroundColor: isActive ? `${mainColor}20` : `${mainColor}10`,
+            backgroundColor: `${mainColor}10`,
             color: mainColor
           }}
-          className="hover:bg-opacity-20 h-9 w-9"
+          className="hover:bg-opacity-20 h-11 w-11" // Increased from h-9 w-9 to h-11 w-11
         >
-          <ArrowDownUp className="h-4 w-4" />
+          <SlidersHorizontal className="h-6 w-6" /> {/* Increased icon size */}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="w-56 bg-white/95 backdrop-blur-sm" 
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Sort By</DropdownMenuLabel>
-        <DropdownMenuCheckboxItem
-          checked={currentSort === "newest"}
-          onCheckedChange={() => handleSortChange("newest")}
+      <DropdownMenuContent align="end" className="w-48"> {/* Increased width */}
+        <DropdownMenuItem
+          className="text-base py-3" // Increased text size and padding
+          onClick={() => onSortChange?.("newest")}
         >
           Newest First
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={currentSort === "oldest"}
-          onCheckedChange={() => handleSortChange("oldest")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="text-base py-3" // Increased text size and padding
+          onClick={() => onSortChange?.("oldest")}
         >
           Oldest First
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={currentSort === "price-desc"}
-          onCheckedChange={() => handleSortChange("price-desc")}
-        >
-          Price: High to Low
-        </DropdownMenuCheckboxItem>
-        <DropdownMenuCheckboxItem
-          checked={currentSort === "price-asc"}
-          onCheckedChange={() => handleSortChange("price-asc")}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="text-base py-3" // Increased text size and padding
+          onClick={() => onSortChange?.("price-asc")}
         >
           Price: Low to High
-        </DropdownMenuCheckboxItem>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className="text-base py-3" // Increased text size and padding
+          onClick={() => onSortChange?.("price-desc")}
+        >
+          Price: High to Low
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

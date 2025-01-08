@@ -1,19 +1,17 @@
-import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
+  DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu";
+import { Filter } from "lucide-react";
 
 interface FilterDropdownProps {
   categories: string[];
   selectedCategory: string | null;
-  onCategoryChange?: (category: string | null) => void;
-  mainColor?: string;
+  onCategoryChange: ((category: string | null) => void) | undefined;
+  mainColor: string;
 }
 
 export function FilterDropdown({
@@ -22,43 +20,38 @@ export function FilterDropdown({
   onCategoryChange,
   mainColor,
 }: FilterDropdownProps) {
-  console.log("FilterDropdown - selectedCategory:", selectedCategory);
-  console.log("FilterDropdown - available categories:", categories);
+  if (!categories.length) return null;
 
   return (
-    <DropdownMenu modal={false}>
+    <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           size="icon"
           style={{ 
-            backgroundColor: selectedCategory ? `${mainColor}20` : `${mainColor}10`,
+            backgroundColor: `${mainColor}10`,
             color: mainColor
           }}
-          className="hover:bg-opacity-20 h-9 w-9"
+          className="hover:bg-opacity-20 h-11 w-11" // Increased from h-9 w-9 to h-11 w-11
         >
-          <Filter className="h-4 w-4" />
+          <Filter className="h-6 w-6" /> {/* Increased icon size */}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent 
-        className="w-56 bg-white/95 backdrop-blur-sm" 
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">Categories</DropdownMenuLabel>
-        <DropdownMenuCheckboxItem
-          checked={selectedCategory === null}
-          onCheckedChange={() => onCategoryChange?.(null)}
+      <DropdownMenuContent align="end" className="w-48"> {/* Increased width */}
+        <DropdownMenuItem
+          className="text-base py-3" // Increased text size and padding
+          onClick={() => onCategoryChange?.(null)}
         >
           All Categories
-        </DropdownMenuCheckboxItem>
+        </DropdownMenuItem>
         {categories.map((category) => (
-          <DropdownMenuCheckboxItem
+          <DropdownMenuItem
             key={category}
-            checked={selectedCategory === category}
-            onCheckedChange={() => onCategoryChange?.(category)}
+            className="text-base py-3" // Increased text size and padding
+            onClick={() => onCategoryChange?.(category)}
           >
             {category}
-          </DropdownMenuCheckboxItem>
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
