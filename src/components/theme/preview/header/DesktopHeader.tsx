@@ -53,7 +53,7 @@ export function DesktopHeader({
               <Input
                 type="search"
                 placeholder="Search products..."
-                className="w-80 pl-10 h-9 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+                className="w-80 pl-10 h-9 rounded-full shadow-lg"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 autoFocus

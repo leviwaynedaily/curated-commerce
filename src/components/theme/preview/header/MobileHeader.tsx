@@ -55,7 +55,7 @@ export function MobileHeader({
               <Input
                 type="search"
                 placeholder="Search..."
-                className="w-[calc(100vw-120px)] pl-10 h-11 text-base rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg"
+                className="w-[calc(100vw-120px)] pl-10 h-11 text-base rounded-full shadow-lg"
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 autoFocus
