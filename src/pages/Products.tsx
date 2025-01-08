@@ -19,6 +19,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, RotateCw } from "lucide-react"
 import { Loader2 } from "lucide-react"
 
+type ProductStatus = "active" | "inactive" | "all"
+
 // Extracted components to reduce file size
 const LoadingState = () => (
   <div className="flex items-center justify-center min-h-[400px]">
@@ -64,7 +66,7 @@ const NoStorefrontSelected = ({ onNavigate }: { onNavigate: () => void }) => (
 );
 
 const Products = () => {
-  const [selectedStatus, setSelectedStatus] = useState("all")
+  const [selectedStatus, setSelectedStatus] = useState<ProductStatus>("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProducts, setSelectedProducts] = useState<string[]>([])
   const [showCreateProduct, setShowCreateProduct] = useState(false)
