@@ -28,7 +28,6 @@ export function PreviewHeader({
   categories = [],
   selectedCategory,
   currentSort,
-  isScrolled = false,
   onLogoClick,
   textPlacement = "below",
   onTextPlacementChange = () => {},
@@ -40,11 +39,8 @@ export function PreviewHeader({
   console.log("PreviewHeader - searchQuery:", searchQuery);
   console.log("PreviewHeader - currentSort:", currentSort);
 
-  // Ensure we have valid values, using defaults if not provided
   const opacity = typeof previewData.header_opacity === 'number' ? previewData.header_opacity : 30;
   const headerColor = previewData.header_color || "#FFFFFF";
-
-  // Convert opacity to hex for background color
   const opacityHex = Math.round((opacity / 100) * 255).toString(16).padStart(2, '0');
 
   const handleLogoClick = () => {
@@ -58,17 +54,13 @@ export function PreviewHeader({
 
   return (
     <header 
-      className="sticky top-0 left-0 z-50 right-0 w-full transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 w-full"
       style={{
-        backgroundColor: `${previewData.storefront_background_color}10`,
+        backgroundColor: `${headerColor}${opacityHex}`,
+        backdropFilter: 'blur(8px)',
       }}
     >
-      <div 
-        className="w-full py-2 px-4 md:px-8 backdrop-blur-md transition-all duration-300"
-        style={{
-          backgroundColor: `${headerColor}${opacityHex}`
-        }}
-      >
+      <div className="w-full py-2 px-4 md:px-8">
         <MobileHeader 
           previewData={previewData}
           searchQuery={searchQuery}

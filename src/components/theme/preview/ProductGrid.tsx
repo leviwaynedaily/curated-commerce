@@ -46,7 +46,6 @@ export function ProductGrid({
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
   
-  // Set up intersection observer for infinite loading
   const { ref, inView } = useInView({
     threshold: 0,
     rootMargin: '400px',
@@ -81,7 +80,7 @@ export function ProductGrid({
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative pt-20">
       <ProductCount 
         currentCount={visibleProducts.size}
         totalCount={totalCount}
@@ -108,11 +107,12 @@ export function ProductGrid({
         ))}
       </div>
 
-      {/* Infinite scroll trigger */}
-      <div ref={ref} className="h-10 w-full">
+      {/* Loading indicator */}
+      <div ref={ref} className="w-full flex justify-center py-8">
         {isFetchingNextPage && (
-          <div className="flex justify-center py-4">
+          <div className="flex flex-col items-center gap-2">
             <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="text-sm text-gray-500">Loading more products...</span>
           </div>
         )}
       </div>
