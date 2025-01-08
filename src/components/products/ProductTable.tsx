@@ -19,9 +19,11 @@ import { ProductForm } from "../forms/ProductForm"
 import { ProductTableHeader } from "./ProductTableHeader"
 import { ProductTableRow } from "./ProductTableRow"
 
+type ProductStatus = "active" | "inactive" | "all";
+
 interface ProductTableProps {
   storefrontId: string
-  statusFilter: string
+  statusFilter: ProductStatus
   searchQuery: string
   selectedProducts: string[]
   onSelectedProductsChange: (products: string[]) => void
@@ -54,6 +56,7 @@ export function ProductTable({
     queryFn: async () => {
       try {
         console.log("Fetching products for storefront:", storefrontId)
+        console.log("Status filter:", statusFilter)
         
         // First check if we have an authenticated session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
@@ -73,7 +76,7 @@ export function ProductTable({
           .eq("storefront_id", storefrontId)
 
         if (statusFilter !== "all") {
-          query = query.eq("status", statusFilter)
+          query = query.eq("status", statusFilter as "active" | "inactive")
         }
 
         if (searchQuery) {

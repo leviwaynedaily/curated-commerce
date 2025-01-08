@@ -9,9 +9,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+type ProductStatus = "active" | "inactive" | "all";
+
 interface ProductFiltersProps {
-  selectedStatus: string
-  onStatusChange: (status: string) => void
+  selectedStatus: ProductStatus
+  onStatusChange: (status: ProductStatus) => void
   searchQuery: string
   onSearchChange: (query: string) => void
 }
