@@ -43,47 +43,22 @@ export function PreviewContent({
     isLoading 
   } = useStorefrontProducts({
     storefrontId: previewData.id || '',
-    selectedCategory
+    selectedCategory,
+    searchQuery,
+    currentSort
   });
 
   const allProducts = data?.pages.flatMap(page => page.products) || [];
+  const totalCount = data?.pages[0]?.totalCount || 0;
   
   console.log("PreviewContent - currentSort:", currentSort);
   console.log("PreviewContent - searchQuery:", searchQuery);
-  
-  // Apply remaining filters (search and sorting)
-  const filteredAndSortedProducts = allProducts.filter(product => {
-    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-    return true;
-  }).sort((a, b) => {
-    switch (currentSort) {
-      case "newest":
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      case "oldest":
-        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-      case "price-desc":
-        return (b.in_town_price || 0) - (a.in_town_price || 0);
-      case "price-asc":
-        return (a.in_town_price || 0) - (b.in_town_price || 0);
-      default:
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    }
-  });
+  console.log("PreviewContent - totalCount:", totalCount);
 
   const handleProductClick = (product: any) => {
     console.log("Product clicked, setting selected product:", product);
     setSelectedProduct(product);
   };
-
-  // Calculate total count based on current page data and whether there are more pages
-  const totalCount = hasNextPage 
-    ? filteredAndSortedProducts.length + ITEMS_PER_PAGE 
-    : filteredAndSortedProducts.length;
-
-  // Get unique categories from products, flattening the arrays and removing duplicates
-  const categories = [...new Set(allProducts.flatMap(product => product.category || []))].filter(Boolean) as string[];
 
   if (selectedProduct) {
     return (
@@ -132,7 +107,7 @@ export function PreviewContent({
           </div>
         ) : (
           <ProductGrid
-            products={filteredAndSortedProducts}
+            products={allProducts}
             layout="small"
             textPlacement="below"
             onProductClick={handleProductClick}
@@ -149,8 +124,8 @@ export function PreviewContent({
             isFetchingNextPage={isFetchingNextPage}
             fetchNextPage={fetchNextPage}
             isDesktop={!window.matchMedia('(max-width: 768px)').matches}
-            currentCount={filteredAndSortedProducts.length}
-            totalCount={data?.pages[0]?.products.length || 0}
+            currentCount={allProducts.length}
+            totalCount={totalCount}
           />
         )}
       </main>

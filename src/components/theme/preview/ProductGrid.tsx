@@ -37,14 +37,28 @@ export function ProductGrid({
   productPriceButtonColor,
   productCategoryBackgroundColor,
   productCategoryTextColor,
+  hasNextPage,
   isFetchingNextPage,
-  isDesktop = false,
+  fetchNextPage,
   currentCount,
   totalCount
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
   
+  // Set up intersection observer for infinite loading
+  const { ref, inView } = useInView({
+    threshold: 0,
+    rootMargin: '400px',
+  });
+
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
+      console.log("Loading more products...");
+      fetchNextPage?.();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   useEffect(() => {
     if (products.length > 0) {
       setVisibleRange({
@@ -92,6 +106,15 @@ export function ProductGrid({
             onVisibilityChange={handleVisibilityChange}
           />
         ))}
+      </div>
+
+      {/* Infinite scroll trigger */}
+      <div ref={ref} className="h-10 w-full">
+        {isFetchingNextPage && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin" />
+          </div>
+        )}
       </div>
     </div>
   );

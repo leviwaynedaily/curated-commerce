@@ -2,7 +2,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const ITEMS_PER_PAGE = 1000; // Set to a large number to effectively load all products
+export const ITEMS_PER_PAGE = 16;
 
 interface Product {
   id: string;
@@ -19,37 +19,64 @@ interface Product {
   storefront_id?: string;
 }
 
-interface PageData {
-  products: Product[];
-  nextPage: number | undefined;
-}
-
 interface UseStorefrontProductsProps {
   storefrontId: string;
   selectedCategory?: string | null;
+  searchQuery?: string;
+  currentSort?: string;
 }
 
-export function useStorefrontProducts({ storefrontId, selectedCategory }: UseStorefrontProductsProps) {
+export function useStorefrontProducts({ 
+  storefrontId, 
+  selectedCategory,
+  searchQuery,
+  currentSort = "newest"
+}: UseStorefrontProductsProps) {
   console.log("Initializing useStorefrontProducts with ID:", storefrontId);
   console.log("Selected category:", selectedCategory);
+  console.log("Search query:", searchQuery);
+  console.log("Current sort:", currentSort);
 
-  return useInfiniteQuery<PageData>({
-    queryKey: ["preview-products", storefrontId, selectedCategory],
+  return useInfiniteQuery({
+    queryKey: ["preview-products", storefrontId, selectedCategory, searchQuery, currentSort],
     initialPageParam: 0,
     queryFn: async ({ pageParam = 0 }) => {
       try {
-        console.log("Fetching all products");
+        console.log("Fetching products page:", pageParam);
         console.log("With category filter:", selectedCategory);
+        console.log("With search query:", searchQuery);
         
         let query = supabase
           .from("products")
           .select("*", { count: "exact" })
           .eq("storefront_id", storefrontId)
           .eq("status", "active")
-          .order("sort_order", { ascending: true });
+          .order("sort_order", { ascending: true })
+          .range(pageParam * ITEMS_PER_PAGE, (pageParam + 1) * ITEMS_PER_PAGE - 1);
 
+        // Apply category filter if selected
         if (selectedCategory) {
           query = query.contains('category', [selectedCategory]);
+        }
+
+        // Apply search filter if provided
+        if (searchQuery) {
+          query = query.ilike('name', `%${searchQuery}%`);
+        }
+
+        // Apply sorting
+        switch (currentSort) {
+          case "oldest":
+            query = query.order('created_at', { ascending: true });
+            break;
+          case "price-desc":
+            query = query.order('in_town_price', { ascending: false });
+            break;
+          case "price-asc":
+            query = query.order('in_town_price', { ascending: true });
+            break;
+          default: // "newest"
+            query = query.order('created_at', { ascending: false });
         }
 
         const { data: products, error, count } = await query;
@@ -64,7 +91,8 @@ export function useStorefrontProducts({ storefrontId, selectedCategory }: UseSto
         
         return {
           products: products as Product[] || [],
-          nextPage: undefined, // No more pages since we're loading all at once
+          nextPage: products?.length === ITEMS_PER_PAGE ? pageParam + 1 : undefined,
+          totalCount: count || 0
         };
       } catch (error) {
         console.error("Error in products query:", error);
