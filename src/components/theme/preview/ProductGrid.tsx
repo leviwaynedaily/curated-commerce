@@ -45,6 +45,7 @@ export function ProductGrid({
 }: ProductGridProps) {
   const [visibleRange, setVisibleRange] = useState({ start: 0, end: 11 });
   const [visibleProducts, setVisibleProducts] = useState<Set<string>>(new Set());
+  const [isLoadingVisible, setIsLoadingVisible] = useState(false);
   
   const { ref, inView } = useInView({
     threshold: 0,
@@ -54,9 +55,16 @@ export function ProductGrid({
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
       console.log("Loading more products...");
+      setIsLoadingVisible(true);
       fetchNextPage?.();
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    if (!isFetchingNextPage) {
+      setIsLoadingVisible(false);
+    }
+  }, [isFetchingNextPage]);
 
   useEffect(() => {
     if (products.length > 0) {
@@ -80,7 +88,7 @@ export function ProductGrid({
   }, []);
 
   return (
-    <div className="relative pt-28"> {/* Increased padding-top to accommodate fixed header */}
+    <div className="relative pt-28">
       <ProductCount 
         currentCount={visibleProducts.size}
         totalCount={totalCount}
@@ -110,14 +118,16 @@ export function ProductGrid({
       {/* Loading indicator */}
       <div 
         ref={ref} 
-        className={`w-full flex justify-center py-8 transition-opacity duration-300 ${isFetchingNextPage ? 'opacity-100' : 'opacity-0'}`}
+        className={`fixed top-[72px] left-0 right-0 flex justify-center transition-all duration-300 ${
+          isLoadingVisible || isFetchingNextPage 
+            ? 'opacity-100 h-16 bg-white/80 backdrop-blur-sm shadow-sm' 
+            : 'opacity-0 h-0'
+        }`}
       >
-        {isFetchingNextPage && (
-          <div className="flex flex-col items-center gap-2 bg-white/80 backdrop-blur-sm px-6 py-3 rounded-full shadow-sm">
-            <div className="flex items-center gap-2">
-              <Loader2 className="h-5 w-5 animate-spin text-primary" />
-              <span className="text-sm text-gray-600">Loading more products...</span>
-            </div>
+        {(isLoadingVisible || isFetchingNextPage) && (
+          <div className="flex items-center gap-2 py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            <span className="text-sm text-gray-600">Loading more products...</span>
           </div>
         )}
       </div>
