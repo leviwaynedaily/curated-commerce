@@ -88,7 +88,7 @@ export function ProductGrid({
   }, []);
 
   return (
-    <div className="relative pt-28">
+    <div className="relative pt-20">
       <ProductCount 
         currentCount={visibleProducts.size}
         totalCount={totalCount}
