@@ -21,8 +21,8 @@ export const saveManifest = async (storefrontId: string, manifestData: any) => {
       type: 'application/json'
     });
 
-    // Save to storage using storefront slug in the path
-    const manifestPath = `${storefront.slug}/manifest/manifest.json`;
+    // Save to storage using new path structure
+    const manifestPath = `pwa/${storefront.slug}/manifest.json`;
     console.log("Saving manifest to storage path:", manifestPath);
     
     const { error: storageError } = await supabase.storage

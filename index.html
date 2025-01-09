@@ -9,11 +9,11 @@
       // Dynamic manifest URL handling
       window.addEventListener('load', async () => {
         try {
-          const storefrontId = new URLSearchParams(window.location.search).get('storefrontId');
-          if (storefrontId) {
+          const slug = new URLSearchParams(window.location.search).get('slug');
+          if (slug) {
             const manifestLink = document.createElement('link');
             manifestLink.rel = 'manifest';
-            manifestLink.href = `/manifest/manifest.json?storefrontId=${storefrontId}`;
+            manifestLink.href = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
             document.head.appendChild(manifestLink);
           }
         } catch (error) {
@@ -24,7 +24,6 @@
   </head>
   <body>
     <div id="root"></div>
-    <!-- Add Lovable script tag before main application script -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>

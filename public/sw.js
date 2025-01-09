@@ -30,15 +30,16 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/manifest/manifest.json')) {
+  if (event.request.url.includes('/pwa/') && event.request.url.includes('/manifest.json')) {
     event.respondWith(
       (async () => {
         try {
           const url = new URL(event.request.url);
-          const slug = url.searchParams.get('slug');
+          const pathParts = url.pathname.split('/');
+          const slug = pathParts[pathParts.indexOf('pwa') + 1];
           
           if (!slug) {
-            console.error('Manifest Request: No slug provided');
+            console.error('Manifest Request: No slug found in path');
             return new Response(JSON.stringify({ error: 'No slug provided' }), {
               status: 400,
               headers: { 'Content-Type': 'application/json' }
@@ -46,7 +47,7 @@ self.addEventListener('fetch', (event) => {
           }
           
           console.log('Manifest Request: Fetching for storefront with slug:', slug);
-          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/${slug}/manifest/manifest.json`;
+          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
           
           // Try cache first
           const cache = await caches.open('manifest-cache');
