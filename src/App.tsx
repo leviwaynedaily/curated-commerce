@@ -5,7 +5,7 @@ import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { router } from "./router";
 
-// Move queryClient outside of the component
+// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,14 +16,22 @@ const queryClient = new QueryClient({
   },
 });
 
+// Separate the app content from the providers
+function AppContent() {
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+      <RouterProvider router={router} />
+      <Toaster />
+    </ThemeProvider>
+  );
+}
+
+// Main App component
 function App() {
   return (
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <RouterProvider router={router} />
-          <Toaster />
-        </ThemeProvider>
+        <AppContent />
       </QueryClientProvider>
     </StrictMode>
   );
