@@ -12,6 +12,7 @@ import { PWAFormValues, pwaFormSchema } from "./types";
 import { PWAFormValidation } from "./PWAFormValidation";
 import { PWAFormActions } from "./PWAFormActions";
 import { PWAManifestPreview } from "./PWAManifestPreview";
+import { PWAManifestUrl } from "./PWAManifestUrl";
 import { saveManifest } from "@/utils/manifestUtils";
 import { useState, useEffect } from "react";
 
@@ -19,6 +20,7 @@ export function PWASettingsForm() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [manifestJson, setManifestJson] = useState<string | null>(null);
+  const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   const { data: pwaSettings, isLoading: isPwaLoading } = useQuery({
@@ -76,6 +78,7 @@ export function PWASettingsForm() {
     if (!isPwaLoading && pwaSettings) {
       console.log("Setting form values from PWA settings");
       form.reset(pwaSettings);
+      setManifestUrl(pwaSettings.manifest_url);
     }
   }, [pwaSettings, isPwaLoading, form]);
 
@@ -148,8 +151,8 @@ export function PWASettingsForm() {
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
-        name: values.name || "", // Ensure required field is never undefined
-        short_name: values.short_name || "", // Ensure required field is never undefined
+        name: values.name || "",
+        short_name: values.short_name || "",
       };
       
       console.log("Saving PWA settings:", dataToSave);
@@ -198,8 +201,9 @@ export function PWASettingsForm() {
         ].filter(Boolean)
       };
 
-      // Save manifest to the database
-      await saveManifest(currentStorefrontId, manifestData);
+      // Save manifest and get the URL
+      const url = await saveManifest(currentStorefrontId, manifestData);
+      setManifestUrl(url);
       
       // Update the preview
       setManifestJson(JSON.stringify(manifestData, null, 2));
@@ -243,6 +247,7 @@ export function PWASettingsForm() {
           hasRequiredFields={hasRequiredFields}
         />
 
+        <PWAManifestUrl manifestUrl={manifestUrl} />
         <PWAManifestPreview manifestJson={manifestJson} />
       </form>
     </Form>

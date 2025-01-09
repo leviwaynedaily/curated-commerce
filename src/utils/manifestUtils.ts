@@ -1,6 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export const saveManifest = async (storefrontId: string, manifestData: any) => {
+export const saveManifest = async (storefrontId: string, manifestData: any): Promise<string> => {
   console.log("Saving manifest for storefront:", storefrontId);
   
   try {
