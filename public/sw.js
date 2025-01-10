@@ -34,9 +34,11 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       (async () => {
         try {
+          // Extract slug from URL path
           const url = new URL(event.request.url);
           const pathParts = url.pathname.split('/');
-          const slug = pathParts[pathParts.indexOf('pwa') + 1];
+          const pwaIndex = pathParts.indexOf('pwa');
+          const slug = pwaIndex !== -1 ? pathParts[pwaIndex + 1] : null;
           
           if (!slug) {
             console.error('Manifest Request: No slug found in path');
@@ -51,7 +53,7 @@ self.addEventListener('fetch', (event) => {
           
           // Try cache first
           const cache = await caches.open('manifest-cache');
-          const cachedResponse = await cache.match(event.request);
+          const cachedResponse = await cache.match(manifestUrl);
           
           if (cachedResponse) {
             console.log('Manifest Request: Using cached manifest');
@@ -72,7 +74,7 @@ self.addEventListener('fetch', (event) => {
           const jsonData = await responseToCache.json();
           if (jsonData) {
             console.log('Manifest Request: Successfully fetched manifest:', jsonData);
-            await cache.put(event.request, response.clone());
+            await cache.put(manifestUrl, response.clone());
           }
           
           return response;
