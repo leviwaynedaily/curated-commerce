@@ -4,7 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { router } from "./router";
 import { RouterProvider } from "react-router-dom";
 
-// Create a client
+// Create a client outside the component
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
