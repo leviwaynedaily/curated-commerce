@@ -260,6 +260,7 @@ export type Database = {
           enable_instructions: boolean | null
           favicon_url: string | null
           font_color: string | null
+          has_pwa: boolean | null
           header_color: string | null
           header_opacity: number | null
           id: string
@@ -276,6 +277,7 @@ export type Database = {
           product_price_button_color: string | null
           product_price_color: string | null
           product_title_text_color: string | null
+          pwa_manifest_url: string | null
           secondary_color: string | null
           show_description: boolean | null
           slug: string
@@ -305,6 +307,7 @@ export type Database = {
           enable_instructions?: boolean | null
           favicon_url?: string | null
           font_color?: string | null
+          has_pwa?: boolean | null
           header_color?: string | null
           header_opacity?: number | null
           id?: string
@@ -321,6 +324,7 @@ export type Database = {
           product_price_button_color?: string | null
           product_price_color?: string | null
           product_title_text_color?: string | null
+          pwa_manifest_url?: string | null
           secondary_color?: string | null
           show_description?: boolean | null
           slug: string
@@ -350,6 +354,7 @@ export type Database = {
           enable_instructions?: boolean | null
           favicon_url?: string | null
           font_color?: string | null
+          has_pwa?: boolean | null
           header_color?: string | null
           header_opacity?: number | null
           id?: string
@@ -366,6 +371,7 @@ export type Database = {
           product_price_button_color?: string | null
           product_price_color?: string | null
           product_title_text_color?: string | null
+          pwa_manifest_url?: string | null
           secondary_color?: string | null
           show_description?: boolean | null
           slug?: string

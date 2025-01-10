@@ -153,10 +153,10 @@ export function PWASettingsForm() {
       // Update the storefront to mark it as PWA-enabled
       const { error: updateError } = await supabase
         .from("storefronts")
-        .update({ 
-          has_pwa: true,
-          pwa_manifest_url: manifestUrl
-        })
+        .update({
+          pwa_manifest_url: manifestUrl,
+          has_pwa: true
+        } as any) // Type assertion needed until types are updated
         .eq('id', currentStorefrontId);
 
       if (updateError) throw updateError;
