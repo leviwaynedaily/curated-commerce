@@ -11,10 +11,23 @@
         try {
           const slug = new URLSearchParams(window.location.search).get('slug');
           if (slug) {
-            const manifestLink = document.createElement('link');
-            manifestLink.rel = 'manifest';
-            manifestLink.href = `/pwa/${slug}/manifest.json`;
-            document.head.appendChild(manifestLink);
+            console.log('Fetching manifest URL for slug:', slug);
+            const response = await fetch(`https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${slug}&select=pwa_manifest_url`, {
+              headers: {
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5OTg0ODEsImV4cCI6MjA1MTU3NDQ4MX0.bQo5CgIk3t0BGth_XjP-4Qx1M1PMCu6ZIzrUnMKfddE'
+              }
+            });
+            const [data] = await response.json();
+            
+            if (data?.pwa_manifest_url) {
+              console.log('Found manifest URL:', data.pwa_manifest_url);
+              const manifestLink = document.createElement('link');
+              manifestLink.rel = 'manifest';
+              manifestLink.href = data.pwa_manifest_url;
+              document.head.appendChild(manifestLink);
+            } else {
+              console.log('No manifest URL found for slug:', slug);
+            }
           }
         } catch (error) {
           console.error('Error setting up manifest:', error);
