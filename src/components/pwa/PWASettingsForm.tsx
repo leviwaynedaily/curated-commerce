@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 export function PWASettingsForm() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [manifestJson, setManifestJson] = useState<string | null>(null);
   const [manifestUrl, setManifestUrl] = useState<string | null>(null);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -105,8 +106,8 @@ export function PWASettingsForm() {
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
-        name: values.name || "", // Ensure required field is never undefined
-        short_name: values.short_name || "", // Ensure required field is never undefined
+        name: values.name || "",
+        short_name: values.short_name || "",
       };
       
       console.log("Saving PWA settings draft:", dataToSave);
@@ -132,6 +133,47 @@ export function PWASettingsForm() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const publishPWA = async () => {
+    if (!currentStorefrontId || !manifestUrl) {
+      toast({
+        title: "Error",
+        description: "No manifest URL available. Please save the manifest first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsPublishing(true);
+    try {
+      console.log("Publishing PWA for storefront:", currentStorefrontId);
+      
+      // Update the storefront to mark it as PWA-enabled
+      const { error: updateError } = await supabase
+        .from("storefronts")
+        .update({ 
+          has_pwa: true,
+          pwa_manifest_url: manifestUrl
+        })
+        .eq('id', currentStorefrontId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "PWA published successfully! Your storefront is now installable.",
+      });
+    } catch (error) {
+      console.error("Error publishing PWA:", error);
+      toast({
+        title: "Error",
+        description: "Failed to publish PWA",
+        variant: "destructive",
+      });
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -245,6 +287,8 @@ export function PWASettingsForm() {
           isSaving={isSaving}
           onSaveDraft={saveDraft}
           hasRequiredFields={hasRequiredFields}
+          onPublish={publishPWA}
+          isPublishing={isPublishing}
         />
 
         <PWAManifestUrl manifestUrl={manifestUrl} />

@@ -7,9 +7,18 @@ interface PWAFormActionsProps {
   isSaving: boolean;
   onSaveDraft: () => Promise<void>;
   hasRequiredFields: boolean;
+  onPublish?: () => Promise<void>;
+  isPublishing?: boolean;
 }
 
-export function PWAFormActions({ form, isSaving, onSaveDraft, hasRequiredFields }: PWAFormActionsProps) {
+export function PWAFormActions({ 
+  form, 
+  isSaving, 
+  onSaveDraft, 
+  hasRequiredFields,
+  onPublish,
+  isPublishing 
+}: PWAFormActionsProps) {
   const isDirty = form.formState.isDirty;
 
   return (
@@ -31,6 +40,18 @@ export function PWAFormActions({ form, isSaving, onSaveDraft, hasRequiredFields 
         {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Save & Create Manifest
       </Button>
+
+      {onPublish && (
+        <Button
+          type="button"
+          variant="default"
+          onClick={onPublish}
+          disabled={isPublishing || !hasRequiredFields}
+        >
+          {isPublishing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Publish PWA
+        </Button>
+      )}
     </div>
   );
 }
