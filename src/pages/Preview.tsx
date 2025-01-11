@@ -62,34 +62,14 @@ export default function Preview() {
     getStorefrontId();
   }, [searchParams, slug]);
 
-  // Fetch PWA settings when storefrontId is available
+  // Set manifest URL when slug is available
   useEffect(() => {
-    const fetchPWASettings = async () => {
-      if (!storefrontId) {
-        console.log("No storefront ID available for PWA settings");
-        return;
-      }
-
-      try {
-        console.log("Fetching PWA settings for storefront:", storefrontId);
-        const { data: storefront } = await supabase
-          .from("storefronts")
-          .select("slug")
-          .eq("id", storefrontId)
-          .single();
-
-        if (storefront?.slug) {
-          const manifestUrl = `/manifest/manifest.json?slug=${storefront.slug}`;
-          console.log("Setting manifest URL:", manifestUrl);
-          setManifestUrl(manifestUrl);
-        }
-      } catch (err) {
-        console.error("Error in fetchPWASettings:", err);
-      }
-    };
-
-    fetchPWASettings();
-  }, [storefrontId]);
+    if (slug) {
+      const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
+      console.log('Setting manifest URL:', manifestUrl);
+      setManifestUrl(manifestUrl);
+    }
+  }, [slug]);
 
   const { data: storefront, isLoading: isStorefrontLoading } = useStorefront(storefrontId || '');
 
