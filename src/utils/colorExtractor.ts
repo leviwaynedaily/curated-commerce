@@ -1,24 +1,9 @@
-import { ThemeConfig } from "@/types/theme";
-
-export async function extractColors(imageUrl: string): Promise<ThemeConfig["colors"]> {
-  // Return default colors since we can't extract them without the canvas package
-  return {
-    background: {
-      primary: "#FFFFFF",
-      secondary: "#F5F5F5",
-      accent: "#E5E7EB",
-    },
-    font: {
-      primary: "#1A1F2C",
-      secondary: "#4B5563",
-      highlight: "#D946EF",
-    },
-  };
+export async function extractDominantColor(imageUrl: string): Promise<string> {
+  // Return a default color since we can't extract colors without the canvas package
+  return '#000000';
 }
 
-export function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + [r, g, b].map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? "0" + hex : hex;
-  }).join("");
+export async function extractColorPalette(imageUrl: string): Promise<string[]> {
+  // Return default colors since we can't extract colors without the canvas package
+  return ['#000000', '#ffffff', '#cccccc'];
 }
