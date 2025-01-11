@@ -85,7 +85,8 @@ self.addEventListener('fetch', (event) => {
               headers: {
                 'Content-Type': 'application/json',
                 'Service-Worker-Allowed': '/',
-                'Cache-Control': 'no-cache'
+                'Cache-Control': 'no-cache',
+                'Access-Control-Allow-Origin': '*'
               }
             });
             await cache.put(manifestUrl, newResponse.clone());
