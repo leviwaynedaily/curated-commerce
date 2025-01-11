@@ -30,7 +30,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('/pwa/') && event.request.url.includes('/manifest.json')) {
+  // Special handling for manifest.json requests
+  if (event.request.url.includes('manifest.json')) {
     event.respondWith(
       (async () => {
         try {
@@ -61,7 +62,12 @@ self.addEventListener('fetch', (event) => {
           }
           
           console.log('Manifest Request: Fetching from storage:', manifestUrl);
-          const response = await fetch(manifestUrl);
+          const response = await fetch(manifestUrl, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Service-Worker-Allowed': '/'
+            }
+          });
           
           if (!response.ok) {
             throw new Error(`Manifest fetch failed: ${response.status}`);
@@ -74,7 +80,16 @@ self.addEventListener('fetch', (event) => {
           const jsonData = await responseToCache.json();
           if (jsonData) {
             console.log('Manifest Request: Successfully fetched manifest:', jsonData);
-            await cache.put(manifestUrl, response.clone());
+            // Create a new response with proper headers
+            const newResponse = new Response(JSON.stringify(jsonData), {
+              headers: {
+                'Content-Type': 'application/json',
+                'Service-Worker-Allowed': '/',
+                'Cache-Control': 'no-cache'
+              }
+            });
+            await cache.put(manifestUrl, newResponse.clone());
+            return newResponse;
           }
           
           return response;
@@ -87,21 +102,22 @@ self.addEventListener('fetch', (event) => {
         }
       })()
     );
-  } else {
-    event.respondWith(
-      caches.match(event.request)
-        .then((response) => {
-          if (response) {
-            return response;
-          }
-          return fetch(event.request);
-        })
-        .catch(() => {
-          if (event.request.mode === 'navigate') {
-            return caches.match('/index.html');
-          }
-          return null;
-        })
-    );
   }
+  
+  // Handle all other requests
+  event.respondWith(
+    caches.match(event.request)
+      .then((response) => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request);
+      })
+      .catch(() => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
+        return null;
+      })
+  );
 });
