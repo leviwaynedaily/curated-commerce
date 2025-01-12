@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Landing from "./pages/Landing";
 import Products from "./pages/Products";
 import StorefrontInformation from "./pages/StorefrontInformation";
 import Preview from "./pages/Preview";
@@ -14,6 +15,10 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <PublicHome />,
+  },
+  {
+    path: "/landing",
+    element: <Landing />,
   },
   {
     path: "/dashboard",
