@@ -7,54 +7,104 @@ import { Plus, Store, ArrowRight, BookOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
 
+  // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (!currentSession) {
+      const { data: { session: currentSession }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Auth session error:", error);
+        toast.error("Authentication error. Please try logging in again.");
         navigate("/login");
         return;
       }
+      if (!currentSession) {
+        console.log("No active session, redirecting to login");
+        navigate("/login");
+        return;
+      }
+      console.log("Auth state changed:", "INITIAL_SESSION", currentSession.user.id);
       setSession(currentSession);
     };
     
     checkAuth();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, currentSession) => {
+      if (!currentSession) {
+        console.log("Session ended, redirecting to login");
+        navigate("/login");
+      }
+      setSession(currentSession);
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
   const { data: storefronts, isLoading } = useQuery({
     queryKey: ["storefronts"],
     queryFn: async () => {
       console.log("Fetching storefronts for dashboard");
-      const { data: business } = await supabase
-        .from("businesses")
-        .select("id")
-        .eq("user_id", session?.user?.id)
-        .single();
-
-      if (!business) {
-        console.log("No business found for user");
+      if (!session?.user?.id) {
+        console.log("No session, returning null");
         return [];
       }
 
-      const { data: storefronts, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("business_id", business.id)
-        .order("created_at", { ascending: false });
+      try {
+        const { data: business, error: businessError } = await supabase
+          .from("businesses")
+          .select("id")
+          .eq("user_id", session.user.id)
+          .single();
 
-      if (error) {
-        console.error("Error fetching storefronts:", error);
-        throw error;
+        if (businessError) {
+          console.error("Error fetching business:", businessError);
+          toast.error("Failed to load business data");
+          return [];
+        }
+
+        if (!business) {
+          console.log("No business found for user");
+          return [];
+        }
+
+        console.log("Business data fetched:", business.id);
+
+        const { data: storefronts, error } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("business_id", business.id)
+          .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("Error fetching storefronts:", error);
+          toast.error("Failed to load storefronts");
+          return [];
+        }
+
+        console.log("Fetched storefronts:", storefronts?.length);
+        console.log("Fetched storefronts:", storefronts);
+        return storefronts || [];
+      } catch (error) {
+        console.error("Error in storefronts query:", error);
+        toast.error("An error occurred while loading your storefronts");
+        return [];
       }
-
-      console.log("Fetched storefronts:", storefronts?.length);
-      return storefronts || [];
     },
     enabled: !!session?.user?.id,
+    retry: (failureCount, error) => {
+      // Only retry on network errors, not auth errors
+      if (error instanceof Error && error.message === "Authentication required") {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   if (!session) return null;
