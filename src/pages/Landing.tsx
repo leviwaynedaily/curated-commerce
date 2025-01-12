@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { Store, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -43,7 +45,10 @@ export default function Landing() {
         console.log("Fetching storefronts for business:", business.id);
         const { data: storefronts, error } = await supabase
           .from("storefronts")
-          .select("*")
+          .select(`
+            *,
+            products (count)
+          `)
           .eq("business_id", business.id)
           .order("created_at", { ascending: false });
 
@@ -63,6 +68,31 @@ export default function Landing() {
     },
     enabled: !!session?.user?.id,
   });
+
+  const getSetupProgress = (storefront) => {
+    let progress = 0;
+    const steps = [
+      !!storefront.name,
+      !!storefront.description,
+      !!storefront.logo_url,
+      !!storefront.products?.length,
+      storefront.is_published
+    ];
+    
+    progress = (steps.filter(Boolean).length / steps.length) * 100;
+    return Math.round(progress);
+  };
+
+  const getStatusBadge = (storefront) => {
+    if (storefront.is_published) {
+      return <Badge className="bg-green-500">Published</Badge>;
+    }
+    const progress = getSetupProgress(storefront);
+    if (progress === 100) {
+      return <Badge className="bg-yellow-500">Ready to Publish</Badge>;
+    }
+    return <Badge variant="secondary">Draft</Badge>;
+  };
 
   if (!session) return null;
 
@@ -109,26 +139,38 @@ export default function Landing() {
             {storefronts?.map((store) => (
               <Card key={store.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <CardTitle>{store.name}</CardTitle>
+                  <div className="flex justify-between items-start mb-2">
+                    <CardTitle>{store.name}</CardTitle>
+                    {getStatusBadge(store)}
+                  </div>
                   <p className="text-sm text-muted-foreground">
-                    {store.is_published ? "Published" : "Draft"}
+                    {store.products?.length || 0} Products
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {store.description || "No description"}
-                  </p>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => {
-                      localStorage.setItem('lastStorefrontId', store.id);
-                      navigate('/dashboard');
-                    }}
-                  >
-                    Select Store
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Setup Progress</span>
+                        <span className="font-medium">{getSetupProgress(store)}%</span>
+                      </div>
+                      <Progress value={getSetupProgress(store)} className="h-2" />
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {store.description || "No description"}
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => {
+                        localStorage.setItem('lastStorefrontId', store.id);
+                        navigate('/dashboard');
+                      }}
+                    >
+                      Select Store
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
