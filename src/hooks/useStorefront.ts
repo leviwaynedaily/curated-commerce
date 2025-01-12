@@ -2,8 +2,19 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 export function useStorefront(storefrontId: string | undefined | null) {
+  // First check if we have a session
+  const checkSession = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Session check error:", error);
+      return null;
+    }
+    return session;
+  };
+
   return useQuery({
     queryKey: ["storefront", storefrontId],
     queryFn: async () => {
@@ -15,6 +26,14 @@ export function useStorefront(storefrontId: string | undefined | null) {
       }
 
       try {
+        // Check session before proceeding
+        const session = await checkSession();
+        if (!session) {
+          console.log("No active session found");
+          toast.error("Please log in to access this content");
+          throw new Error("Authentication required");
+        }
+
         const { data, error } = await supabase
           .from("storefronts")
           .select("*")
@@ -41,8 +60,15 @@ export function useStorefront(storefrontId: string | undefined | null) {
         throw error;
       }
     },
-    retry: 1,
-    staleTime: 0,
+    retry: (failureCount, error) => {
+      // Only retry if it's a network error and not an auth error
+      if (error instanceof Error && error.message === "Authentication required") {
+        return false;
+      }
+      return failureCount < 3;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
+    staleTime: 0, // Always fetch fresh data
     enabled: !!storefrontId, // Only run query if storefrontId exists
   });
 }
