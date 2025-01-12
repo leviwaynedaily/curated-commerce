@@ -9,12 +9,11 @@ import DomainManagement from "./pages/DomainManagement";
 import Appearance from "./pages/Appearance";
 import PublicHome from "./pages/PublicHome";
 import Dashboard from "./pages/Dashboard";
-import StorefrontSelector from "./pages/StorefrontSelector";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <StorefrontSelector />,
+    element: <PublicHome />,
   },
   {
     path: "/dashboard",
