@@ -7,11 +7,17 @@ import Preview from "./pages/Preview";
 import PWASettings from "./pages/PWASettings";
 import DomainManagement from "./pages/DomainManagement";
 import Appearance from "./pages/Appearance";
+import PublicHome from "./pages/PublicHome";
+import Dashboard from "./pages/Dashboard";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Index />,
+    element: <PublicHome />,
+  },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
   },
   {
     path: "/login",
