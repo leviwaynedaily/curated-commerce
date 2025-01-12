@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Store, ArrowRight } from "lucide-react";
+import { Plus, Store, ArrowRight, BookOpen } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -27,20 +28,30 @@ export default function Dashboard() {
   const { data: storefronts, isLoading } = useQuery({
     queryKey: ["storefronts"],
     queryFn: async () => {
+      console.log("Fetching storefronts for dashboard");
       const { data: business } = await supabase
         .from("businesses")
         .select("id")
         .eq("user_id", session?.user?.id)
         .single();
 
-      if (!business) return [];
+      if (!business) {
+        console.log("No business found for user");
+        return [];
+      }
 
-      const { data: storefronts } = await supabase
+      const { data: storefronts, error } = await supabase
         .from("storefronts")
         .select("*")
         .eq("business_id", business.id)
         .order("created_at", { ascending: false });
 
+      if (error) {
+        console.error("Error fetching storefronts:", error);
+        throw error;
+      }
+
+      console.log("Fetched storefronts:", storefronts?.length);
       return storefronts || [];
     },
     enabled: !!session?.user?.id,
@@ -50,15 +61,15 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
+      <div className="space-y-8 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Welcome Back!</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Welcome to Your Dashboard</h1>
             <p className="text-muted-foreground mt-2">
               Manage your storefronts and create new ones.
             </p>
           </div>
-          <Button onClick={() => navigate("/storefront-information")}>
+          <Button onClick={() => navigate("/storefront-information")} className="hover:scale-105 transition-transform">
             <Plus className="mr-2 h-4 w-4" />
             Create Store
           </Button>
@@ -76,18 +87,26 @@ export default function Dashboard() {
             ))}
           </div>
         ) : storefronts?.length === 0 ? (
-          <Card>
+          <Card className="border-2 border-dashed">
             <CardHeader>
-              <CardTitle>Get Started</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                Get Started with Your First Store
+              </CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center text-center p-6">
               <Store className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Create Your First Store</h3>
-              <p className="text-muted-foreground mb-4">
-                Start by creating your first online storefront. It only takes a few minutes!
+              <h3 className="text-xl font-semibold mb-2">Create Your First Storefront</h3>
+              <p className="text-muted-foreground mb-6 max-w-md">
+                Start your journey by creating your first online storefront. It only takes a few minutes to set up and customize your store!
               </p>
-              <Button onClick={() => navigate("/storefront-information")}>
-                Create Store
+              <Alert className="mb-6 max-w-md">
+                <AlertDescription>
+                  Creating a store is easy! You'll be able to customize your store's appearance, add products, and manage orders all in one place.
+                </AlertDescription>
+              </Alert>
+              <Button onClick={() => navigate("/storefront-information")} size="lg" className="animate-pulse">
+                Create Your First Store
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </CardContent>
@@ -95,20 +114,29 @@ export default function Dashboard() {
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {storefronts?.map((store) => (
-              <Card key={store.id} className="hover:shadow-lg transition-shadow">
+              <Card 
+                key={store.id} 
+                className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+              >
                 <CardHeader>
-                  <CardTitle>{store.name}</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="truncate">{store.name}</span>
+                    <span className={`text-sm px-2 py-1 rounded-full ${
+                      store.is_published 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}>
+                      {store.is_published ? "Published" : "Draft"}
+                    </span>
+                  </CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    {store.is_published ? "Published" : "Draft"}
+                    {store.description || "No description"}
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {store.description || "No description"}
-                  </p>
                   <Button 
                     variant="outline" 
-                    className="w-full"
+                    className="w-full group-hover:bg-primary group-hover:text-white transition-colors"
                     onClick={() => navigate(`/storefront-information?id=${store.id}`)}
                   >
                     Manage Store
