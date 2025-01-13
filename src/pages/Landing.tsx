@@ -19,7 +19,7 @@ const Landing = () => {
           id,
           user_id,
           role,
-          user:profiles!user_id(
+          profiles:user_id(
             email
           )
         `)
@@ -36,7 +36,7 @@ const Landing = () => {
         user_id: user.user_id,
         role: user.role,
         profiles: {
-          email: user.user.email
+          email: user.profiles.email
         }
       }));
 

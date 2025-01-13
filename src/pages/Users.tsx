@@ -35,7 +35,7 @@ const Users = () => {
             id,
             user_id,
             role,
-            user:profiles!user_id(
+            profiles:user_id(
               email
             )
           )
@@ -55,7 +55,7 @@ const Users = () => {
           user_id: user.user_id,
           role: user.role,
           profiles: {
-            email: user.user.email
+            email: user.profiles.email
           }
         }))
       }));
