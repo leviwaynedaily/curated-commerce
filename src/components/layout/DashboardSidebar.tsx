@@ -119,7 +119,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
   return (
     <div className={cn(
-      "relative h-full bg-background transition-all duration-300",
+      "relative h-full bg-[#1A1F2C] transition-all duration-300",
       isCollapsed ? "w-16" : "w-[240px]",
       className
     )}>
@@ -150,9 +150,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     <Button
                       variant={route.active ? "default" : "ghost"}
                       className={cn(
-                        "w-full justify-start transition-colors",
+                        "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
                         route.active && "bg-primary hover:bg-primary text-primary-foreground",
-                        isCollapsed && "justify-center px-2"
+                        isCollapsed && "justify-center px-2",
+                        !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
                       )}
                       onClick={route.onClick}
                       asChild={!route.onClick}
@@ -183,7 +184,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     </Button>
                   </TooltipTrigger>
                   {isCollapsed && (
-                    <TooltipContent side="right" className="bg-popover/95 text-popover-foreground">
+                    <TooltipContent side="right" className="bg-[#1A1F2C] border border-[#33C3F0]/20 text-white">
                       {route.label}
                     </TooltipContent>
                   )}
@@ -196,7 +197,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute bottom-4 right-2 h-8 w-8"
+          className="absolute bottom-4 right-2 h-8 w-8 text-white/80 hover:text-white hover:bg-white/5"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
