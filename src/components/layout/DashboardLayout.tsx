@@ -14,7 +14,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex w-full overflow-x-hidden bg-[#121212]">
+    <div className="min-h-screen flex w-full overflow-x-hidden bg-[#121212] dark:bg-[#121212] text-foreground">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <DashboardSidebar />
@@ -28,7 +28,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </Sheet>
 
       <div className="flex-1 min-w-0">
-        <header className="h-16 border-b flex items-center gap-2 px-3 sm:px-4 w-full">
+        <header className="h-16 border-b flex items-center gap-2 px-3 sm:px-4 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
           <Button
             variant="ghost"
             size="icon"

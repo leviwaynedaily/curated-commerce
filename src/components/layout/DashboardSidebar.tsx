@@ -109,7 +109,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   return (
     <div 
       className={cn(
-        "relative h-full bg-[#161616] transition-all duration-300",
+        "relative h-full bg-[#161616] dark:bg-[#161616] transition-all duration-300",
         isCollapsed ? "w-16" : "w-[240px]",
         className
       )}
@@ -127,7 +127,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             className="h-8 w-auto"
           />
           {!isCollapsed && (
-            <span className="font-montserrat font-bold text-white text-xl">
+            <span className="font-montserrat font-bold text-white dark:text-white text-xl">
               curately
             </span>
           )}
@@ -143,7 +143,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                   "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
                   route.active && "bg-primary hover:bg-primary text-primary-foreground",
                   isCollapsed && "justify-center px-2",
-                  !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
+                  !route.active && "hover:bg-white/5 text-foreground hover:text-foreground/80"
                 )}
                 onClick={route.onClick}
                 asChild={!route.onClick}
@@ -185,7 +185,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
                 route.active && "bg-primary hover:bg-primary text-primary-foreground",
                 isCollapsed && "justify-center px-2",
-                !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
+                !route.active && "hover:bg-white/5 text-foreground hover:text-foreground/80"
               )}
               asChild
             >
@@ -206,7 +206,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             isCollapsed ? "justify-center" : "w-full"
           )}>
             <Store className={cn(
-              "shrink-0 text-white/80",
+              "shrink-0 text-foreground/80",
               isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
             )} />
             <div className={cn(
