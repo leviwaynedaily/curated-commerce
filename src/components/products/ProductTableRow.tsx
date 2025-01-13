@@ -102,18 +102,45 @@ export function ProductTableRow({
   }
 
   return (
-    <TableRow>
+    <TableRow className="dark:hover:bg-gray-800/40 dark:border-gray-700">
       <TableCell>
         <Checkbox
           checked={isSelected}
           onCheckedChange={() => onToggleSelect(product.id)}
+          className="dark:border-gray-600"
         />
       </TableCell>
       <TableCell onClick={() => onCellClick(product.id, "name")}>
-        {renderCell("name")}
+        <div className="flex items-center gap-3">
+          {product.images?.[0] && (
+            isVideo(product.images[0]) ? (
+              <video
+                src={product.images[0]}
+                className="h-10 w-10 rounded-md object-cover"
+                muted
+                loop
+                onMouseOver={(e) => (e.target as HTMLVideoElement).play()}
+                onMouseOut={(e) => {
+                  const video = e.target as HTMLVideoElement;
+                  video.pause();
+                  video.currentTime = 0;
+                }}
+              />
+            ) : (
+              <img
+                src={product.images[0]}
+                alt={product.name}
+                className="h-10 w-10 rounded-md object-cover"
+              />
+            )
+          )}
+          <span className="cursor-pointer hover:text-primary dark:text-gray-200">{product.name}</span>
+        </div>
       </TableCell>
       <TableCell onClick={() => onCellClick(product.id, "description")}>
-        {renderCell("description")}
+        <span className="line-clamp-2 text-sm text-muted-foreground cursor-pointer hover:text-primary dark:text-gray-300">
+          {product.description || "—"}
+        </span>
       </TableCell>
       <TableCell>
         <Badge variant={product.status === "active" ? "default" : "secondary"}>
@@ -121,15 +148,17 @@ export function ProductTableRow({
         </Badge>
       </TableCell>
       <TableCell onClick={() => onCellClick(product.id, "in_town_price")}>
-        {renderCell("in_town_price")}
+        <span className="cursor-pointer hover:text-primary dark:text-gray-200">${product.in_town_price}</span>
       </TableCell>
       <TableCell onClick={() => onCellClick(product.id, "shipping_price")}>
-        {renderCell("shipping_price")}
+        <span className="cursor-pointer hover:text-primary dark:text-gray-200">${product.shipping_price}</span>
       </TableCell>
       <TableCell onClick={() => onCellClick(product.id, "category")}>
-        {renderCell("category")}
+        <span className="cursor-pointer hover:text-primary dark:text-gray-200">
+          {product.category || "—"}
+        </span>
       </TableCell>
-      <TableCell>
+      <TableCell className="dark:text-gray-300">
         {renderCell("created_at")}
       </TableCell>
       <TableCell className="text-right">

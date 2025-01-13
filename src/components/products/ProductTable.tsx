@@ -200,15 +200,16 @@ export function ProductTable({
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="rounded-md border dark:border-gray-700">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="dark:bg-gray-800/40 dark:hover:bg-gray-800/60">
               <TableHeader className="w-12 h-12 flex items-center justify-center">
                 <Checkbox
                   checked={products?.length > 0 && selectedProducts.length === products.length}
                   onCheckedChange={toggleAllProducts}
                   aria-label="Select all"
+                  className="dark:border-gray-600"
                 />
               </TableHeader>
               <ProductTableHeader
@@ -265,7 +266,7 @@ export function ProductTable({
               />
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="dark:bg-gray-800/20">
             {products?.map(product => (
               <ProductTableRow
                 key={product.id}
