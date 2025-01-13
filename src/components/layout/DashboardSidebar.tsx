@@ -121,9 +121,16 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           "px-3 py-2 flex items-center",
           isCollapsed ? "justify-center" : "justify-start gap-3"
         )}>
-          <span className="font-montserrat font-bold text-white text-xl">
-            curately
-          </span>
+          <img 
+            src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
+            alt="Logo" 
+            className="h-8 w-auto"
+          />
+          {!isCollapsed && (
+            <span className="font-montserrat font-bold text-white text-xl">
+              curately
+            </span>
+          )}
         </div>
 
         <ScrollArea className="flex-1 px-3 py-2">
