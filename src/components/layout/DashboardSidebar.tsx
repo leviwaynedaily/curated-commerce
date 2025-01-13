@@ -109,7 +109,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   return (
     <div 
       className={cn(
-        "relative h-full bg-white dark:bg-[#161616] transition-all duration-300",
+        "relative h-full bg-[#161616] transition-all duration-300",
         isCollapsed ? "w-16" : "w-[240px]",
         className
       )}
@@ -127,7 +127,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             className="h-8 w-auto"
           />
           {!isCollapsed && (
-            <span className="font-montserrat font-bold text-foreground dark:text-white text-xl">
+            <span className="font-montserrat font-bold text-white text-xl">
               curately
             </span>
           )}
