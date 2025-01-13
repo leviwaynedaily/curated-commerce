@@ -35,10 +35,8 @@ const Users = () => {
             id,
             user_id,
             role,
-            user:user_id (
-              profile:profiles!id (
-                email
-              )
+            user:profiles!user_id(
+              email
             )
           )
         `)
@@ -57,13 +55,13 @@ const Users = () => {
           user_id: user.user_id,
           role: user.role,
           profiles: {
-            email: user.user.profile.email
+            email: user.user.email
           }
         }))
       }));
 
       console.log("Fetched storefronts with users:", transformedData);
-      return transformedData;
+      return transformedData as Storefront[];
     },
     enabled: !!business?.id,
   });
