@@ -77,16 +77,6 @@ const Landing = () => {
           <span className="text-xl font-semibold">Curately</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          {business && (
-            <Button
-              onClick={() => window.location.href = '/stores'}
-              variant="default"
-              size="sm"
-            >
-              <Plus className="h-4 w-4" />
-              Create Store
-            </Button>
-          )}
           <ThemeToggle />
           <UserButton />
         </div>
@@ -94,11 +84,24 @@ const Landing = () => {
 
       <main className="p-3 sm:p-4 w-full">
         <div className="max-w-[1400px] mx-auto space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Select a Storefront</h1>
-            <p className="text-muted-foreground mt-2">
-              Choose a storefront to manage or create a new one
-            </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">Select a Storefront</h1>
+              <p className="text-muted-foreground mt-2">
+                Choose a storefront to manage or create a new one
+              </p>
+            </div>
+            {business && (
+              <Button
+                onClick={() => window.location.href = '/stores'}
+                variant="default"
+                size="sm"
+                className="shrink-0"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Store
+              </Button>
+            )}
           </div>
 
           {storefronts && storefronts.length > 0 ? (
