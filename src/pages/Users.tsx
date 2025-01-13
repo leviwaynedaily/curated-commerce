@@ -35,9 +35,7 @@ const Users = () => {
             id,
             user_id,
             role,
-            profiles:user_id (
-              email
-            )
+            profiles:profiles!user_id(email)
           )
         `)
         .eq("business_id", business.id);
