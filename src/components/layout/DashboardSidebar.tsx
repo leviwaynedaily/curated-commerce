@@ -14,30 +14,16 @@ import {
   Globe,
   Palette,
   Users,
-  ChevronLeft,
-  ChevronRight,
+  Store,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    const stored = localStorage.getItem('sidebarCollapsed');
-    return stored ? JSON.parse(stored) : false;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
-  }, [isCollapsed]);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Query to get the current storefront
   const { data: storefront } = useQuery({
@@ -118,15 +104,19 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   ];
 
   return (
-    <div className={cn(
-      "relative h-full bg-[#212121] transition-all duration-300",
-      isCollapsed ? "w-16" : "w-[240px]",
-      className
-    )}>
-      <div className="space-y-4 py-4">
+    <div 
+      className={cn(
+        "relative h-full bg-[#212121] transition-all duration-300",
+        isCollapsed ? "w-16" : "w-[240px]",
+        className
+      )}
+      onMouseEnter={() => setIsCollapsed(false)}
+      onMouseLeave={() => setIsCollapsed(true)}
+    >
+      <div className="space-y-4 py-4 flex flex-col h-full">
         <div className={cn(
-          "px-3 py-2 flex items-center justify-center", 
-          isCollapsed ? "justify-center" : "justify-center" 
+          "px-3 py-2 flex items-center justify-center",
+          isCollapsed ? "justify-center" : "justify-center"
         )}>
           <img 
             src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
@@ -134,74 +124,67 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             className="h-8 w-auto"
           />
         </div>
-        
-        {!isCollapsed && (
-          <div className="px-3 py-2">
-            <StorefrontSwitcher />
-          </div>
-        )}
 
-        <ScrollArea className="px-3 py-2">
+        <ScrollArea className="flex-1 px-3 py-2">
           <div className="space-y-1">
-            <TooltipProvider delayDuration={0}>
-              {routes.map((route) => (
-                <Tooltip key={route.href}>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={route.active ? "default" : "ghost"}
-                      className={cn(
-                        "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
-                        route.active && "bg-primary hover:bg-primary text-primary-foreground",
-                        isCollapsed && "justify-center px-2",
-                        !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
-                      )}
-                      onClick={route.onClick}
-                      asChild={!route.onClick}
-                    >
-                      {route.onClick ? (
-                        <div className={cn(
-                          "flex items-center",
-                          isCollapsed ? "justify-center" : "w-full"
-                        )}>
-                          <route.icon className={cn(
-                            "shrink-0",
-                            isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                          )} />
-                          {!isCollapsed && <span className="truncate">{route.label}</span>}
-                        </div>
-                      ) : (
-                        <Link to={route.href} className={cn(
-                          "flex items-center",
-                          isCollapsed ? "justify-center" : "w-full"
-                        )}>
-                          <route.icon className={cn(
-                            "shrink-0",
-                            isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                          )} />
-                          {!isCollapsed && <span className="truncate">{route.label}</span>}
-                        </Link>
-                      )}
-                    </Button>
-                  </TooltipTrigger>
-                  {isCollapsed && (
-                    <TooltipContent side="right" className="bg-[#212121] border border-[#33C3F0]/20 text-white">
-                      {route.label}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              ))}
-            </TooltipProvider>
+            {routes.map((route) => (
+              <Button
+                key={route.href}
+                variant={route.active ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                  route.active && "bg-primary hover:bg-primary text-primary-foreground",
+                  isCollapsed && "justify-center px-2",
+                  !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
+                )}
+                onClick={route.onClick}
+                asChild={!route.onClick}
+              >
+                {route.onClick ? (
+                  <div className={cn(
+                    "flex items-center",
+                    isCollapsed ? "justify-center" : "w-full"
+                  )}>
+                    <route.icon className={cn(
+                      "shrink-0",
+                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                    )} />
+                    {!isCollapsed && <span className="truncate">{route.label}</span>}
+                  </div>
+                ) : (
+                  <Link to={route.href} className={cn(
+                    "flex items-center",
+                    isCollapsed ? "justify-center" : "w-full"
+                  )}>
+                    <route.icon className={cn(
+                      "shrink-0",
+                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                    )} />
+                    {!isCollapsed && <span className="truncate">{route.label}</span>}
+                  </Link>
+                )}
+              </Button>
+            ))}
           </div>
         </ScrollArea>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute bottom-4 right-2 h-8 w-8 text-white/80 hover:text-white hover:bg-white/5"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-        >
-          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </Button>
+
+        <div className="px-3 py-2 mt-auto">
+          <div className={cn(
+            "flex items-center",
+            isCollapsed ? "justify-center" : "w-full"
+          )}>
+            <Store className={cn(
+              "shrink-0 text-white/80",
+              isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+            )} />
+            <div className={cn(
+              "transition-all duration-300",
+              isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+            )}>
+              <StorefrontSwitcher />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
