@@ -5,6 +5,7 @@ import { Menu, Lock } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Link } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -38,11 +39,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <Menu className="h-5 w-5" />
           </Button>
           
-          {/* Curately branding */}
-          <div className="flex items-center gap-2">
+          {/* Curately branding with Link */}
+          <Link to="/landing" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Lock className="h-5 w-5 shrink-0 text-primary" />
             <span className="text-xl font-semibold">Curately</span>
-          </div>
+          </Link>
 
           <div className="ml-auto flex items-center gap-2">
             <ThemeToggle />
