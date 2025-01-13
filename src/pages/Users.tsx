@@ -48,7 +48,7 @@ export default function Users() {
             id,
             user_id,
             role,
-            profiles (
+            profiles!storefront_users_user_id_fkey (
               email
             )
           )
