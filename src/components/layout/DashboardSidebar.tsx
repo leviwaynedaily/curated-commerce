@@ -108,8 +108,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 key={route.href}
                 variant={route.active ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start",
-                  route.active && "bg-primary text-primary-foreground"
+                  "w-full justify-start transition-colors",
+                  route.active && "bg-primary hover:bg-primary text-primary-foreground"
                 )}
                 onClick={route.onClick}
                 asChild={!route.onClick}
