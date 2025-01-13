@@ -5,31 +5,105 @@ import { useUserQueries } from "@/hooks/useUserQueries";
 import { useSession } from "@supabase/auth-helpers-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
-import { Lock, User, ExternalLink } from "lucide-react";
+import { Lock, User, ExternalLink, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 
 const Landing = () => {
   const session = useSession();
-  const { storefronts } = useUserQueries(session);
+  const { storefronts, business } = useUserQueries(session);
+  const { toast } = useToast();
+  const [newUserEmail, setNewUserEmail] = useState("");
 
-  const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
-    queryKey: ["all-users"],
+  const { data: businessUsers = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useQuery({
+    queryKey: ["business-users", business?.id],
     queryFn: async () => {
-      console.log("Fetching all users");
+      if (!business?.id) return [];
+      console.log("Fetching business users for business:", business.id);
+
       const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("email");
+        .from("business_users")
+        .select(`
+          id,
+          role,
+          user:user_id (
+            id,
+            email
+          )
+        `)
+        .eq("business_id", business.id);
 
       if (error) {
-        console.error("Error fetching users:", error);
+        console.error("Error fetching business users:", error);
         throw error;
       }
 
-      console.log("Fetched users:", data);
+      console.log("Fetched business users:", data);
       return data;
     },
+    enabled: !!business?.id,
   });
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!business?.id || !newUserEmail) return;
+
+    try {
+      // First, check if the user exists in the profiles table
+      const { data: userProfile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", newUserEmail)
+        .single();
+
+      if (profileError || !userProfile) {
+        toast({
+          title: "Error",
+          description: "User not found. Please make sure they have registered first.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Add the user to business_users
+      const { error: insertError } = await supabase
+        .from("business_users")
+        .insert({
+          business_id: business.id,
+          user_id: userProfile.id,
+          role: "member",
+        });
+
+      if (insertError) {
+        if (insertError.code === "23505") { // Unique violation
+          toast({
+            title: "Error",
+            description: "This user is already a member of the business.",
+            variant: "destructive",
+          });
+        } else {
+          throw insertError;
+        }
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "User added successfully!",
+      });
+      setNewUserEmail("");
+      refetchUsers();
+    } catch (error) {
+      console.error("Error adding user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add user. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,28 +188,49 @@ const Landing = () => {
             </div>
           )}
 
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <User className="h-5 w-5" />
-              <h2 className="text-xl font-semibold">All Users</h2>
-            </div>
-            <div className="rounded-lg border">
-              <div className="p-4">
-                <div className="divide-y">
-                  {allUsers.map((user) => (
-                    <div key={user.id} className="py-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="h-4 w-4 text-primary" />
+          {business && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  <h2 className="text-xl font-semibold">Business Users</h2>
+                </div>
+                <form onSubmit={handleAddUser} className="flex gap-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter user email"
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                    className="w-64"
+                  />
+                  <Button type="submit" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add User
+                  </Button>
+                </form>
+              </div>
+              <div className="rounded-lg border">
+                <div className="p-4">
+                  <div className="divide-y">
+                    {businessUsers.map((user) => (
+                      <div key={user.id} className="py-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                            <User className="h-4 w-4 text-primary" />
+                          </div>
+                          <span>{user.user.email}</span>
                         </div>
-                        <span>{user.email}</span>
+                        <span className="text-sm text-muted-foreground capitalize">{user.role}</span>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                    {businessUsers.length === 0 && (
+                      <p className="py-3 text-muted-foreground text-center">No users found. Add users to collaborate on your business.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
     </div>
