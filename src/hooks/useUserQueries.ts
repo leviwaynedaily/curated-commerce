@@ -87,8 +87,8 @@ export const useUserQueries = (session: any) => {
         .select(`
           id,
           role,
-          profiles:user_id (
-            id,
+          user_id,
+          profiles!business_users_user_id_fkey (
             email
           )
         `)

@@ -8,70 +8,67 @@ import { Lock, User, ExternalLink, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const Landing = () => {
   const session = useSession();
   const { storefronts, business, businessUsers, refetchBusinessUsers } = useUserQueries(session);
-  const { toast } = useToast();
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business?.id || !newUserEmail) return;
 
     try {
-      // First, check if the user exists in the profiles table
-      const { data: userProfile, error: profileError } = await supabase
+      setIsLoading(true);
+      console.log("Adding user to business:", business.id);
+
+      // First, get the user's ID from their email using the profiles table
+      const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
         .eq("email", newUserEmail)
         .single();
 
-      if (profileError || !userProfile) {
-        toast({
-          title: "Error",
-          description: "User not found. Please make sure they have registered first.",
-          variant: "destructive",
-        });
+      if (userError || !userData) {
+        console.error("Error finding user:", userError);
+        toast.error("User not found. Please check the email address.");
         return;
       }
 
-      // Add the user to business_users
-      const { error: insertError } = await supabase
+      // Check if user already has access
+      const { data: existingAccess } = await supabase
+        .from("business_users")
+        .select("id")
+        .eq("business_id", business.id)
+        .eq("user_id", userData.id)
+        .single();
+
+      if (existingAccess) {
+        toast.error("User already has access to this business");
+        return;
+      }
+
+      // Add user to business
+      const { error } = await supabase
         .from("business_users")
         .insert({
           business_id: business.id,
-          user_id: userProfile.id,
-          role: "member",
+          user_id: userData.id,
+          role: "member"
         });
 
-      if (insertError) {
-        if (insertError.code === "23505") { // Unique violation
-          toast({
-            title: "Error",
-            description: "This user is already a member of the business.",
-            variant: "destructive",
-          });
-        } else {
-          throw insertError;
-        }
-        return;
-      }
+      if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "User added successfully!",
-      });
+      toast.success("User added successfully");
       setNewUserEmail("");
       refetchBusinessUsers();
     } catch (error) {
       console.error("Error adding user:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add user. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to add user. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -171,7 +168,7 @@ const Landing = () => {
                     onChange={(e) => setNewUserEmail(e.target.value)}
                     className="w-64"
                   />
-                  <Button type="submit" size="sm">
+                  <Button type="submit" size="sm" disabled={isLoading}>
                     <Plus className="h-4 w-4 mr-2" />
                     Add User
                   </Button>
