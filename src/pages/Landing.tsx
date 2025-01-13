@@ -18,7 +18,7 @@ const Landing = () => {
           id,
           user_id,
           role,
-          profiles:profiles!user_id(email)
+          profiles:user_id(email)
         `)
         .eq("storefront_id", currentStorefrontId);
 
