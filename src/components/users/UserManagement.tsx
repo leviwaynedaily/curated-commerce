@@ -32,14 +32,15 @@ export function UserManagement({ storefronts }: { storefronts: Storefront[] }) {
       setIsLoading(true);
       console.log("Adding user to storefront:", storefrontId);
 
-      // First, check if the user exists in auth.users
-      const { data: users, error: userError } = await supabase
-        .from("auth_users")
-        .select("id, email")
+      // First, get the user's ID from their email using a Postgres function
+      const { data: userData, error: userError } = await supabase
+        .from("profiles")
+        .select("id")
         .eq("email", newUserEmail)
         .single();
 
-      if (!users || userError) {
+      if (userError || !userData) {
+        console.error("Error finding user:", userError);
         toast.error("User not found. Please check the email address.");
         return;
       }
@@ -49,7 +50,7 @@ export function UserManagement({ storefronts }: { storefronts: Storefront[] }) {
         .from("storefront_users")
         .select("id")
         .eq("storefront_id", storefrontId)
-        .eq("user_id", users.id)
+        .eq("user_id", userData.id)
         .single();
 
       if (existingAccess) {
@@ -62,7 +63,7 @@ export function UserManagement({ storefronts }: { storefronts: Storefront[] }) {
         .from("storefront_users")
         .insert({
           storefront_id: storefrontId,
-          user_id: users.id,
+          user_id: userData.id,
           role: "member"
         });
 
