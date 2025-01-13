@@ -10,6 +10,7 @@ const Landing = () => {
     queryKey: ["storefront-users", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) return [];
+      console.log("Fetching users for storefront:", currentStorefrontId);
 
       const { data, error } = await supabase
         .from("storefront_users")
@@ -17,7 +18,7 @@ const Landing = () => {
           id,
           user_id,
           role,
-          profiles!storefront_users_user_id_fkey (
+          profiles:user_id (
             email
           )
         `)
@@ -28,6 +29,7 @@ const Landing = () => {
         throw error;
       }
 
+      console.log("Fetched storefront users:", data);
       return data;
     },
     enabled: !!currentStorefrontId,

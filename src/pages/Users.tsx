@@ -1,43 +1,29 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, Users as UsersIcon } from "lucide-react";
-import { UserManagement } from "@/components/users/UserManagement";
+import { useUserQueries } from "@/hooks/useUserQueries";
 
-export default function Users() {
-  const navigate = useNavigate();
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (!currentSession) {
-        navigate("/login");
-        return;
-      }
-      setSession(currentSession);
+interface Storefront {
+  id: string;
+  name: string;
+  storefront_users: {
+    id: string;
+    user_id: string;
+    role: string;
+    profiles: {
+      email: string;
     };
-    
-    checkAuth();
-  }, [navigate]);
+  }[];
+}
 
-  const { data: storefronts, isLoading, error } = useQuery({
-    queryKey: ["user-storefronts"],
+const Users = () => {
+  const { business } = useUserQueries({});
+
+  const { data: storefronts = [], isLoading } = useQuery({
+    queryKey: ["storefronts-with-users", business?.id],
     queryFn: async () => {
-      if (!session?.user?.id) return [];
-
-      console.log("Fetching storefronts for user management...");
-
-      const { data: business } = await supabase
-        .from("businesses")
-        .select("id")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (!business) return [];
+      if (!business?.id) return [];
+      console.log("Fetching storefronts with users for business:", business.id);
 
       const { data, error } = await supabase
         .from("storefronts")
@@ -48,7 +34,7 @@ export default function Users() {
             id,
             user_id,
             role,
-            profiles!storefront_users_user_id_fkey (
+            profiles:user_id (
               email
             )
           )
@@ -56,54 +42,38 @@ export default function Users() {
         .eq("business_id", business.id);
 
       if (error) {
-        console.error("Error fetching storefronts:", error);
+        console.error("Error fetching storefronts with users:", error);
         throw error;
       }
 
       console.log("Fetched storefronts with users:", data);
-      return data || [];
+      return data as Storefront[];
     },
-    enabled: !!session?.user?.id,
+    enabled: !!business?.id,
   });
-
-  if (!session) return null;
-
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <div>Loading user information...</div>
-      </DashboardLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <DashboardLayout>
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Error loading user information. Please try refreshing the page.
-          </AlertDescription>
-        </Alert>
-      </DashboardLayout>
-    );
-  }
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-4 md:p-8">
+      <div className="space-y-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2">
-            <UsersIcon className="h-8 w-8" />
-            User Management
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-2">
-            Manage user access to your storefronts
+          <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+          <p className="text-muted-foreground mt-2">
+            Manage users across your storefronts
           </p>
         </div>
 
-        <UserManagement storefronts={storefronts || []} />
+        {storefronts.map((storefront) => (
+          <div key={storefront.id} className="space-y-4">
+            <h2 className="text-2xl font-semibold">{storefront.name}</h2>
+            <StorefrontUsers 
+              storefrontId={storefront.id} 
+              users={storefront.storefront_users} 
+            />
+          </div>
+        ))}
       </div>
     </DashboardLayout>
   );
-}
+};
+
+export default Users;
