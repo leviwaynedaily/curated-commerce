@@ -69,9 +69,16 @@ const Landing = () => {
                 >
                   <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-2xl font-semibold leading-none tracking-tight">
-                        {storefront.name}
-                      </h3>
+                      <div>
+                        <h3 className="text-2xl font-semibold leading-none tracking-tight">
+                          {storefront.name}
+                        </h3>
+                        {storefront.is_published && (
+                          <p className="text-sm text-muted-foreground mt-1">
+                            /{storefront.slug}
+                          </p>
+                        )}
+                      </div>
                       {storefront.is_published && (
                         <a
                           href={`/${storefront.slug}`}
