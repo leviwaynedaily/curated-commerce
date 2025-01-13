@@ -30,31 +30,49 @@ const Landing = () => {
     try {
       setIsLoading(true);
       console.log("Adding user to business:", business.id);
+      console.log("Searching for user with email:", newUserEmail);
 
       // First check if the user exists in profiles
       const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
         .eq("email", newUserEmail)
-        .single();
+        .maybeSingle();
 
-      if (userError || !userData) {
+      if (userError) {
         console.error("Error finding user:", userError);
         toast({
           title: "Error",
-          description: "User not found. Please check the email address.",
+          description: "An error occurred while searching for the user",
           variant: "destructive",
         });
         return;
       }
 
+      if (!userData) {
+        console.log("No user found with email:", newUserEmail);
+        toast({
+          title: "User Not Found",
+          description: "No user found with this email address. Please check the email and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log("User found:", userData.id);
+
       // Check if user already has access to this business
-      const { data: existingAccess } = await supabase
+      const { data: existingAccess, error: existingAccessError } = await supabase
         .from("business_users")
         .select("id")
         .eq("business_id", business.id)
         .eq("user_id", userData.id)
-        .single();
+        .maybeSingle();
+
+      if (existingAccessError) {
+        console.error("Error checking existing access:", existingAccessError);
+        throw existingAccessError;
+      }
 
       if (existingAccess) {
         toast({
