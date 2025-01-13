@@ -48,7 +48,7 @@ export default function Users() {
             id,
             user_id,
             role,
-            auth_users:profiles!inner(
+            profiles (
               email
             )
           )

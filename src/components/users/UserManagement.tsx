@@ -11,7 +11,7 @@ interface StorefrontUser {
   id: string;
   user_id: string;
   role: string;
-  auth_users: {
+  profiles: {
     email: string;
   };
 }
@@ -32,7 +32,7 @@ export function UserManagement({ storefronts }: { storefronts: Storefront[] }) {
       setIsLoading(true);
       console.log("Adding user to storefront:", storefrontId);
 
-      // First, get the user's ID from their email using a Postgres function
+      // First, get the user's ID from their email using the profiles table
       const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
@@ -135,7 +135,7 @@ export function UserManagement({ storefronts }: { storefronts: Storefront[] }) {
                     key={user.id}
                     className="flex items-center justify-between p-2 rounded bg-muted"
                   >
-                    <span>{user.auth_users.email}</span>
+                    <span>{user.profiles.email}</span>
                     <Button
                       variant="ghost"
                       size="sm"
