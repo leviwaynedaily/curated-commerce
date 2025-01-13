@@ -127,11 +127,9 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             className="h-8 w-auto"
           />
           {!isCollapsed && (
-            <img 
-              src="/lovable-uploads/34939a9a-7fd2-424b-a0b7-a21e82f527c9.png" 
-              alt="Curately" 
-              className="h-6 w-auto"
-            />
+            <span className="font-montserrat font-bold text-white text-xl">
+              Curately
+            </span>
           )}
         </div>
 
