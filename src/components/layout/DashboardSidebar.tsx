@@ -106,8 +106,11 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             {routes.map((route) => (
               <Button
                 key={route.href}
-                variant={route.active ? "secondary" : "ghost"}
-                className="w-full justify-start"
+                variant={route.active ? "default" : "ghost"}
+                className={cn(
+                  "w-full justify-start",
+                  route.active && "bg-primary text-primary-foreground"
+                )}
                 onClick={route.onClick}
                 asChild={!route.onClick}
               >
