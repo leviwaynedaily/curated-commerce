@@ -76,10 +76,41 @@ export const useUserQueries = (session: any) => {
     enabled: !!businessQuery.data?.id,
   });
 
+  const businessUsersQuery = useQuery({
+    queryKey: ["business-users", businessQuery.data?.id],
+    queryFn: async () => {
+      if (!businessQuery.data?.id) return [];
+      console.log("Fetching business users for business:", businessQuery.data.id);
+
+      const { data, error } = await supabase
+        .from("business_users")
+        .select(`
+          id,
+          role,
+          profiles:user_id (
+            id,
+            email
+          )
+        `)
+        .eq("business_id", businessQuery.data.id);
+
+      if (error) {
+        console.error("Error fetching business users:", error);
+        throw error;
+      }
+
+      console.log("Business users fetched:", data);
+      return data;
+    },
+    enabled: !!businessQuery.data?.id,
+  });
+
   return {
     user: userQuery.data,
     business: businessQuery.data,
     storefronts: storefrontsQuery.data,
+    businessUsers: businessUsersQuery.data,
     refetchUser: userQuery.refetch,
+    refetchBusinessUsers: businessUsersQuery.refetch,
   };
 };

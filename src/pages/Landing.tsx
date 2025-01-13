@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useSession } from "@supabase/auth-helpers-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
-import { useSession } from "@supabase/auth-helpers-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { Lock, User, ExternalLink, Plus } from "lucide-react";
@@ -13,38 +12,9 @@ import { useToast } from "@/components/ui/use-toast";
 
 const Landing = () => {
   const session = useSession();
-  const { storefronts, business } = useUserQueries(session);
+  const { storefronts, business, businessUsers, refetchBusinessUsers } = useUserQueries(session);
   const { toast } = useToast();
   const [newUserEmail, setNewUserEmail] = useState("");
-
-  const { data: businessUsers = [], isLoading: isLoadingUsers, refetch: refetchUsers } = useQuery({
-    queryKey: ["business-users", business?.id],
-    queryFn: async () => {
-      if (!business?.id) return [];
-      console.log("Fetching business users for business:", business.id);
-
-      const { data, error } = await supabase
-        .from("business_users")
-        .select(`
-          id,
-          role,
-          user:user_id (
-            id,
-            email
-          )
-        `)
-        .eq("business_id", business.id);
-
-      if (error) {
-        console.error("Error fetching business users:", error);
-        throw error;
-      }
-
-      console.log("Fetched business users:", data);
-      return data;
-    },
-    enabled: !!business?.id,
-  });
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +64,7 @@ const Landing = () => {
         description: "User added successfully!",
       });
       setNewUserEmail("");
-      refetchUsers();
+      refetchBusinessUsers();
     } catch (error) {
       console.error("Error adding user:", error);
       toast({
@@ -107,7 +77,6 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Simple header */}
       <header className="h-16 border-b flex items-center gap-2 px-3 sm:px-4 w-full">
         <div className="flex items-center gap-2">
           <Lock className="h-5 w-5 shrink-0 text-primary" />
@@ -119,7 +88,6 @@ const Landing = () => {
         </div>
       </header>
 
-      {/* Main content */}
       <main className="p-3 sm:p-4 w-full">
         <div className="max-w-[1400px] mx-auto space-y-8">
           <div>
@@ -141,9 +109,9 @@ const Landing = () => {
                     window.location.reload();
                   }}
                 >
-                  <div className="p-6 space-y-4 min-h-[160px]">
-                    <div className="flex items-center justify-between">
-                      <div className="min-h-[3.5rem] flex flex-col justify-center">
+                  <div className="p-6 space-y-4">
+                    <div className="flex items-center justify-between min-h-[3.5rem]">
+                      <div className="flex flex-col justify-center">
                         <h3 className="text-2xl font-semibold leading-none tracking-tight">
                           {storefront.name}
                         </h3>
@@ -212,18 +180,18 @@ const Landing = () => {
               <div className="rounded-lg border">
                 <div className="p-4">
                   <div className="divide-y">
-                    {businessUsers.map((user) => (
+                    {businessUsers?.map((user) => (
                       <div key={user.id} className="py-3 flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                             <User className="h-4 w-4 text-primary" />
                           </div>
-                          <span>{user.user.email}</span>
+                          <span>{user.profiles.email}</span>
                         </div>
                         <span className="text-sm text-muted-foreground capitalize">{user.role}</span>
                       </div>
                     ))}
-                    {businessUsers.length === 0 && (
+                    {(!businessUsers || businessUsers.length === 0) && (
                       <p className="py-3 text-muted-foreground text-center">No users found. Add users to collaborate on your business.</p>
                     )}
                   </div>
