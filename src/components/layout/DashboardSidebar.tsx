@@ -47,8 +47,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     {
       label: 'Dashboard',
       icon: LayoutDashboard,
-      href: '/',
-      active: location.pathname === '/',
+      href: '/dashboard',
+      active: location.pathname === '/dashboard',
     },
     {
       label: 'Products',
