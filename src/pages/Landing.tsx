@@ -67,9 +67,9 @@ const Landing = () => {
                     window.location.reload();
                   }}
                 >
-                  <div className="p-6 space-y-4">
+                  <div className="p-6 space-y-4 min-h-[160px]">
                     <div className="flex items-center justify-between">
-                      <div>
+                      <div className="min-h-[3.5rem] flex flex-col justify-center">
                         <h3 className="text-2xl font-semibold leading-none tracking-tight">
                           {storefront.name}
                         </h3>
