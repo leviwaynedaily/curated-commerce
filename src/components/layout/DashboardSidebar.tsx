@@ -97,15 +97,6 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     <div className={cn("h-full bg-background", className)}>
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          {storefront?.logo_url && (
-            <div className="mb-6 flex justify-center">
-              <img 
-                src={storefront.logo_url} 
-                alt={storefront.name || 'Store logo'} 
-                className="h-12 object-contain"
-              />
-            </div>
-          )}
           <div className="mb-2">
             <StorefrontSwitcher />
           </div>
