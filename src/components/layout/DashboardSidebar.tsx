@@ -121,7 +121,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           "px-3 py-2 flex items-center",
           isCollapsed ? "justify-center" : "justify-start gap-3"
         )}>
-          <div className="bg-white rounded-md p-1 shadow-sm">
+          <div className="rounded-md p-1 dark:bg-transparent">
             <img 
               src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
               alt="Logo" 
