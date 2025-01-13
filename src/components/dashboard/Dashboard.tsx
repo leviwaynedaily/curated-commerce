@@ -93,11 +93,15 @@ export function Dashboard({ storefront }: { storefront: any }) {
         </div>
 
         {storefront.logo_url && (
-          <img 
-            src={storefront.logo_url} 
-            alt={storefront.name || 'Store logo'} 
-            className="h-12 object-contain"
-          />
+          <div className="flex items-center gap-4">
+            <div className="bg-white dark:bg-white rounded-md p-2 w-fit">
+              <img 
+                src={storefront.logo_url} 
+                alt={storefront.name || 'Store logo'} 
+                className="h-12 object-contain"
+              />
+            </div>
+          </div>
         )}
       </div>
 
