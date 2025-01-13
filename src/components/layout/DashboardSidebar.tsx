@@ -183,7 +183,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     </Button>
                   </TooltipTrigger>
                   {isCollapsed && (
-                    <TooltipContent side="right">
+                    <TooltipContent side="right" className="bg-popover/95 text-popover-foreground">
                       {route.label}
                     </TooltipContent>
                   )}
