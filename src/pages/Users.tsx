@@ -4,17 +4,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
 import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
 
+interface StorefrontUser {
+  id: string;
+  user_id: string;
+  role: string;
+  profiles: {
+    email: string;
+  };
+}
+
 interface Storefront {
   id: string;
   name: string;
-  storefront_users: {
-    id: string;
-    user_id: string;
-    role: string;
-    profiles: {
-      email: string;
-    };
-  }[];
+  storefront_users: StorefrontUser[];
 }
 
 const Users = () => {
@@ -26,7 +28,7 @@ const Users = () => {
       if (!business?.id) return [];
       console.log("Fetching storefronts with users for business:", business.id);
 
-      const { data, error } = await supabase
+      const { data: storefrontsData, error: storefrontsError } = await supabase
         .from("storefronts")
         .select(`
           id,
@@ -34,31 +36,40 @@ const Users = () => {
           storefront_users (
             id,
             user_id,
-            role,
-            user:user_id(
-              profiles!id(
-                email
-              )
-            )
+            role
           )
         `)
         .eq("business_id", business.id);
 
-      if (error) {
-        console.error("Error fetching storefronts with users:", error);
-        throw error;
+      if (storefrontsError) {
+        console.error("Error fetching storefronts:", storefrontsError);
+        throw storefrontsError;
       }
 
-      // Transform the data to match the expected format
-      const transformedData = data.map(storefront => ({
+      // Get all unique user IDs from storefront users
+      const userIds = [...new Set(
+        storefrontsData.flatMap(s => 
+          s.storefront_users.map(u => u.user_id)
+        )
+      )];
+
+      // Fetch profiles for all users
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        throw profilesError;
+      }
+
+      // Map profiles to storefront users
+      const transformedData = storefrontsData.map(storefront => ({
         ...storefront,
         storefront_users: storefront.storefront_users.map(user => ({
-          id: user.id,
-          user_id: user.user_id,
-          role: user.role,
-          profiles: {
-            email: user.user.profiles.email
-          }
+          ...user,
+          profiles: profiles.find(p => p.id === user.user_id) || { email: '' }
         }))
       }));
 
