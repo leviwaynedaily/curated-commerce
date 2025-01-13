@@ -82,26 +82,37 @@ export const useUserQueries = (session: any) => {
       if (!businessQuery.data?.id) return [];
       console.log("Fetching business users for business:", businessQuery.data.id);
 
-      // Updated query to join with profiles table directly
-      const { data, error } = await supabase
+      // First get business users
+      const { data: businessUsers, error: businessUsersError } = await supabase
         .from("business_users")
-        .select(`
-          id,
-          role,
-          user_id,
-          profiles (
-            email
-          )
-        `)
+        .select("id, role, user_id")
         .eq("business_id", businessQuery.data.id);
 
-      if (error) {
-        console.error("Error fetching business users:", error);
-        throw error;
+      if (businessUsersError) {
+        console.error("Error fetching business users:", businessUsersError);
+        throw businessUsersError;
       }
 
-      console.log("Business users fetched:", data);
-      return data;
+      // Then get the profiles for those users
+      const userIds = businessUsers.map(user => user.user_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("id", userIds);
+
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        throw profilesError;
+      }
+
+      // Combine the data
+      const usersWithProfiles = businessUsers.map(user => ({
+        ...user,
+        profiles: profiles.find(profile => profile.id === user.user_id)
+      }));
+
+      console.log("Business users fetched:", usersWithProfiles);
+      return usersWithProfiles;
     },
     enabled: !!businessQuery.data?.id,
   });
