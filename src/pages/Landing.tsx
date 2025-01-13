@@ -6,14 +6,35 @@ import { useUserQueries } from "@/hooks/useUserQueries";
 import { useSession } from "@supabase/auth-helpers-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
-import { Lock } from "lucide-react";
+import { Lock, User } from "lucide-react";
+import { QuickActions } from "@/components/dashboard/QuickActions";
+import { Stats } from "@/components/dashboard/Stats";
 
 const Landing = () => {
   const session = useSession();
   const { storefronts } = useUserQueries(session);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
+    queryKey: ["all-users"],
+    queryFn: async () => {
+      console.log("Fetching all users");
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .order("email");
+
+      if (error) {
+        console.error("Error fetching users:", error);
+        throw error;
+      }
+
+      console.log("Fetched users:", data);
+      return data;
+    },
+  });
+
+  const { data: users = [] } = useQuery({
     queryKey: ["storefront-users", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) return [];
@@ -34,13 +55,12 @@ const Landing = () => {
         throw error;
       }
 
-      // Transform the data to match the expected format
       const transformedData = data.map(user => ({
         id: user.id,
         user_id: user.user_id,
         role: user.role,
         profiles: {
-          email: user.user.profiles.email
+          email: user.user?.profiles?.email
         }
       }));
 
@@ -74,6 +94,12 @@ const Landing = () => {
             </p>
           </div>
 
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Stats />
+          </div>
+
+          <QuickActions />
+
           {storefronts && storefronts.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {storefronts.map((storefront) => (
@@ -85,11 +111,6 @@ const Landing = () => {
                     <h3 className="text-2xl font-semibold leading-none tracking-tight">
                       {storefront.name}
                     </h3>
-                    {storefront.description && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        {storefront.description}
-                      </p>
-                    )}
                   </div>
                 </div>
               ))}
@@ -99,6 +120,29 @@ const Landing = () => {
               <p className="text-muted-foreground">No storefronts found. Create your first storefront to get started.</p>
             </div>
           )}
+
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              <h2 className="text-xl font-semibold">All Users</h2>
+            </div>
+            <div className="rounded-lg border">
+              <div className="p-4">
+                <div className="divide-y">
+                  {allUsers.map((user) => (
+                    <div key={user.id} className="py-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <span>{user.email}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
 
           <StorefrontUsers storefrontId={currentStorefrontId} users={users} />
         </div>
