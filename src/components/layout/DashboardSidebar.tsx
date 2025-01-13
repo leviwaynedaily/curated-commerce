@@ -128,7 +128,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           />
           {!isCollapsed && (
             <span className="font-montserrat font-bold text-white text-xl">
-              Curately
+              curately
             </span>
           )}
         </div>
