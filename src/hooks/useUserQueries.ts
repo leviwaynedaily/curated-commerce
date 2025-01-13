@@ -82,13 +82,14 @@ export const useUserQueries = (session: any) => {
       if (!businessQuery.data?.id) return [];
       console.log("Fetching business users for business:", businessQuery.data.id);
 
+      // Updated query to join with profiles table directly
       const { data, error } = await supabase
         .from("business_users")
         .select(`
           id,
           role,
           user_id,
-          profiles!business_users_user_id_fkey (
+          profiles (
             email
           )
         `)
