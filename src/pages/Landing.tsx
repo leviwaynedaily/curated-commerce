@@ -20,6 +20,7 @@ export default function Landing() {
         navigate("/login");
         return;
       }
+      console.log("Session found for user:", currentSession.user.id);
       setSession(currentSession);
     };
     
@@ -30,12 +31,24 @@ export default function Landing() {
     queryKey: ["storefronts"],
     queryFn: async () => {
       try {
-        console.log("Fetching business for user:", session?.user?.id);
-        const { data: business } = await supabase
+        if (!session?.user?.id) {
+          console.log("No user session found");
+          return [];
+        }
+
+        console.log("Fetching businesses for user:", session.user.id);
+        // Simplified query to avoid recursion
+        const { data: business, error: businessError } = await supabase
           .from("businesses")
           .select("id")
-          .eq("user_id", session?.user?.id)
-          .maybeSingle();
+          .eq("user_id", session.user.id)
+          .single();
+
+        if (businessError) {
+          console.error("Error fetching business:", businessError);
+          toast.error("Failed to load business data");
+          return [];
+        }
 
         if (!business) {
           console.log("No business found");
@@ -43,22 +56,22 @@ export default function Landing() {
         }
 
         console.log("Fetching storefronts for business:", business.id);
-        const { data: storefronts, error } = await supabase
+        const { data: storefronts, error: storefrontsError } = await supabase
           .from("storefronts")
           .select(`
             *,
-            products (count)
+            products:products(count)
           `)
           .eq("business_id", business.id)
           .order("created_at", { ascending: false });
 
-        if (error) {
-          console.error("Error fetching storefronts:", error);
+        if (storefrontsError) {
+          console.error("Error fetching storefronts:", storefrontsError);
           toast.error("Failed to load storefronts");
-          throw error;
+          throw storefrontsError;
         }
 
-        console.log("Fetched storefronts:", storefronts);
+        console.log("Fetched storefronts:", storefronts?.length);
         return storefronts || [];
       } catch (error) {
         console.error("Failed to fetch storefronts:", error);
