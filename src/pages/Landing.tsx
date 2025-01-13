@@ -18,12 +18,16 @@ const Landing = () => {
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!business?.id || !newUserEmail) return;
+    if (!business?.id || !newUserEmail) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
 
     try {
       setIsLoading(true);
       console.log("Adding user to business:", business.id);
 
+      // First check if the user exists in profiles
       const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
@@ -36,6 +40,7 @@ const Landing = () => {
         return;
       }
 
+      // Check if user already has access to this business
       const { data: existingAccess } = await supabase
         .from("business_users")
         .select("id")
@@ -48,6 +53,7 @@ const Landing = () => {
         return;
       }
 
+      // Add user to business_users
       const { error } = await supabase
         .from("business_users")
         .insert({
@@ -56,7 +62,10 @@ const Landing = () => {
           role: "member"
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error adding user:", error);
+        throw error;
+      }
 
       toast.success("User added successfully");
       setNewUserEmail("");
