@@ -14,7 +14,7 @@ export type Database = {
           business_id: string | null
           created_at: string | null
           id: string
-          role: string
+          role: Database["public"]["Enums"]["business_user_role"]
           updated_at: string | null
           user_id: string | null
         }
@@ -22,7 +22,7 @@ export type Database = {
           business_id?: string | null
           created_at?: string | null
           id?: string
-          role?: string
+          role?: Database["public"]["Enums"]["business_user_role"]
           updated_at?: string | null
           user_id?: string | null
         }
@@ -30,7 +30,7 @@ export type Database = {
           business_id?: string | null
           created_at?: string | null
           id?: string
-          role?: string
+          role?: Database["public"]["Enums"]["business_user_role"]
           updated_at?: string | null
           user_id?: string | null
         }
@@ -502,6 +502,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      business_user_role: "owner" | "member"
       product_status: "active" | "inactive"
       pwa_display_mode: "standalone" | "fullscreen" | "minimal-ui" | "browser"
       pwa_orientation: "portrait" | "landscape" | "any"
