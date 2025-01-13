@@ -37,7 +37,6 @@ export default function Landing() {
         }
 
         console.log("Fetching businesses for user:", session.user.id);
-        // Simplified query to avoid recursion
         const { data: business, error: businessError } = await supabase
           .from("businesses")
           .select("id")
@@ -169,9 +168,6 @@ export default function Landing() {
                       </div>
                       <Progress value={getSetupProgress(store)} className="h-2" />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-4">
-                      {store.description || "No description"}
-                    </p>
                     <Button 
                       variant="outline" 
                       className="w-full"
