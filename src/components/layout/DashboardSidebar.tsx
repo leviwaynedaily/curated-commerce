@@ -109,7 +109,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   return (
     <div 
       className={cn(
-        "relative h-full bg-[#212121] transition-all duration-300",
+        "relative h-full bg-[#1a1a1a] transition-all duration-300",
         isCollapsed ? "w-16" : "w-[240px]",
         className
       )}
