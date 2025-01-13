@@ -109,7 +109,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   return (
     <div 
       className={cn(
-        "relative h-full bg-[#161616] dark:bg-[#161616] transition-all duration-300",
+        "relative h-full bg-white dark:bg-[#161616] border-r border-gray-200 dark:border-gray-800 transition-all duration-300",
         isCollapsed ? "w-16" : "w-[240px]",
         className
       )}
@@ -121,7 +121,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           "px-3 py-2 flex items-center",
           isCollapsed ? "justify-center" : "justify-start gap-3"
         )}>
-          <div className="bg-white rounded-md p-1">
+          <div className="bg-white rounded-md p-1 shadow-sm">
             <img 
               src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
               alt="Logo" 
@@ -129,7 +129,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             />
           </div>
           {!isCollapsed && (
-            <span className="font-montserrat font-bold text-white dark:text-white text-xl">
+            <span className="font-montserrat font-bold text-gray-900 dark:text-white text-xl">
               curately
             </span>
           )}
@@ -142,10 +142,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 key={route.href}
                 variant={route.active ? "default" : "ghost"}
                 className={cn(
-                  "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                  "w-full justify-start transition-colors border-b border-gray-100 dark:border-gray-800",
                   route.active && "bg-primary hover:bg-primary text-primary-foreground",
                   isCollapsed && "justify-center px-2",
-                  !route.active && "hover:bg-white/5 text-white/70 dark:text-white/70 hover:text-white dark:hover:text-white"
+                  !route.active && "hover:bg-gray-100 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                 )}
                 onClick={route.onClick}
                 asChild={!route.onClick}
@@ -156,10 +156,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     isCollapsed ? "justify-center" : "w-full"
                   )}>
                     <route.icon className={cn(
-                      "shrink-0 text-white/70 dark:text-white/70",
+                      "shrink-0 text-gray-600 dark:text-gray-400",
                       isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                     )} />
-                    {!isCollapsed && <span className="truncate text-white/70 dark:text-white/70">{route.label}</span>}
+                    {!isCollapsed && <span className="truncate text-gray-700 dark:text-gray-300">{route.label}</span>}
                   </div>
                 ) : (
                   <Link to={route.href} className={cn(
@@ -167,10 +167,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     isCollapsed ? "justify-center" : "w-full"
                   )}>
                     <route.icon className={cn(
-                      "shrink-0 text-white/70 dark:text-white/70",
+                      "shrink-0 text-gray-600 dark:text-gray-400",
                       isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                     )} />
-                    {!isCollapsed && <span className="truncate text-white/70 dark:text-white/70">{route.label}</span>}
+                    {!isCollapsed && <span className="truncate text-gray-700 dark:text-gray-300">{route.label}</span>}
                   </Link>
                 )}
               </Button>
@@ -184,10 +184,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
               key={route.href}
               variant={route.active ? "default" : "ghost"}
               className={cn(
-                "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                "w-full justify-start transition-colors border-b border-gray-100 dark:border-gray-800",
                 route.active && "bg-primary hover:bg-primary text-primary-foreground",
                 isCollapsed && "justify-center px-2",
-                !route.active && "hover:bg-white/5 text-white/70 dark:text-white/70 hover:text-white dark:hover:text-white"
+                !route.active && "hover:bg-gray-100 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
               )}
               asChild
             >
@@ -196,10 +196,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 isCollapsed ? "justify-center" : "w-full"
               )}>
                 <route.icon className={cn(
-                  "shrink-0 text-white/70 dark:text-white/70",
+                  "shrink-0 text-gray-600 dark:text-gray-400",
                   isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                 )} />
-                {!isCollapsed && <span className="truncate text-white/70 dark:text-white/70">{route.label}</span>}
+                {!isCollapsed && <span className="truncate text-gray-700 dark:text-gray-300">{route.label}</span>}
               </Link>
             </Button>
           ))}
@@ -208,7 +208,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             isCollapsed ? "justify-center" : "w-full"
           )}>
             <Store className={cn(
-              "shrink-0 text-white/70 dark:text-white/70",
+              "shrink-0 text-gray-600 dark:text-gray-400",
               isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
             )} />
             <div className={cn(
