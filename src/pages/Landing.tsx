@@ -4,14 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Store, ArrowRight } from "lucide-react";
+import { Store, ArrowRight, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { StorefrontForm } from "@/components/forms/StorefrontForm";
 
 export default function Landing() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
+  const [showCreateStore, setShowCreateStore] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -27,7 +30,7 @@ export default function Landing() {
     checkAuth();
   }, [navigate]);
 
-  const { data: storefronts, isLoading } = useQuery({
+  const { data: storefronts, isLoading, refetch: refetchStorefronts } = useQuery({
     queryKey: ["storefronts"],
     queryFn: async () => {
       try {
@@ -111,11 +114,20 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome to Your Storefronts</h1>
-          <p className="text-muted-foreground mt-2">
-            Select a storefront to manage or create a new one.
-          </p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Welcome to Your Storefronts</h1>
+            <p className="text-muted-foreground mt-2">
+              Select a storefront to manage or create a new one.
+            </p>
+          </div>
+          <Button 
+            onClick={() => setShowCreateStore(true)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Create Store
+          </Button>
         </div>
 
         {isLoading ? (
@@ -140,7 +152,7 @@ export default function Landing() {
               <p className="text-muted-foreground mb-4">
                 Start by creating your first online storefront. It only takes a few minutes!
               </p>
-              <Button onClick={() => navigate("/storefront-information")}>
+              <Button onClick={() => setShowCreateStore(true)}>
                 Create Store
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -187,6 +199,24 @@ export default function Landing() {
             ))}
           </div>
         )}
+
+        <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Store</DialogTitle>
+            </DialogHeader>
+            {session && (
+              <StorefrontForm
+                businessId={storefronts?.[0]?.business_id}
+                onSuccess={() => {
+                  setShowCreateStore(false);
+                  refetchStorefronts();
+                  toast.success("Store created successfully!");
+                }}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
