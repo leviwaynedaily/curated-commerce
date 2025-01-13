@@ -151,13 +151,15 @@ export default function Landing() {
             {storefronts?.map((store) => (
               <Card key={store.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex flex-col space-y-2">
                     <CardTitle>{store.name}</CardTitle>
-                    {getStatusBadge(store)}
+                    <div className="flex items-center space-x-2">
+                      {getStatusBadge(store)}
+                      <span className="text-sm text-muted-foreground">
+                        {store.products?.length || 0} Products
+                      </span>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {store.products?.length || 0} Products
-                  </p>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
