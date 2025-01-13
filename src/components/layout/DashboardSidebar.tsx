@@ -125,26 +125,14 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     )}>
       <div className="space-y-4 py-4">
         <div className={cn(
-          "px-3 py-2 flex items-center",
-          isCollapsed ? "justify-center" : "justify-between"
+          "px-3 py-2 flex items-center justify-center", 
+          isCollapsed ? "justify-center" : "justify-center" 
         )}>
-          <div className={cn(
-            "flex items-center gap-2 transition-all duration-300",
-            isCollapsed ? "justify-center w-full" : ""
-          )}>
-            <img 
-              src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
-              alt="Logo" 
-              className="h-8 w-auto"
-            />
-            {!isCollapsed && (
-              <img
-                src="/lovable-uploads/982a241f-b82d-4f33-879d-d27bf029a82c.png"
-                alt="Curately"
-                className="h-6 w-auto"
-              />
-            )}
-          </div>
+          <img 
+            src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
+            alt="Logo" 
+            className="h-8 w-auto"
+          />
         </div>
         
         {!isCollapsed && (
