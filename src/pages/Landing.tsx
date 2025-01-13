@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
 import { useUserQueries } from "@/hooks/useUserQueries";
 import { useSession } from "@supabase/auth-helpers-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { Lock, User } from "lucide-react";
-import { QuickActions } from "@/components/dashboard/QuickActions";
-import { Stats } from "@/components/dashboard/Stats";
 
 const Landing = () => {
   const session = useSession();
   const { storefronts } = useUserQueries(session);
-  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
     queryKey: ["all-users"],
@@ -34,68 +30,6 @@ const Landing = () => {
     },
   });
 
-  // Query for products to pass to Stats component
-  const { data: products = [] } = useQuery({
-    queryKey: ["products", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return [];
-      console.log("Fetching products for storefront:", currentStorefrontId);
-      
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("storefront_id", currentStorefrontId);
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!currentStorefrontId,
-  });
-
-  const { data: users = [] } = useQuery({
-    queryKey: ["storefront-users", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return [];
-      console.log("Fetching users for storefront:", currentStorefrontId);
-
-      // First get the storefront users
-      const { data: storefrontUsers, error: storefrontError } = await supabase
-        .from("storefront_users")
-        .select("id, user_id, role")
-        .eq("storefront_id", currentStorefrontId);
-
-      if (storefrontError) throw storefrontError;
-
-      // Then get the profile information for each user
-      const usersWithProfiles = await Promise.all(
-        storefrontUsers.map(async (user) => {
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("email")
-            .eq("id", user.user_id)
-            .single();
-
-          if (profileError) {
-            console.error("Error fetching profile:", profileError);
-            return {
-              ...user,
-              profiles: { email: "Unknown" }
-            };
-          }
-
-          return {
-            ...user,
-            profiles: { email: profile.email }
-          };
-        })
-      );
-
-      console.log("Fetched storefront users:", usersWithProfiles);
-      return usersWithProfiles;
-    },
-    enabled: !!currentStorefrontId,
-  });
-
   return (
     <div className="min-h-screen bg-background">
       {/* Simple header */}
@@ -114,29 +48,31 @@ const Landing = () => {
       <main className="p-3 sm:p-4 w-full">
         <div className="max-w-[1400px] mx-auto space-y-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Storefront Dashboard</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Select a Storefront</h1>
             <p className="text-muted-foreground mt-2">
-              Manage your storefronts and users
+              Choose a storefront to manage or create a new one
             </p>
           </div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Stats products={products} />
-          </div>
-
-          <QuickActions />
 
           {storefronts && storefronts.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {storefronts.map((storefront) => (
                 <div
                   key={storefront.id}
-                  className="rounded-lg border bg-card text-card-foreground shadow-sm"
+                  className="rounded-lg border bg-card text-card-foreground shadow-sm hover:border-primary/50 cursor-pointer transition-colors"
+                  onClick={() => {
+                    console.log("Selecting storefront:", storefront.id);
+                    localStorage.setItem('lastStorefrontId', storefront.id);
+                    window.location.reload();
+                  }}
                 >
                   <div className="p-6">
                     <h3 className="text-2xl font-semibold leading-none tracking-tight">
                       {storefront.name}
                     </h3>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Status: {storefront.is_published ? 'Published' : 'Draft'}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -169,8 +105,6 @@ const Landing = () => {
               </div>
             </div>
           </div>
-
-          <StorefrontUsers storefrontId={currentStorefrontId} users={users} />
         </div>
       </main>
     </div>
