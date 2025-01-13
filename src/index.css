@@ -29,22 +29,22 @@
   .dark {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    --card: 240 10% 15%; /* Lightened from 3.9% to 15% */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 240 10% 15%; /* Lightened to match card */
     --popover-foreground: 0 0% 98%;
     --primary: 187 57% 44%;
     --primary-foreground: 0 0% 100%;
     --secondary: 252 29% 54%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 240 10% 25%; /* Lightened for better visibility */
+    --muted-foreground: 240 5% 84.9%; /* Lightened for better contrast */
     --accent: 187 57% 44%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
+    --border: 240 10% 25%; /* Lightened border for visibility */
+    --input: 240 10% 25%; /* Lightened input for visibility */
     --ring: 187 57% 44%;
   }
 }
