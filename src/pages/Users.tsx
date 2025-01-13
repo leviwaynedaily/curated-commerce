@@ -2,6 +2,7 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
+import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
 
 interface Storefront {
   id: string;
