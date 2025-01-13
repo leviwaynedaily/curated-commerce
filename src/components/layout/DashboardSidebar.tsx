@@ -133,13 +133,13 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             isCollapsed ? "justify-center w-full" : ""
           )}>
             <img 
-              src="/lovable-uploads/f_logo_transparent.png" 
+              src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
               alt="Logo" 
               className="h-8 w-auto"
             />
             {!isCollapsed && (
               <img
-                src="/lovable-uploads/f_text_transparent.png"
+                src="/lovable-uploads/982a241f-b82d-4f33-879d-d27bf029a82c.png"
                 alt="Curately"
                 className="h-6 w-auto"
               />
