@@ -29,6 +29,8 @@ export default function Users() {
     queryFn: async () => {
       if (!session?.user?.id) return [];
 
+      console.log("Fetching storefronts for user management...");
+
       const { data: business } = await supabase
         .from("businesses")
         .select("id")
@@ -58,6 +60,7 @@ export default function Users() {
         throw error;
       }
 
+      console.log("Fetched storefronts with users:", data);
       return data || [];
     },
     enabled: !!session?.user?.id,
