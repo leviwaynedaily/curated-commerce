@@ -17,7 +17,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block w-[240px] min-w-[240px] border-r">
+      <div className="hidden md:block">
         <DashboardSidebar />
       </div>
 
@@ -42,12 +42,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Updated branding with new logo and text */}
           <Link to="/landing" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <img 
-              src="/lovable-uploads/ac145c3c-5db2-4de7-89cd-43ff8840e998.png" 
+              src="/lovable-uploads/f_logo_transparent.png" 
               alt="Logo" 
               className="h-6 w-auto"
             />
             <img
-              src="/lovable-uploads/cf59138a-3534-4915-91ab-d6dec06d2b4b.png"
+              src="/lovable-uploads/f_text_transparent.png"
               alt="Curately"
               className="h-5 w-auto"
             />

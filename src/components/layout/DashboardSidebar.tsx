@@ -14,13 +14,30 @@ import {
   Globe,
   Palette,
   Users,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    const stored = localStorage.getItem('sidebarCollapsed');
+    return stored ? JSON.parse(stored) : false;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(isCollapsed));
+  }, [isCollapsed]);
 
   // Query to get the current storefront
   const { data: storefront } = useQuery({
@@ -101,41 +118,101 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   ];
 
   return (
-    <div className={cn("h-full bg-background", className)}>
+    <div className={cn(
+      "relative h-full bg-background transition-all duration-300",
+      isCollapsed ? "w-16" : "w-[240px]",
+      className
+    )}>
       <div className="space-y-4 py-4">
-        <div className="px-3 py-2">
-          <div className="mb-2">
-            <StorefrontSwitcher />
+        <div className={cn(
+          "px-3 py-2 flex items-center",
+          isCollapsed ? "justify-center" : "justify-between"
+        )}>
+          <div className={cn(
+            "flex items-center gap-2 transition-all duration-300",
+            isCollapsed ? "justify-center w-full" : ""
+          )}>
+            <img 
+              src="/lovable-uploads/f_logo_transparent.png" 
+              alt="Logo" 
+              className="h-8 w-auto"
+            />
+            {!isCollapsed && (
+              <img
+                src="/lovable-uploads/f_text_transparent.png"
+                alt="Curately"
+                className="h-6 w-auto"
+              />
+            )}
           </div>
         </div>
+        
+        {!isCollapsed && (
+          <div className="px-3 py-2">
+            <StorefrontSwitcher />
+          </div>
+        )}
+
         <ScrollArea className="px-3 py-2">
           <div className="space-y-1">
-            {routes.map((route) => (
-              <Button
-                key={route.href}
-                variant={route.active ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start transition-colors",
-                  route.active && "bg-primary hover:bg-primary text-primary-foreground"
-                )}
-                onClick={route.onClick}
-                asChild={!route.onClick}
-              >
-                {route.onClick ? (
-                  <div className="flex w-full items-center">
-                    <route.icon className="mr-2 h-4 w-4 shrink-0" />
-                    <span className="truncate">{route.label}</span>
-                  </div>
-                ) : (
-                  <Link to={route.href} className="flex w-full items-center">
-                    <route.icon className="mr-2 h-4 w-4 shrink-0" />
-                    <span className="truncate">{route.label}</span>
-                  </Link>
-                )}
-              </Button>
-            ))}
+            <TooltipProvider delayDuration={0}>
+              {routes.map((route) => (
+                <Tooltip key={route.href}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={route.active ? "default" : "ghost"}
+                      className={cn(
+                        "w-full justify-start transition-colors",
+                        route.active && "bg-primary hover:bg-primary text-primary-foreground",
+                        isCollapsed && "justify-center px-2"
+                      )}
+                      onClick={route.onClick}
+                      asChild={!route.onClick}
+                    >
+                      {route.onClick ? (
+                        <div className={cn(
+                          "flex items-center",
+                          isCollapsed ? "justify-center" : "w-full"
+                        )}>
+                          <route.icon className={cn(
+                            "shrink-0",
+                            isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                          )} />
+                          {!isCollapsed && <span className="truncate">{route.label}</span>}
+                        </div>
+                      ) : (
+                        <Link to={route.href} className={cn(
+                          "flex items-center",
+                          isCollapsed ? "justify-center" : "w-full"
+                        )}>
+                          <route.icon className={cn(
+                            "shrink-0",
+                            isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                          )} />
+                          {!isCollapsed && <span className="truncate">{route.label}</span>}
+                        </Link>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  {isCollapsed && (
+                    <TooltipContent side="right">
+                      {route.label}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              ))}
+            </TooltipProvider>
           </div>
         </ScrollArea>
+        
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute bottom-4 right-2 h-8 w-8"
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
       </div>
     </div>
   );
