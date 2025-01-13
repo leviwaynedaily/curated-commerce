@@ -118,14 +118,21 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     >
       <div className="space-y-4 py-4 flex flex-col h-full">
         <div className={cn(
-          "px-3 py-2 flex items-center justify-center",
-          isCollapsed ? "justify-center" : "justify-center"
+          "px-3 py-2 flex items-center",
+          isCollapsed ? "justify-center" : "justify-start gap-3"
         )}>
           <img 
             src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
             alt="Logo" 
             className="h-8 w-auto"
           />
+          {!isCollapsed && (
+            <img 
+              src="/lovable-uploads/34939a9a-7fd2-424b-a0b7-a21e82f527c9.png" 
+              alt="Curately" 
+              className="h-6 w-auto"
+            />
+          )}
         </div>
 
         <ScrollArea className="flex-1 px-3 py-2">
