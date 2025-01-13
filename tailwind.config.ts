@@ -21,6 +21,7 @@ export default {
       fontFamily: {
         'open-sans': ['Open Sans', 'sans-serif'],
         'dancing': ['Dancing Script', 'cursive'],
+        'montserrat': ['Montserrat', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -29,9 +30,9 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5",
+          DEFAULT: "#31abb2",
           foreground: "#ffffff",
-          hover: "#8a74f3",
+          hover: "#2c9a9f",
         },
         secondary: {
           DEFAULT: "#7E69AB",
