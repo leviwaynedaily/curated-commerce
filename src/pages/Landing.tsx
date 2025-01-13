@@ -24,7 +24,6 @@ const Landing = () => {
       setIsLoading(true);
       console.log("Adding user to business:", business.id);
 
-      // First, get the user's ID from their email using the profiles table
       const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
@@ -37,7 +36,6 @@ const Landing = () => {
         return;
       }
 
-      // Check if user already has access
       const { data: existingAccess } = await supabase
         .from("business_users")
         .select("id")
@@ -50,7 +48,6 @@ const Landing = () => {
         return;
       }
 
-      // Add user to business
       const { error } = await supabase
         .from("business_users")
         .insert({
@@ -80,6 +77,16 @@ const Landing = () => {
           <span className="text-xl font-semibold">Curately</span>
         </div>
         <div className="ml-auto flex items-center gap-2">
+          {business && (
+            <Button
+              onClick={() => window.location.href = '/stores'}
+              variant="default"
+              size="sm"
+            >
+              <Plus className="h-4 w-4" />
+              Create Store
+            </Button>
+          )}
           <ThemeToggle />
           <UserButton />
         </div>
