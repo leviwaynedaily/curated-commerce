@@ -119,7 +119,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
   return (
     <div className={cn(
-      "relative h-full bg-[#1A1F2C] transition-all duration-300",
+      "relative h-full bg-[#212121] transition-all duration-300",
       isCollapsed ? "w-16" : "w-[240px]",
       className
     )}>
@@ -184,7 +184,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     </Button>
                   </TooltipTrigger>
                   {isCollapsed && (
-                    <TooltipContent side="right" className="bg-[#1A1F2C] border border-[#33C3F0]/20 text-white">
+                    <TooltipContent side="right" className="bg-[#212121] border border-[#33C3F0]/20 text-white">
                       {route.label}
                     </TooltipContent>
                   )}
