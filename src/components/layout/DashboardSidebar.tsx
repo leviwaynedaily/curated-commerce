@@ -16,7 +16,7 @@ import {
   Users,
   Store,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -47,7 +47,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   });
 
-  const routes = [
+  const mainRoutes = [
     {
       label: 'Dashboard',
       icon: LayoutDashboard,
@@ -59,12 +59,6 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       icon: Package2,
       href: '/products',
       active: location.pathname === '/products',
-    },
-    {
-      label: 'Users',
-      icon: Users,
-      href: '/users',
-      active: location.pathname === '/users',
     },
     {
       label: 'Storefront Information',
@@ -103,6 +97,15 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   ];
 
+  const bottomRoutes = [
+    {
+      label: 'Users',
+      icon: Users,
+      href: '/users',
+      active: location.pathname === '/users',
+    },
+  ];
+
   return (
     <div 
       className={cn(
@@ -127,7 +130,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
         <ScrollArea className="flex-1 px-3 py-2">
           <div className="space-y-1">
-            {routes.map((route) => (
+            {mainRoutes.map((route) => (
               <Button
                 key={route.href}
                 variant={route.active ? "default" : "ghost"}
@@ -168,7 +171,31 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           </div>
         </ScrollArea>
 
-        <div className="px-3 py-2 mt-auto">
+        <div className="px-3 py-2 mt-auto space-y-2">
+          {bottomRoutes.map((route) => (
+            <Button
+              key={route.href}
+              variant={route.active ? "default" : "ghost"}
+              className={cn(
+                "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                route.active && "bg-primary hover:bg-primary text-primary-foreground",
+                isCollapsed && "justify-center px-2",
+                !route.active && "hover:bg-white/5 text-white/80 hover:text-white"
+              )}
+              asChild
+            >
+              <Link to={route.href} className={cn(
+                "flex items-center",
+                isCollapsed ? "justify-center" : "w-full"
+              )}>
+                <route.icon className={cn(
+                  "shrink-0",
+                  isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                )} />
+                {!isCollapsed && <span className="truncate">{route.label}</span>}
+              </Link>
+            </Button>
+          ))}
           <div className={cn(
             "flex items-center",
             isCollapsed ? "justify-center" : "w-full"
