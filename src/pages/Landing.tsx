@@ -8,7 +8,7 @@ import { Lock, User, ExternalLink, Plus } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 const Landing = () => {
   const session = useSession();
@@ -19,7 +19,11 @@ const Landing = () => {
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business?.id || !newUserEmail) {
-      toast.error("Please enter a valid email address");
+      toast({
+        title: "Error",
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -36,7 +40,11 @@ const Landing = () => {
 
       if (userError || !userData) {
         console.error("Error finding user:", userError);
-        toast.error("User not found. Please check the email address.");
+        toast({
+          title: "Error",
+          description: "User not found. Please check the email address.",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -49,7 +57,11 @@ const Landing = () => {
         .single();
 
       if (existingAccess) {
-        toast.error("User already has access to this business");
+        toast({
+          title: "Error",
+          description: "User already has access to this business",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -67,12 +79,19 @@ const Landing = () => {
         throw error;
       }
 
-      toast.success("User added successfully");
+      toast({
+        title: "Success",
+        description: "User added successfully",
+      });
       setNewUserEmail("");
       refetchBusinessUsers();
     } catch (error) {
       console.error("Error adding user:", error);
-      toast.error("Failed to add user. Please try again.");
+      toast({
+        title: "Error",
+        description: "Failed to add user. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
