@@ -10,6 +10,7 @@ import DomainManagement from "./pages/DomainManagement";
 import Appearance from "./pages/Appearance";
 import PublicHome from "./pages/PublicHome";
 import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
 
 export const router = createBrowserRouter([
   {
@@ -31,6 +32,10 @@ export const router = createBrowserRouter([
   {
     path: "/products",
     element: <Products />,
+  },
+  {
+    path: "/users",
+    element: <Users />,
   },
   {
     path: "/storefront-information",

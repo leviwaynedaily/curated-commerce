@@ -13,6 +13,7 @@ import {
   AppWindow,
   Globe,
   Palette,
+  Users,
 } from "lucide-react";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
@@ -55,6 +56,12 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       icon: Package2,
       href: '/products',
       active: location.pathname === '/products',
+    },
+    {
+      label: 'Users',
+      icon: Users,
+      href: '/users',
+      active: location.pathname === '/users',
     },
     {
       label: 'Storefront Information',

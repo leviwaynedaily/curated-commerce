@@ -286,6 +286,41 @@ export type Database = {
           },
         ]
       }
+      storefront_users: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          storefront_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          storefront_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          storefront_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storefront_users_storefront_id_fkey"
+            columns: ["storefront_id"]
+            isOneToOne: false
+            referencedRelation: "storefronts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storefronts: {
         Row: {
           business_id: string | null
