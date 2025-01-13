@@ -1,62 +1,108 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  LayoutDashboard,
-  Store,
-  Package,
+import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { 
+  LayoutDashboard, 
+  Package2,
+  FileText,
+  Eye,
+  AppWindow,
+  Globe,
+  Palette,
   Users,
-  Settings,
-  ChevronLeft,
+  Store,
 } from "lucide-react";
-import { NavLink, useLocation } from "react-router-dom";
 import { useState } from "react";
-import { StorefrontSwitcher } from "../storefront/StorefrontSwitcher";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { UserButton } from "@/components/auth/UserButton";
 
-interface DashboardSidebarProps {
-  className?: string;
-}
+interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
+  // Query to get the current storefront
+  const { data: storefront } = useQuery({
+    queryKey: ["current-storefront"],
+    queryFn: async () => {
+      const lastStorefrontId = localStorage.getItem('lastStorefrontId');
+      if (!lastStorefrontId) return null;
 
-  const navigation = [
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("id", lastStorefrontId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        return null;
+      }
+
+      return data;
+    },
+  });
+
+  const mainRoutes = [
     {
-      name: "Dashboard",
-      href: "/dashboard",
+      label: 'Dashboard',
       icon: LayoutDashboard,
-      current: isActive("/dashboard"),
+      href: '/dashboard',
+      active: location.pathname === '/dashboard',
     },
     {
-      name: "Stores",
-      href: "/stores",
-      icon: Store,
-      current: isActive("/stores"),
+      label: 'Products',
+      icon: Package2,
+      href: '/products',
+      active: location.pathname === '/products',
     },
     {
-      name: "Products",
-      href: "/products",
-      icon: Package,
-      current: isActive("/products"),
+      label: 'Storefront Information',
+      icon: FileText,
+      href: '/storefront-information',
+      active: location.pathname === '/storefront-information',
     },
     {
-      name: "Users",
-      href: "/users",
+      label: 'Appearance',
+      icon: Palette,
+      href: '/appearance',
+      active: location.pathname === '/appearance',
+    },
+    {
+      label: 'PWA Settings',
+      icon: AppWindow,
+      href: '/pwa-settings',
+      active: location.pathname === '/pwa-settings',
+    },
+    {
+      label: 'Domain Management',
+      icon: Globe,
+      href: '/domain-management',
+      active: location.pathname === '/domain-management',
+    },
+    {
+      label: 'Live Preview',
+      icon: Eye,
+      onClick: () => {
+        if (storefront?.id) {
+          navigate(`/preview?storefrontId=${storefront.id}`);
+        }
+      },
+      href: '#',
+      active: location.pathname === '/preview',
+    },
+  ];
+
+  const bottomRoutes = [
+    {
+      label: 'Users',
       icon: Users,
-      current: isActive("/users"),
-    },
-    {
-      name: "Settings",
-      href: "/settings",
-      icon: Settings,
-      current: isActive("/settings"),
+      href: '/users',
+      active: location.pathname === '/users',
     },
   ];
 
@@ -67,76 +113,108 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
         isCollapsed ? "w-16" : "w-[240px]",
         className
       )}
+      onMouseEnter={() => setIsCollapsed(false)}
+      onMouseLeave={() => setIsCollapsed(true)}
     >
-      <div className="flex h-full flex-col gap-2">
-        <div className="flex h-[60px] items-center gap-2 border-b border-white/10 px-4">
-          <div className={cn(
-            "flex items-center gap-2",
-            isCollapsed ? "justify-center w-full" : ""
-          )}>
-            <div className="bg-white p-1 rounded-md">
-              <img
-                src="/lovable-uploads/982a241f-b82d-4f33-879d-d27bf029a82c.png"
-                alt="Logo"
-                className="h-8 w-auto"
-              />
-            </div>
-            {!isCollapsed && (
-              <span className="font-montserrat font-bold text-white text-xl">
-                curately
-              </span>
-            )}
-          </div>
+      <div className="space-y-4 py-4 flex flex-col h-full">
+        <div className={cn(
+          "px-3 py-2 flex items-center",
+          isCollapsed ? "justify-center" : "justify-start gap-3"
+        )}>
+          <img 
+            src="/lovable-uploads/754b1fad-189d-4d77-8e89-3ddd6f651ba3.png" 
+            alt="Logo" 
+            className="h-8 w-auto"
+          />
+          {!isCollapsed && (
+            <span className="font-montserrat font-bold text-white text-xl">
+              curately
+            </span>
+          )}
         </div>
 
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full">
-            <div className="flex flex-col gap-2 p-2">
-              <StorefrontSwitcher />
-              <nav className="grid gap-1 px-2">
-                {navigation.map((item) => (
-                  <NavLink
-                    key={item.name}
-                    to={item.href}
-                    className={({ isActive }) =>
-                      cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:text-white",
-                        isActive
-                          ? "bg-white/10 text-white"
-                          : "text-white/70 hover:bg-white/10"
-                      )
-                    }
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {!isCollapsed && <span>{item.name}</span>}
-                  </NavLink>
-                ))}
-              </nav>
-            </div>
-          </ScrollArea>
-        </div>
-
-        <div className="flex flex-col gap-2 p-4 border-t border-white/10">
-          <div className="flex items-center justify-between">
-            {!isCollapsed && (
-              <div className="flex items-center gap-2">
-                <ThemeToggle />
-                <UserButton />
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 text-white/70 hover:text-white"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-            >
-              <ChevronLeft
+        <ScrollArea className="flex-1 px-3 py-2">
+          <div className="space-y-1">
+            {mainRoutes.map((route) => (
+              <Button
+                key={route.href}
+                variant={route.active ? "default" : "ghost"}
                 className={cn(
-                  "h-4 w-4 transition-transform",
-                  isCollapsed && "rotate-180"
+                  "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                  route.active && "bg-primary hover:bg-primary text-primary-foreground",
+                  isCollapsed && "justify-center px-2",
+                  !route.active && "hover:bg-white/5 text-foreground hover:text-foreground/80"
                 )}
-              />
+                onClick={route.onClick}
+                asChild={!route.onClick}
+              >
+                {route.onClick ? (
+                  <div className={cn(
+                    "flex items-center",
+                    isCollapsed ? "justify-center" : "w-full"
+                  )}>
+                    <route.icon className={cn(
+                      "shrink-0",
+                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                    )} />
+                    {!isCollapsed && <span className="truncate">{route.label}</span>}
+                  </div>
+                ) : (
+                  <Link to={route.href} className={cn(
+                    "flex items-center",
+                    isCollapsed ? "justify-center" : "w-full"
+                  )}>
+                    <route.icon className={cn(
+                      "shrink-0",
+                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                    )} />
+                    {!isCollapsed && <span className="truncate">{route.label}</span>}
+                  </Link>
+                )}
+              </Button>
+            ))}
+          </div>
+        </ScrollArea>
+
+        <div className="px-3 py-2 mt-auto space-y-2">
+          {bottomRoutes.map((route) => (
+            <Button
+              key={route.href}
+              variant={route.active ? "default" : "ghost"}
+              className={cn(
+                "w-full justify-start transition-colors border-b border-[#33C3F0]/10",
+                route.active && "bg-primary hover:bg-primary text-primary-foreground",
+                isCollapsed && "justify-center px-2",
+                !route.active && "hover:bg-white/5 text-foreground hover:text-foreground/80"
+              )}
+              asChild
+            >
+              <Link to={route.href} className={cn(
+                "flex items-center",
+                isCollapsed ? "justify-center" : "w-full"
+              )}>
+                <route.icon className={cn(
+                  "shrink-0",
+                  isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                )} />
+                {!isCollapsed && <span className="truncate">{route.label}</span>}
+              </Link>
             </Button>
+          ))}
+          <div className={cn(
+            "flex items-center",
+            isCollapsed ? "justify-center" : "w-full"
+          )}>
+            <Store className={cn(
+              "shrink-0 text-foreground/80",
+              isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+            )} />
+            <div className={cn(
+              "transition-all duration-300",
+              isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+            )}>
+              <StorefrontSwitcher />
+            </div>
           </div>
         </div>
       </div>
