@@ -82,13 +82,23 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Dashboard for {storefront.name}
-        </h1>
-        <p className="text-sm md:text-base text-muted-foreground mt-2">
-          {greeting}, {userName}. Here's an overview of {storefront.name}.
-        </p>
+      <div className="space-y-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            Dashboard for {storefront.name}
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-2">
+            {greeting}, {userName}. Here's an overview of {storefront.name}.
+          </p>
+        </div>
+
+        {storefront.logo_url && (
+          <img 
+            src={storefront.logo_url} 
+            alt={storefront.name || 'Store logo'} 
+            className="h-12 object-contain"
+          />
+        )}
       </div>
 
       <div className="space-y-4">

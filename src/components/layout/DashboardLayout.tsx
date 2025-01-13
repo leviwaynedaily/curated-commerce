@@ -5,9 +5,6 @@ import { Menu, Lock } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserButton } from "@/components/auth/UserButton";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,27 +12,6 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const currentStorefrontId = localStorage.getItem('lastStorefrontId');
-
-  // Query to get the current storefront for logo display
-  const { data: storefront } = useQuery({
-    queryKey: ["current-storefront", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return null;
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        return null;
-      }
-      return data;
-    },
-    enabled: !!currentStorefrontId,
-  });
 
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden">
@@ -76,19 +52,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
         <main className="p-3 sm:p-4 w-full">
           <div className="max-w-[1400px] mx-auto">
-            {/* Store Selector Section */}
-            <div className="mb-6 space-y-4">
-              <div className="flex items-center gap-4">
-                {storefront?.logo_url && (
-                  <img 
-                    src={storefront.logo_url} 
-                    alt={storefront.name || 'Store logo'} 
-                    className="h-12 object-contain"
-                  />
-                )}
-                <StorefrontSwitcher />
-              </div>
-            </div>
             {children}
           </div>
         </main>
