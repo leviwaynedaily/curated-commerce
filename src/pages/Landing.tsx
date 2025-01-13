@@ -34,38 +34,64 @@ const Landing = () => {
     },
   });
 
+  // Query for products to pass to Stats component
+  const { data: products = [] } = useQuery({
+    queryKey: ["products", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return [];
+      console.log("Fetching products for storefront:", currentStorefrontId);
+      
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("storefront_id", currentStorefrontId);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentStorefrontId,
+  });
+
   const { data: users = [] } = useQuery({
     queryKey: ["storefront-users", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) return [];
       console.log("Fetching users for storefront:", currentStorefrontId);
 
-      const { data, error } = await supabase
+      // First get the storefront users
+      const { data: storefrontUsers, error: storefrontError } = await supabase
         .from("storefront_users")
-        .select(`
-          id,
-          user_id,
-          role,
-          user:user_id(profiles!id(email))
-        `)
+        .select("id, user_id, role")
         .eq("storefront_id", currentStorefrontId);
 
-      if (error) {
-        console.error("Error fetching storefront users:", error);
-        throw error;
-      }
+      if (storefrontError) throw storefrontError;
 
-      const transformedData = data.map(user => ({
-        id: user.id,
-        user_id: user.user_id,
-        role: user.role,
-        profiles: {
-          email: user.user?.profiles?.email
-        }
-      }));
+      // Then get the profile information for each user
+      const usersWithProfiles = await Promise.all(
+        storefrontUsers.map(async (user) => {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("id", user.user_id)
+            .single();
 
-      console.log("Fetched storefront users:", transformedData);
-      return transformedData;
+          if (profileError) {
+            console.error("Error fetching profile:", profileError);
+            return {
+              ...user,
+              profiles: { email: "Unknown" }
+            };
+          }
+
+          return {
+            ...user,
+            profiles: { email: profile.email }
+          };
+        })
+      );
+
+      console.log("Fetched storefront users:", usersWithProfiles);
+      return usersWithProfiles;
     },
     enabled: !!currentStorefrontId,
   });
@@ -95,7 +121,7 @@ const Landing = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Stats />
+            <Stats products={products} />
           </div>
 
           <QuickActions />
