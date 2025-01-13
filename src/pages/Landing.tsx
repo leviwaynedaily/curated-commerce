@@ -1,7 +1,8 @@
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
+import { DashboardLayout } from "@/components/layout/DashboardLayout";
 
 const Landing = () => {
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -18,7 +19,11 @@ const Landing = () => {
           id,
           user_id,
           role,
-          profiles:user_id(email)
+          user:user_id (
+            profile:profiles!id (
+              email
+            )
+          )
         `)
         .eq("storefront_id", currentStorefrontId);
 
@@ -27,8 +32,18 @@ const Landing = () => {
         throw error;
       }
 
-      console.log("Fetched storefront users:", data);
-      return data;
+      // Transform the data to match the expected format
+      const transformedData = data.map(user => ({
+        id: user.id,
+        user_id: user.user_id,
+        role: user.role,
+        profiles: {
+          email: user.user.profile.email
+        }
+      }));
+
+      console.log("Fetched storefront users:", transformedData);
+      return transformedData;
     },
     enabled: !!currentStorefrontId,
   });

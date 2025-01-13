@@ -35,7 +35,11 @@ const Users = () => {
             id,
             user_id,
             role,
-            profiles:user_id(email)
+            user:user_id (
+              profile:profiles!id (
+                email
+              )
+            )
           )
         `)
         .eq("business_id", business.id);
@@ -45,8 +49,21 @@ const Users = () => {
         throw error;
       }
 
-      console.log("Fetched storefronts with users:", data);
-      return data as Storefront[];
+      // Transform the data to match the expected format
+      const transformedData = data.map(storefront => ({
+        ...storefront,
+        storefront_users: storefront.storefront_users.map(user => ({
+          id: user.id,
+          user_id: user.user_id,
+          role: user.role,
+          profiles: {
+            email: user.user.profile.email
+          }
+        }))
+      }));
+
+      console.log("Fetched storefronts with users:", transformedData);
+      return transformedData;
     },
     enabled: !!business?.id,
   });
