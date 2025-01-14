@@ -37,13 +37,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </Sheet>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-x-hidden px-4 md:px-8 py-8 pt-16 md:pt-8 md:ml-[240px]">
+      <main className="flex-1 overflow-x-hidden md:ml-[240px]">
         {/* Theme Toggle and User Button */}
         <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
           <ThemeToggle />
           <UserButton />
         </div>
-        {children}
+        <div className="px-4 md:px-8 py-8 pt-16 md:pt-8">
+          {children}
+        </div>
       </main>
     </div>
   );
