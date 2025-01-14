@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 167 7% 32%;
+    --background: 0 0% 100%;
     --foreground: 0 0% 100%;
     --card: 0 0% 100%;
     --card-foreground: 0 0% 100%;
@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-[#4e5651] text-foreground antialiased;
+    @apply bg-white text-foreground antialiased;
   }
 }
 
