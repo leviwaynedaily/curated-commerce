@@ -14,7 +14,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex w-full overflow-x-hidden bg-[#699276] text-foreground">
+    <div className="min-h-screen flex w-full overflow-x-hidden bg-background dark:bg-[#121212] text-foreground">
       {/* Desktop Sidebar */}
       <div className="hidden md:block">
         <DashboardSidebar />

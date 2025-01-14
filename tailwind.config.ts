@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -27,19 +28,19 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        foreground: "#4e5651", // Updated to new primary color
+        foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#699276",
-          foreground: "#4e5651", // Updated to new primary color
-          hover: "#5a8167",
+          DEFAULT: "#699276", // Updated to new brand green
+          foreground: "#ffffff",
+          hover: "#5a8167", // Slightly darker variant
         },
         secondary: {
-          DEFAULT: "#f5c98f",
-          foreground: "#857c65", // Updated to new secondary color
+          DEFAULT: "#f5c98f", // Updated to new brand peach
+          foreground: "#4e5651",
         },
         success: {
-          DEFAULT: "#699276",
-          foreground: "#4e5651", // Updated to match primary
+          DEFAULT: "#699276", // Using brand green for success
+          foreground: "#ffffff",
         },
         destructive: {
           DEFAULT: "#ef4444",
@@ -47,22 +48,22 @@ export default {
         },
         muted: {
           DEFAULT: "#F1F0FB",
-          foreground: "#857c65", // Updated to match secondary
+          foreground: "#8E9196",
         },
         accent: {
-          DEFAULT: "#bda27a",
-          foreground: "#4e5651", // Updated to match primary
+          DEFAULT: "#bda27a", // New warm accent color
+          foreground: "#1A1F2C",
         },
         brand: {
           green: "#699276",
           peach: "#f5c98f",
           tan: "#bda27a",
-          gray: "#857c65", // Updated to new secondary color
-          dark: "#4e5651", // Updated to new primary color
+          gray: "#857c65",
+          dark: "#4e5651",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "#4e5651", // Updated to match primary
+          foreground: "hsl(var(--card-foreground))",
         },
       },
       borderRadius: {
