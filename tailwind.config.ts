@@ -30,16 +30,16 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#31abb2",
+          DEFAULT: "#699276", // Updated to new brand green
           foreground: "#ffffff",
-          hover: "#2c9a9f",
+          hover: "#5a8167", // Slightly darker variant
         },
         secondary: {
-          DEFAULT: "#7E69AB",
-          foreground: "#ffffff",
+          DEFAULT: "#f5c98f", // Updated to new brand peach
+          foreground: "#4e5651",
         },
         success: {
-          DEFAULT: "#4CAF50",
+          DEFAULT: "#699276", // Using brand green for success
           foreground: "#ffffff",
         },
         destructive: {
@@ -51,8 +51,15 @@ export default {
           foreground: "#8E9196",
         },
         accent: {
-          DEFAULT: "#D6BCFA",
+          DEFAULT: "#bda27a", // New warm accent color
           foreground: "#1A1F2C",
+        },
+        brand: {
+          green: "#699276",
+          peach: "#f5c98f",
+          tan: "#bda27a",
+          gray: "#857c65",
+          dark: "#4e5651",
         },
         card: {
           DEFAULT: "hsl(var(--card))",
