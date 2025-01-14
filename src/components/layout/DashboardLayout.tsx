@@ -14,11 +14,27 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();
 
-  // Function to get the page title based on the current route
-  const getPageTitle = () => {
+  // Function to get the page title and description based on the current route
+  const getPageInfo = () => {
     const path = location.pathname.split("/")[1];
-    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+    const title = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+    
+    // Map of route paths to their descriptions
+    const descriptions: Record<string, string> = {
+      "domain-management": "Configure how customers access your storefront",
+      "appearance": "Customize how your storefront looks. Changes are saved automatically.",
+      "products": "Manage your store's products here.",
+      "pwa-settings": "Configure your Progressive Web App settings for mobile and desktop devices.",
+      "storefront-information": "Customize how your storefront appears to customers. Changes are saved automatically."
+    };
+
+    return {
+      title,
+      description: descriptions[path] || ""
+    };
   };
+
+  const { title, description } = getPageInfo();
 
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden bg-background dark:bg-[#121212] text-foreground">
@@ -47,7 +63,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
-        <DashboardHeader title={getPageTitle()} />
+        <DashboardHeader title={title} description={description} />
         <div className="px-4 md:px-8 py-8">
           {children}
         </div>
