@@ -91,33 +91,35 @@ export function UserProfileDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="bg-brand-green text-white">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle className="text-white">Edit Profile</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleUpdateProfile} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-white">Email</Label>
             <Input
               id="email"
               value={user?.email || ""}
               disabled
               type="email"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
+            <Label htmlFor="fullName" className="text-white">Full Name</Label>
             <Input
               id="fullName"
               name="fullName"
               defaultValue={user?.user_metadata?.full_name || ""}
               placeholder="Enter your full name"
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/70"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="theme">Theme</Label>
+            <Label htmlFor="theme" className="text-white">Theme</Label>
             <Select name="theme" defaultValue={theme}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white">
                 <SelectValue placeholder="Select theme" />
               </SelectTrigger>
               <SelectContent>
@@ -128,12 +130,12 @@ export function UserProfileDialog({
           </div>
           {storefronts && storefronts.length > 1 && (
             <div className="space-y-2">
-              <Label htmlFor="defaultStore">Default Store</Label>
+              <Label htmlFor="defaultStore" className="text-white">Default Store</Label>
               <Select
                 name="defaultStore"
                 defaultValue={user?.user_metadata?.default_storefront_id || ""}
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white">
                   <SelectValue placeholder="Select default store" />
                 </SelectTrigger>
                 <SelectContent>
@@ -151,12 +153,12 @@ export function UserProfileDialog({
               type="button"
               variant="outline"
               onClick={handleResetPassword}
-              className="w-full"
+              className="w-full bg-white/10 border-white/20 text-white hover:bg-white/20"
             >
               Reset Password
             </Button>
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full bg-white text-brand-green hover:bg-white/90">
             Save Changes
           </Button>
         </form>
