@@ -16,8 +16,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden bg-background dark:bg-[#121212] text-foreground">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block fixed left-0 top-0 h-full z-30">
-        <DashboardSidebar />
+      <div className="hidden md:block w-16 hover:w-[240px] transition-all duration-300">
+        <div className="fixed left-0 top-0 h-full">
+          <DashboardSidebar />
+        </div>
       </div>
 
       {/* Mobile Sidebar */}
