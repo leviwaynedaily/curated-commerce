@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 133 27% 49%; /* This is #699276 converted to HSL */
+    --background: 133 27% 49%;
     --foreground: 240 10% 3.9%;
     --card: 0 0% 100%;
     --card-foreground: 240 10% 3.9%;
@@ -32,7 +32,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-[#699276] text-foreground antialiased;
   }
 }
 
