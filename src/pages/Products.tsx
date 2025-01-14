@@ -18,12 +18,9 @@ import { useNavigate } from "react-router-dom"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, RotateCw } from "lucide-react"
 import { Loader2 } from "lucide-react"
-import { UserButton } from "@/components/auth/UserButton"
-import { ThemeToggle } from "@/components/theme/ThemeToggle"
 
 type ProductStatus = "active" | "inactive" | "all"
 
-// Extracted components to reduce file size
 const LoadingState = () => (
   <div className="flex items-center justify-center min-h-[400px]">
     <div className="flex items-center gap-2">
@@ -75,7 +72,6 @@ const Products = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  // Get the current storefront ID from localStorage
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   // First check authentication
@@ -193,14 +189,6 @@ const Products = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <UserButton />
-        </div>
-      </div>
-
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <Button variant="outline">Export</Button>
