@@ -202,12 +202,9 @@ const Products = () => {
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between mb-6">
-          <p className="text-muted-foreground">
-            Manage your store's products here.
-          </p>
+        <div className="flex items-center justify-between">
+          <Button variant="outline">Export</Button>
           <div className="flex items-center gap-2">
-            <Button variant="outline">Export</Button>
             <Button variant="outline">Import</Button>
             <Button 
               variant="default"
