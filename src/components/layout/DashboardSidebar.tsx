@@ -54,25 +54,6 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   });
 
-  // Common class for menu items to ensure consistent spacing
-  const menuItemClass = (active: boolean) => cn(
-    "w-full flex items-center transition-colors border-b border-brand-peach dark:border-brand-peach",
-    active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
-    !active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
-  );
-
-  // Common class for content inside menu items
-  const contentClass = cn(
-    "flex items-center w-full gap-2",
-    isCollapsed ? "justify-center" : "justify-start px-2"
-  );
-
-  // Common class for icons
-  const iconClass = cn(
-    "shrink-0 text-white dark:text-white",
-    isCollapsed ? "h-5 w-5" : "h-4 w-4"
-  );
-
   const mainRoutes = [
     {
       label: 'Dashboard',
@@ -161,18 +142,35 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 <Button
                   key={route.href}
                   variant={route.active ? "default" : "ghost"}
-                  className={menuItemClass(route.active)}
+                  className={cn(
+                    "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                    route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
+                    isCollapsed && "justify-center px-2",
+                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
+                  )}
                   onClick={route.onClick}
                   asChild={!route.onClick}
                 >
                   {route.onClick ? (
-                    <div className={contentClass}>
-                      <route.icon className={iconClass} />
+                    <div className={cn(
+                      "flex items-center w-full",
+                      isCollapsed ? "justify-center" : ""
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
                       {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
                     </div>
                   ) : (
-                    <Link to={route.href} className={contentClass}>
-                      <route.icon className={iconClass} />
+                    <Link to={route.href} className={cn(
+                      "flex items-center w-full",
+                      isCollapsed ? "justify-center" : ""
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
                       {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
                     </Link>
                   )}
@@ -185,13 +183,18 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           <div className="px-3 py-2 mt-auto">
             <Button
               variant="ghost"
-              className={menuItemClass(false)}
+              className={cn(
+                "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                isCollapsed && "justify-center px-2"
+              )}
               onClick={() => setIsSettingsOpen(true)}
             >
-              <div className={contentClass}>
-                <Settings className={iconClass} />
-                {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
-              </div>
+              <Settings className={cn(
+                "shrink-0 text-white dark:text-white",
+                isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+              )} />
+              {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
             </Button>
           </div>
         </div>
