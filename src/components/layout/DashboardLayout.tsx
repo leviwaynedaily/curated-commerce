@@ -3,8 +3,6 @@ import { DashboardSidebar } from "./DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { UserButton } from "@/components/auth/UserButton";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -40,12 +38,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
-        {/* Theme Toggle and User Button */}
-        <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
-          <ThemeToggle />
-          <UserButton />
-        </div>
-        <div className="px-4 md:px-8 py-8 pt-16 md:pt-8">
+        <div className="px-4 md:px-8 py-8">
           {children}
         </div>
       </main>

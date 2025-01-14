@@ -5,6 +5,8 @@ import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
+import { UserButton } from "@/components/auth/UserButton";
 import { 
   LayoutDashboard, 
   Package2,
@@ -117,6 +119,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       onMouseLeave={() => setIsCollapsed(true)}
     >
       <div className="space-y-4 py-4 flex flex-col h-full">
+        {/* Logo section */}
         <div className={cn(
           "px-3 py-2 flex items-center",
           isCollapsed ? "justify-center" : "justify-start gap-3"
@@ -135,6 +138,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           )}
         </div>
 
+        {/* Main navigation */}
         <ScrollArea className="flex-1 px-3 py-2">
           <div className="space-y-1">
             {mainRoutes.map((route) => (
@@ -178,7 +182,9 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           </div>
         </ScrollArea>
 
+        {/* Bottom section */}
         <div className="px-3 py-2 mt-auto space-y-2">
+          {/* User management route */}
           {bottomRoutes.map((route) => (
             <Button
               key={route.href}
@@ -203,19 +209,31 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
               </Link>
             </Button>
           ))}
-          <div className={cn(
-            "flex items-center",
-            isCollapsed ? "justify-center" : "w-full"
-          )}>
-            <Store className={cn(
-              "shrink-0 text-white dark:text-white",
-              isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-            )} />
+          
+          {/* Theme and User Controls */}
+          <div className="flex flex-col gap-2">
             <div className={cn(
-              "transition-all duration-300",
-              isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+              "flex items-center",
+              isCollapsed ? "justify-center" : "justify-between"
             )}>
-              <StorefrontSwitcher />
+              <Store className={cn(
+                "shrink-0 text-white dark:text-white",
+                isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+              )} />
+              <div className={cn(
+                "transition-all duration-300",
+                isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+              )}>
+                <StorefrontSwitcher />
+              </div>
+            </div>
+            
+            <div className={cn(
+              "flex items-center gap-2",
+              isCollapsed ? "justify-center" : "justify-start"
+            )}>
+              <ThemeToggle />
+              <UserButton />
             </div>
           </div>
         </div>
