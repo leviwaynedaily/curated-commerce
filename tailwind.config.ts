@@ -28,7 +28,7 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        foreground: "#4e5651", // Updated to new brand dark color
         primary: {
           DEFAULT: "#699276", // Updated to new brand green
           foreground: "#ffffff",
@@ -36,7 +36,7 @@ export default {
         },
         secondary: {
           DEFAULT: "#f5c98f", // Updated to new brand peach
-          foreground: "#4e5651",
+          foreground: "#4e5651", // Updated to new brand dark
         },
         success: {
           DEFAULT: "#699276", // Using brand green for success
@@ -52,7 +52,7 @@ export default {
         },
         accent: {
           DEFAULT: "#bda27a", // New warm accent color
-          foreground: "#1A1F2C",
+          foreground: "#4e5651", // Updated to new brand dark
         },
         brand: {
           green: "#699276",
@@ -63,7 +63,7 @@ export default {
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          foreground: "#4e5651", // Updated to new brand dark
         },
       },
       borderRadius: {
