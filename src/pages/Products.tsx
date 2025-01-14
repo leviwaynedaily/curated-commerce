@@ -192,6 +192,17 @@ const Products = () => {
   return (
     <DashboardLayout>
       <div className="space-y-4">
+        {/* New Header Section */}
+        <div className="w-full bg-brand-green py-8 -mx-8 px-8">
+          <div className="max-w-[600px] mx-auto">
+            <img 
+              src="/lovable-uploads/4a561ac0-5638-4993-9523-0f76796cbb62.png" 
+              alt="E-commerce Storefront Software" 
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Products</h1>
