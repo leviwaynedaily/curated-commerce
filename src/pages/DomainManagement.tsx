@@ -74,13 +74,6 @@ const DomainManagement = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Domain Management</h1>
-          <p className="text-muted-foreground mt-2">
-            Configure how customers access your storefront
-          </p>
-        </div>
-
         <Tabs defaultValue="preview" className="space-y-4">
           <TabsList>
             <TabsTrigger value="preview">Development Preview</TabsTrigger>
