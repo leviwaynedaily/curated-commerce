@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { DashboardHeader } from "./DashboardHeader";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useLocation } from "react-router-dom";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -10,6 +12,13 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const location = useLocation();
+
+  // Function to get the page title based on the current route
+  const getPageTitle = () => {
+    const path = location.pathname.split("/")[1];
+    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+  };
 
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden bg-background dark:bg-[#121212] text-foreground">
@@ -38,6 +47,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
+        <DashboardHeader title={getPageTitle()} />
         <div className="px-4 md:px-8 py-8">
           {children}
         </div>

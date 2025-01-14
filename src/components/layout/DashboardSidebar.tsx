@@ -5,8 +5,6 @@ import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { UserButton } from "@/components/auth/UserButton";
 import { 
   LayoutDashboard, 
   Package2,
@@ -210,34 +208,17 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             </Button>
           ))}
           
-          {/* Theme and User Controls */}
-          <div className="flex flex-col gap-3">
+          {/* Storefront Switcher */}
+          <div className={cn(
+            "flex items-center",
+            isCollapsed ? "justify-center" : "justify-between"
+          )}>
+            <Store className="shrink-0 text-white dark:text-white h-4 w-4" />
             <div className={cn(
-              "flex items-center",
-              isCollapsed ? "justify-center" : "justify-between"
+              "transition-all duration-300",
+              isCollapsed ? "w-0 opacity-0" : "w-full opacity-100 ml-2"
             )}>
-              <Store className="shrink-0 text-white dark:text-white h-4 w-4" />
-              <div className={cn(
-                "transition-all duration-300",
-                isCollapsed ? "w-0 opacity-0" : "w-full opacity-100 ml-2"
-              )}>
-                <StorefrontSwitcher />
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <div className={cn(
-                "flex items-center",
-                isCollapsed ? "justify-center" : "justify-start"
-              )}>
-                <ThemeToggle />
-              </div>
-              <div className={cn(
-                "flex items-center",
-                isCollapsed ? "justify-center" : "justify-start"
-              )}>
-                <UserButton />
-              </div>
+              <StorefrontSwitcher />
             </div>
           </div>
         </div>
