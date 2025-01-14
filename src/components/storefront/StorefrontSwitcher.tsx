@@ -1,14 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import { Plus, Loader2, RefreshCw } from "lucide-react"
+import { Plus, Loader2, RefreshCw, ChevronDown } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -16,14 +14,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
-import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useState } from "react"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { cn } from "@/lib/utils"
 
 export function StorefrontSwitcher() {
   const [showCreateStore, setShowCreateStore] = useState(false)
-  const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
 
   // First check authentication
@@ -96,25 +94,15 @@ export function StorefrontSwitcher() {
   })
 
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
-
-  // Effect to validate current storefront
-  useEffect(() => {
-    if (storefronts && storefronts.length > 0 && !currentStorefrontId) {
-      const firstStorefront = storefronts[0]
-      console.log("Auto-selecting first storefront:", firstStorefront.id)
-      localStorage.setItem('lastStorefrontId', firstStorefront.id)
-      queryClient.invalidateQueries()
-      toast.success(`Selected storefront: ${firstStorefront.name}`)
-    }
-  }, [storefronts, currentStorefrontId, queryClient])
+  const currentStorefront = storefronts?.find(store => store.id === currentStorefrontId)
 
   // Show loading state
   if (isLoadingBusiness || isLoadingStorefronts) {
     return (
-      <Button variant="outline" disabled className="gap-2">
+      <div className="flex items-center gap-2 text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading...
-      </Button>
+      </div>
     )
   }
 
@@ -148,8 +136,8 @@ export function StorefrontSwitcher() {
     return (
       <>
         <Button
-          variant="outline"
-          className="gap-2"
+          variant="ghost"
+          className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
           onClick={() => setShowCreateStore(true)}
         >
           <Plus className="h-4 w-4" />
@@ -179,38 +167,52 @@ export function StorefrontSwitcher() {
   // Show storefront switcher
   return (
     <div>
-      <Select
-        value={currentStorefrontId || undefined}
-        onValueChange={(value) => {
-          if (value === "new") {
-            setShowCreateStore(true)
-          } else {
-            console.log("Switching to storefront:", value)
-            localStorage.setItem('lastStorefrontId', value)
-            queryClient.invalidateQueries()
-            window.location.reload()
-          }
-        }}
-      >
-        <SelectTrigger className="w-[180px] bg-background">
-          <SelectValue placeholder="Select store">
-            {storefronts?.find(store => store.id === currentStorefrontId)?.name || "Select store"}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="bg-background border z-[100]">
-          {storefronts?.map((store) => (
-            <SelectItem key={store.id} value={store.id}>
-              {store.name || store.slug}
-            </SelectItem>
-          ))}
-          <SelectItem value="new" className="text-primary">
-            <span className="flex items-center gap-2">
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button 
+            variant="ghost" 
+            className={cn(
+              "-ml-2 h-auto p-2 text-base hover:bg-transparent hover:text-foreground",
+              !currentStorefront && "text-muted-foreground"
+            )}
+          >
+            <span className="truncate">
+              {currentStorefront?.name || "Select store"}
+            </span>
+            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-2">
+          <div className="grid gap-1">
+            {storefronts.map((store) => (
+              <Button
+                key={store.id}
+                variant="ghost"
+                className="w-full justify-start font-normal"
+                onClick={() => {
+                  localStorage.setItem('lastStorefrontId', store.id)
+                  queryClient.invalidateQueries()
+                  setOpen(false)
+                  window.location.reload()
+                }}
+              >
+                {store.name || store.slug}
+              </Button>
+            ))}
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-2 font-normal text-primary"
+              onClick={() => {
+                setShowCreateStore(true)
+                setOpen(false)
+              }}
+            >
               <Plus className="h-4 w-4" />
               Create New Store
-            </span>
-          </SelectItem>
-        </SelectContent>
-      </Select>
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
         <DialogContent>
