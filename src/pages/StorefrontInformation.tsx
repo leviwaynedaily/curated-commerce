@@ -246,12 +246,9 @@ const StorefrontInformation = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Storefront Information</h1>
-          <p className="text-white mt-2">
-            Customize how your storefront appears to customers. Changes are saved automatically.
-          </p>
-        </div>
+        <p className="text-white mt-2">
+          Customize how your storefront appears to customers. Changes are saved automatically.
+        </p>
 
         <Form {...form}>
           <form className="space-y-8">
