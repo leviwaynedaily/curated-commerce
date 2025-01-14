@@ -189,13 +189,6 @@ const Appearance = () => {
   return (
     <DashboardLayout>
       <div className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Storefront Appearance</h1>
-          <p className="text-muted-foreground mt-2">
-            Customize how your storefront looks. Changes are saved automatically.
-          </p>
-        </div>
-
         {!storefront?.logo_url && (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
