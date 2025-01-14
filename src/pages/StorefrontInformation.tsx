@@ -246,8 +246,8 @@ const StorefrontInformation = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
-        <p className="text-white">
+      <div className="space-y-2">
+        <p className="text-white mb-4">
           Customize how your storefront appears to customers. Changes are saved automatically.
         </p>
 
