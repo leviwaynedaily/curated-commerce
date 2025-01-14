@@ -18,10 +18,11 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -104,116 +105,126 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   ];
 
   return (
-    <div 
-      className={cn(
-        "relative h-full bg-brand-green dark:bg-brand-green border-r border-brand-peach dark:border-brand-peach transition-all duration-300",
-        isCollapsed ? "w-16" : "w-[240px]",
-        className
-      )}
-      onMouseEnter={() => setIsCollapsed(false)}
-      onMouseLeave={() => setIsCollapsed(true)}
-    >
-      <div className="space-y-4 py-4 flex flex-col h-full">
-        {/* Logo section */}
-        <div className={cn(
-          "px-3 py-2 flex items-center",
-          isCollapsed ? "justify-center" : "justify-start gap-3"
-        )}>
-          <div className="rounded-md p-1 dark:bg-transparent">
-            <img 
-              src="/lovable-uploads/84642ac2-258f-4fbc-9f65-bb38ba4fae1f.png" 
-              alt="Logo" 
-              className="h-8 w-auto"
-            />
+    <>
+      <div 
+        className={cn(
+          "relative h-full bg-brand-green dark:bg-brand-green border-r border-brand-peach dark:border-brand-peach transition-all duration-300",
+          isCollapsed ? "w-16" : "w-[240px]",
+          className
+        )}
+        onMouseEnter={() => setIsCollapsed(false)}
+        onMouseLeave={() => setIsCollapsed(true)}
+      >
+        <div className="space-y-4 py-4 flex flex-col h-full">
+          {/* Logo section */}
+          <div className={cn(
+            "px-3 py-2 flex items-center",
+            isCollapsed ? "justify-center" : "justify-start gap-3"
+          )}>
+            <div className="rounded-md p-1 dark:bg-transparent">
+              <img 
+                src="/lovable-uploads/84642ac2-258f-4fbc-9f65-bb38ba4fae1f.png" 
+                alt="Logo" 
+                className="h-8 w-auto"
+              />
+            </div>
+            {!isCollapsed && (
+              <span className="font-montserrat font-bold text-white dark:text-white text-xl">
+                curately
+              </span>
+            )}
           </div>
-          {!isCollapsed && (
-            <span className="font-montserrat font-bold text-white dark:text-white text-xl">
-              curately
-            </span>
-          )}
-        </div>
 
-        {/* Main navigation */}
-        <ScrollArea className="flex-1 px-3 py-2">
-          <div className="space-y-1">
-            {mainRoutes.map((route) => (
-              <Button
-                key={route.href}
-                variant={route.active ? "default" : "ghost"}
-                className={cn(
-                  "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                  route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
-                  isCollapsed && "justify-center px-2",
-                  !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
-                )}
-                onClick={route.onClick}
-                asChild={!route.onClick}
-              >
-                {route.onClick ? (
-                  <div className={cn(
-                    "flex items-center",
-                    isCollapsed ? "justify-center" : "w-full"
-                  )}>
-                    <route.icon className={cn(
-                      "shrink-0 text-white dark:text-white",
-                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                    )} />
-                    {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
-                  </div>
-                ) : (
-                  <Link to={route.href} className={cn(
-                    "flex items-center",
-                    isCollapsed ? "justify-center" : "w-full"
-                  )}>
-                    <route.icon className={cn(
-                      "shrink-0 text-white dark:text-white",
-                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                    )} />
-                    {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
-                  </Link>
-                )}
-              </Button>
-            ))}
+          {/* Main navigation */}
+          <ScrollArea className="flex-1 px-3 py-2">
+            <div className="space-y-1">
+              {mainRoutes.map((route) => (
+                <Button
+                  key={route.href}
+                  variant={route.active ? "default" : "ghost"}
+                  className={cn(
+                    "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                    route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
+                    isCollapsed && "justify-center px-2",
+                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
+                  )}
+                  onClick={route.onClick}
+                  asChild={!route.onClick}
+                >
+                  {route.onClick ? (
+                    <div className={cn(
+                      "flex items-center",
+                      isCollapsed ? "justify-center" : "w-full"
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
+                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                    </div>
+                  ) : (
+                    <Link to={route.href} className={cn(
+                      "flex items-center",
+                      isCollapsed ? "justify-center" : "w-full"
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
+                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                    </Link>
+                  )}
+                </Button>
+              ))}
+            </div>
+          </ScrollArea>
+
+          {/* Settings button */}
+          <div className="px-3 py-2 mt-auto">
+            <Button
+              variant="ghost"
+              className={cn(
+                "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                isCollapsed && "justify-center px-2"
+              )}
+              onClick={() => setIsSettingsOpen(true)}
+            >
+              <Settings className={cn(
+                "shrink-0 text-white dark:text-white",
+                isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+              )} />
+              {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
+            </Button>
           </div>
-        </ScrollArea>
-
-        {/* Settings section */}
-        <div className="px-3 py-2 mt-auto">
-          <Collapsible
-            open={!isCollapsed && isSettingsOpen}
-            onOpenChange={setIsSettingsOpen}
-          >
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                  "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
-                  isCollapsed && "justify-center px-2"
-                )}
-              >
-                <Settings className={cn(
-                  "shrink-0 text-white dark:text-white",
-                  isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                )} />
-                {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 mt-2">
-              <Link to="/users" className={cn(
-                "flex items-center px-2 py-1.5 text-sm text-white hover:bg-brand-peach/10 rounded-md",
-                "transition-colors"
-              )}>
-                <Users className="h-4 w-4 mr-2" />
-                User Management
-              </Link>
-              <div className="px-2">
-                <StorefrontSwitcher />
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
         </div>
       </div>
-    </div>
+
+      {/* Settings Dialog */}
+      <Dialog open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
+        <DialogContent className="bg-brand-green text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">Store Management</h3>
+              <StorefrontSwitcher />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-white">User Management</h3>
+              <Link 
+                to="/users" 
+                className="flex items-center space-x-2 px-2 py-1.5 rounded-md hover:bg-white/10"
+                onClick={() => setIsSettingsOpen(false)}
+              >
+                <Users className="h-4 w-4" />
+                <span>Manage Users</span>
+              </Link>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
