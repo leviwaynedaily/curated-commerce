@@ -14,9 +14,14 @@ import {
   Globe,
   Palette,
   Users,
-  Store,
+  Settings,
 } from "lucide-react";
 import { useState } from "react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -24,6 +29,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Query to get the current storefront
   const { data: storefront } = useQuery({
@@ -94,15 +100,6 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       },
       href: '#',
       active: location.pathname === '/preview',
-    },
-  ];
-
-  const bottomRoutes = [
-    {
-      label: 'Users',
-      icon: Users,
-      href: '/users',
-      active: location.pathname === '/users',
     },
   ];
 
@@ -180,47 +177,41 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           </div>
         </ScrollArea>
 
-        {/* Bottom section */}
-        <div className="px-3 py-2 mt-auto space-y-2">
-          {/* User management route */}
-          {bottomRoutes.map((route) => (
-            <Button
-              key={route.href}
-              variant={route.active ? "default" : "ghost"}
-              className={cn(
-                "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
-                isCollapsed && "justify-center px-2",
-                !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
-              )}
-              asChild
-            >
-              <Link to={route.href} className={cn(
-                "flex items-center",
-                isCollapsed ? "justify-center" : "w-full"
-              )}>
-                <route.icon className={cn(
+        {/* Settings section */}
+        <div className="px-3 py-2 mt-auto">
+          <Collapsible
+            open={!isCollapsed && isSettingsOpen}
+            onOpenChange={setIsSettingsOpen}
+          >
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                  "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                  isCollapsed && "justify-center px-2"
+                )}
+              >
+                <Settings className={cn(
                   "shrink-0 text-white dark:text-white",
                   isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                 )} />
-                {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="space-y-2 mt-2">
+              <Link to="/users" className={cn(
+                "flex items-center px-2 py-1.5 text-sm text-white hover:bg-brand-peach/10 rounded-md",
+                "transition-colors"
+              )}>
+                <Users className="h-4 w-4 mr-2" />
+                User Management
               </Link>
-            </Button>
-          ))}
-          
-          {/* Storefront Switcher */}
-          <div className={cn(
-            "flex items-center",
-            isCollapsed ? "justify-center" : "justify-between"
-          )}>
-            <Store className="shrink-0 text-white dark:text-white h-4 w-4" />
-            <div className={cn(
-              "transition-all duration-300",
-              isCollapsed ? "w-0 opacity-0" : "w-full opacity-100 ml-2"
-            )}>
-              <StorefrontSwitcher />
-            </div>
-          </div>
+              <div className="px-2">
+                <StorefrontSwitcher />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
       </div>
     </div>
