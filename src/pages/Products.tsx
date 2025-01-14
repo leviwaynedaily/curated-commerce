@@ -18,6 +18,8 @@ import { useNavigate } from "react-router-dom"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, RotateCw } from "lucide-react"
 import { Loader2 } from "lucide-react"
+import { UserButton } from "@/components/auth/UserButton"
+import { ThemeToggle } from "@/components/theme/ThemeToggle"
 
 type ProductStatus = "active" | "inactive" | "all"
 
@@ -191,7 +193,15 @@ const Products = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4 pt-20">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">Products</h1>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <UserButton />
+        </div>
+      </div>
+
+      <div className="space-y-4">
         <div className="flex items-center justify-between mb-6">
           <p className="text-muted-foreground">
             Manage your store's products here.
