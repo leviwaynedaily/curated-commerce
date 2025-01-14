@@ -191,12 +191,6 @@ const Products = () => {
 
   return (
     <DashboardLayout>
-      {/* Header Section - Updated positioning */}
-      <div className="fixed top-0 left-0 right-0 z-10 bg-brand-green h-16 flex items-center pl-[240px] md:pl-16 hover:pl-[240px] transition-all duration-300">
-        <h1 className="text-2xl font-bold tracking-tight text-white px-8">Products</h1>
-      </div>
-
-      {/* Main content - Added padding to account for fixed header */}
       <div className="space-y-4 pt-20">
         <div className="flex items-center justify-between mb-6">
           <p className="text-muted-foreground">
