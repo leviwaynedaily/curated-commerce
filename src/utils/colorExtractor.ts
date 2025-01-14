@@ -1,28 +1,30 @@
-// Simple color extractor that returns default colors
-// This version doesn't depend on canvas or other external packages
+import { ColorThief } from 'color-thief-ts';
 
-export const extractColors = async (imageUrl: string): Promise<string[]> => {
-  console.log('Extracting colors from:', imageUrl);
-  
-  // Return default color palette that matches the app's design
-  return [
-    '#1A1F2C', // Dark blue/gray
-    '#D946EF', // Pink
-    '#4CAF50', // Green
-    '#F1F0FB', // Light gray
-    '#FFFFFF', // White
-  ];
-};
+export async function extractDominantColor(imageUrl: string): Promise<string> {
+  try {
+    const colorThief = new ColorThief();
+    
+    // Create a new image element
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    
+    // Wait for the image to load
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = imageUrl;
+    });
 
-export const getMainColors = async (imageUrl: string) => {
-  console.log('Getting main colors from:', imageUrl);
-  const colors = await extractColors(imageUrl);
-  
-  return {
-    primary: colors[0] || '#1A1F2C',
-    secondary: colors[1] || '#D946EF',
-    accent: colors[2] || '#4CAF50',
-    background: colors[3] || '#F1F0FB',
-    text: colors[4] || '#FFFFFF',
-  };
-};
+    // Get the dominant color
+    const color = await colorThief.getColor(img);
+    
+    // Convert RGB to hex
+    return `#${color.map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('')}`;
+  } catch (error) {
+    console.error('Error extracting color:', error);
+    return '#000000'; // Default fallback color
+  }
+}
