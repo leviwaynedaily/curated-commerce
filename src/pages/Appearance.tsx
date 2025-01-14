@@ -1,3 +1,4 @@
+import React from 'react';
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { StorefrontAppearance } from "@/components/storefront/StorefrontAppearance"
 import { useForm } from "react-hook-form"
@@ -48,5 +49,5 @@ export default function Appearance() {
     <DashboardLayout>
       <StorefrontAppearance form={form} />
     </DashboardLayout>
-  )
+  );
 }

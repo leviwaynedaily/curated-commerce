@@ -1,3 +1,4 @@
+import React from 'react';
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { StorefrontBasicInfo } from "@/components/storefront/StorefrontBasicInfo"
 import { StorefrontInstructions } from "@/components/storefront/StorefrontInstructions"
@@ -6,6 +7,8 @@ import { useForm } from "react-hook-form"
 import { useStorefront } from "@/hooks/useStorefront"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { toast } from "sonner"
+import { supabase } from "@/integrations/supabase/client"
 
 export default function StorefrontInformation() {
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -32,6 +35,7 @@ export default function StorefrontInformation() {
   // Update form values when storefront data is loaded
   React.useEffect(() => {
     if (storefront) {
+      console.log("Updating form with storefront data:", storefront);
       form.reset({
         name: storefront.name || "",
         description: storefront.description || "",
@@ -71,5 +75,5 @@ export default function StorefrontInformation() {
         <StorefrontVerification form={form} />
       </div>
     </DashboardLayout>
-  )
+  );
 }
