@@ -160,7 +160,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                         "shrink-0 text-white dark:text-white",
                         isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                       )} />
-                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                      {!isCollapsed && <span className="truncate text-white dark:text-white ml-0.5">{route.label}</span>}
                     </div>
                   ) : (
                     <Link to={route.href} className={cn(
