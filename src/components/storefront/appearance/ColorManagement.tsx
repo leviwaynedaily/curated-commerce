@@ -1,5 +1,4 @@
 import { UseFormReturn } from "react-hook-form";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { BrandColors } from "./BrandColors";
@@ -53,15 +52,10 @@ export function ColorManagement({ form, storefrontId, logoUrl }: ColorManagement
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Color Management</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-8">
-        <BrandColors form={form} onColorChange={handleColorChange} />
-        <VerificationColors form={form} onColorChange={handleColorChange} />
-        <ProductCardColors form={form} onColorChange={handleColorChange} />
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+      <BrandColors form={form} onColorChange={handleColorChange} />
+      <VerificationColors form={form} onColorChange={handleColorChange} />
+      <ProductCardColors form={form} onColorChange={handleColorChange} />
+    </div>
   );
 }
