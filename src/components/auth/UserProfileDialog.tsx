@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/components/theme/ThemeProvider";
 
 interface UserProfileDialogProps {
   isOpen: boolean;
@@ -22,22 +23,27 @@ export function UserProfileDialog({
   onProfileUpdate 
 }: UserProfileDialogProps) {
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
 
   const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const fullName = formData.get("fullName") as string;
     const defaultStoreId = formData.get("defaultStore") as string;
+    const selectedTheme = formData.get("theme") as "light" | "dark";
     
     try {
       const { error } = await supabase.auth.updateUser({
         data: { 
           full_name: fullName,
-          default_storefront_id: defaultStoreId 
+          default_storefront_id: defaultStoreId,
+          theme: selectedTheme
         }
       });
 
       if (error) throw error;
+
+      setTheme(selectedTheme);
 
       if (defaultStoreId) {
         localStorage.setItem('lastStorefrontId', defaultStoreId);
@@ -107,6 +113,18 @@ export function UserProfileDialog({
               defaultValue={user?.user_metadata?.full_name || ""}
               placeholder="Enter your full name"
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="theme">Theme</Label>
+            <Select name="theme" defaultValue={theme}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select theme" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           {storefronts && storefronts.length > 1 && (
             <div className="space-y-2">
