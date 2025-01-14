@@ -16,7 +16,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen flex w-full overflow-x-hidden bg-background dark:bg-[#121212] text-foreground">
       {/* Desktop Sidebar */}
-      <div className="hidden md:block">
+      <div className="hidden md:block fixed left-0 top-0 h-full">
         <DashboardSidebar />
       </div>
 
@@ -37,7 +37,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </Sheet>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-x-hidden px-4 md:px-8 py-8 pt-16 md:pt-8">
+      <main className="flex-1 overflow-x-hidden px-4 md:px-8 py-8 pt-16 md:pt-8 md:ml-[240px]">
         {/* Theme Toggle and User Button */}
         <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
           <ThemeToggle />
