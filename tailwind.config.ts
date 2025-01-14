@@ -27,19 +27,19 @@ export default {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        foreground: "#4e5651", // Updated to new primary color
         primary: {
-          DEFAULT: "#699276", // Updated to new brand green
-          foreground: "#ffffff",
-          hover: "#5a8167", // Slightly darker variant
+          DEFAULT: "#699276",
+          foreground: "#4e5651", // Updated to new primary color
+          hover: "#5a8167",
         },
         secondary: {
-          DEFAULT: "#f5c98f", // Updated to new brand peach
-          foreground: "#4e5651",
+          DEFAULT: "#f5c98f",
+          foreground: "#857c65", // Updated to new secondary color
         },
         success: {
-          DEFAULT: "#699276", // Using brand green for success
-          foreground: "#ffffff",
+          DEFAULT: "#699276",
+          foreground: "#4e5651", // Updated to match primary
         },
         destructive: {
           DEFAULT: "#ef4444",
@@ -47,22 +47,22 @@ export default {
         },
         muted: {
           DEFAULT: "#F1F0FB",
-          foreground: "#8E9196",
+          foreground: "#857c65", // Updated to match secondary
         },
         accent: {
-          DEFAULT: "#bda27a", // New warm accent color
-          foreground: "#1A1F2C",
+          DEFAULT: "#bda27a",
+          foreground: "#4e5651", // Updated to match primary
         },
         brand: {
           green: "#699276",
           peach: "#f5c98f",
           tan: "#bda27a",
-          gray: "#857c65",
-          dark: "#4e5651",
+          gray: "#857c65", // Updated to new secondary color
+          dark: "#4e5651", // Updated to new primary color
         },
         card: {
           DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          foreground: "#4e5651", // Updated to match primary
         },
       },
       borderRadius: {
