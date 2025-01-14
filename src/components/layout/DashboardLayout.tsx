@@ -37,7 +37,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </Sheet>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-x-hidden md:ml-[240px]">
+      <main className="flex-1 overflow-x-hidden">
         {/* Theme Toggle and User Button */}
         <div className="fixed top-4 right-4 flex items-center gap-2 z-50">
           <ThemeToggle />
