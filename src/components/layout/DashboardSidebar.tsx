@@ -211,29 +211,33 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           ))}
           
           {/* Theme and User Controls */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <div className={cn(
               "flex items-center",
               isCollapsed ? "justify-center" : "justify-between"
             )}>
-              <Store className={cn(
-                "shrink-0 text-white dark:text-white",
-                isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-              )} />
+              <Store className="shrink-0 text-white dark:text-white h-4 w-4" />
               <div className={cn(
                 "transition-all duration-300",
-                isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+                isCollapsed ? "w-0 opacity-0" : "w-full opacity-100 ml-2"
               )}>
                 <StorefrontSwitcher />
               </div>
             </div>
             
-            <div className={cn(
-              "flex items-center gap-2",
-              isCollapsed ? "justify-center" : "justify-start"
-            )}>
-              <ThemeToggle />
-              <UserButton />
+            <div className="flex flex-col gap-2">
+              <div className={cn(
+                "flex items-center",
+                isCollapsed ? "justify-center" : "justify-start"
+              )}>
+                <ThemeToggle />
+              </div>
+              <div className={cn(
+                "flex items-center",
+                isCollapsed ? "justify-center" : "justify-start"
+              )}>
+                <UserButton />
+              </div>
             </div>
           </div>
         </div>

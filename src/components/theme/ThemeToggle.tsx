@@ -32,7 +32,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className="mr-2"
+      className="text-white hover:text-white/80 hover:bg-white/10"
     >
       {isDark ? (
         <Sun className="h-5 w-5" />
