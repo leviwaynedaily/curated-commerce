@@ -153,8 +153,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 >
                   {route.onClick ? (
                     <div className={cn(
-                      "flex items-center",
-                      isCollapsed ? "justify-center" : "w-full"
+                      "flex items-center w-full",
+                      isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
                         "shrink-0 text-white dark:text-white",
@@ -164,8 +164,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     </div>
                   ) : (
                     <Link to={route.href} className={cn(
-                      "flex items-center",
-                      isCollapsed ? "justify-center" : "w-full"
+                      "flex items-center w-full",
+                      isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
                         "shrink-0 text-white dark:text-white",
