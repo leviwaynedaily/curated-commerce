@@ -24,7 +24,6 @@ export function StorefrontSwitcher() {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
 
-  // First check authentication
   const { data: session } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -37,7 +36,6 @@ export function StorefrontSwitcher() {
     },
   })
 
-  // Then fetch business data only if we have a session
   const { data: business, isLoading: isLoadingBusiness, error: businessError, refetch: refetchBusiness } = useQuery({
     queryKey: ["business", session?.user?.id],
     queryFn: async () => {
@@ -96,17 +94,15 @@ export function StorefrontSwitcher() {
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
   const currentStorefront = storefronts?.find(store => store.id === currentStorefrontId)
 
-  // Show loading state
   if (isLoadingBusiness || isLoadingStorefronts) {
     return (
-      <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="flex items-center gap-2 text-white">
         <Loader2 className="h-4 w-4 animate-spin" />
         Loading...
       </div>
     )
   }
 
-  // Show error state with retry button
   if (businessError || storefrontsError) {
     return (
       <div className="space-y-2">
@@ -117,7 +113,7 @@ export function StorefrontSwitcher() {
         </Alert>
         <Button 
           variant="outline" 
-          className="w-full gap-2"
+          className="w-full gap-2 text-white bg-white/10 hover:bg-white/20"
           onClick={() => {
             refetchBusiness();
             refetchStorefronts();
@@ -131,13 +127,12 @@ export function StorefrontSwitcher() {
     )
   }
 
-  // Show create store button if no storefronts exist
   if (!storefronts?.length) {
     return (
       <>
         <Button
           variant="ghost"
-          className="gap-2 -ml-2 text-muted-foreground hover:text-foreground"
+          className="gap-2 -ml-2 text-white hover:text-white/90 hover:bg-white/10"
           onClick={() => setShowCreateStore(true)}
         >
           <Plus className="h-4 w-4" />
@@ -145,9 +140,9 @@ export function StorefrontSwitcher() {
         </Button>
 
         <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
-          <DialogContent>
+          <DialogContent className="bg-brand-green text-white">
             <DialogHeader>
-              <DialogTitle>Create Store</DialogTitle>
+              <DialogTitle className="text-white">Create Store</DialogTitle>
             </DialogHeader>
             {business && (
               <StorefrontForm
@@ -164,31 +159,27 @@ export function StorefrontSwitcher() {
     )
   }
 
-  // Show storefront switcher
   return (
     <div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button 
             variant="ghost" 
-            className={cn(
-              "-ml-2 h-auto p-2 text-base hover:bg-transparent hover:text-foreground",
-              !currentStorefront && "text-muted-foreground"
-            )}
+            className="w-full -ml-2 h-auto p-2 text-base hover:bg-white/10 text-white hover:text-white/90 justify-between"
           >
             <span className="truncate">
               {currentStorefront?.name || "Select store"}
             </span>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-2">
+        <PopoverContent className="w-[200px] p-2 bg-brand-green border-white/20">
           <div className="grid gap-1">
             {storefronts.map((store) => (
               <Button
                 key={store.id}
                 variant="ghost"
-                className="w-full justify-start font-normal"
+                className="w-full justify-start font-normal text-white hover:bg-white/10 hover:text-white/90"
                 onClick={() => {
                   localStorage.setItem('lastStorefrontId', store.id)
                   queryClient.invalidateQueries()
@@ -201,7 +192,7 @@ export function StorefrontSwitcher() {
             ))}
             <Button
               variant="ghost"
-              className="w-full justify-start gap-2 font-normal text-primary"
+              className="w-full justify-start gap-2 font-normal text-white hover:bg-white/10 hover:text-white/90"
               onClick={() => {
                 setShowCreateStore(true)
                 setOpen(false)
@@ -215,9 +206,9 @@ export function StorefrontSwitcher() {
       </Popover>
 
       <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
-        <DialogContent>
+        <DialogContent className="bg-brand-green text-white">
           <DialogHeader>
-            <DialogTitle>Create Store</DialogTitle>
+            <DialogTitle className="text-white">Create Store</DialogTitle>
           </DialogHeader>
           {business && (
             <StorefrontForm
