@@ -1,3 +1,4 @@
+import React from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -245,10 +246,13 @@ const StorefrontInformation = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <p className="text-white mt-2">
-          Customize how your storefront appears to customers. Changes are saved automatically.
-        </p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Basic Information</h2>
+          <p className="text-white">
+            Customize how your storefront appears to customers. Changes are saved automatically.
+          </p>
+        </div>
 
         <Form {...form}>
           <form className="space-y-8">
