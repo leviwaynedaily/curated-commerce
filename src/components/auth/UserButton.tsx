@@ -77,7 +77,11 @@ export function UserButton() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
+          <Button 
+            variant="secondary" 
+            size="icon"
+            className="bg-white hover:bg-white/90"
+          >
             <User className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
