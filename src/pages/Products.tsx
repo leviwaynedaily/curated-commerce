@@ -74,7 +74,6 @@ const Products = () => {
 
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
-  // First check authentication
   const { data: session, isLoading: isLoadingAuth } = useQuery({
     queryKey: ["session"],
     queryFn: async () => {
@@ -191,8 +190,14 @@ const Products = () => {
     <DashboardLayout>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <Button variant="outline">Export</Button>
+          <ProductFilters
+            selectedStatus={selectedStatus}
+            onStatusChange={setSelectedStatus}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
           <div className="flex items-center gap-2">
+            <Button variant="outline">Export</Button>
             <Button variant="outline">Import</Button>
             <Button 
               variant="default"
@@ -202,13 +207,6 @@ const Products = () => {
             </Button>
           </div>
         </div>
-
-        <ProductFilters
-          selectedStatus={selectedStatus}
-          onStatusChange={setSelectedStatus}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-        />
 
         <ProductBulkActions
           selectedProducts={selectedProducts}
