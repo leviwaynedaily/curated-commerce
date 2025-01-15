@@ -23,6 +23,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [showUserDialog, setShowUserDialog] = useState(false)
   const [newUserName, setNewUserName] = useState("")
   const [newUserPassword, setNewUserPassword] = useState("")
+  const [passwordError, setPasswordError] = useState("")
 
   const handleOpenDialog = (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,9 +34,22 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     setShowUserDialog(true)
   }
 
+  const validatePassword = (password: string) => {
+    if (password.length < 6) {
+      setPasswordError("Password must be at least 6 characters long")
+      return false
+    }
+    setPasswordError("")
+    return true
+  }
+
   const handleAddUser = async () => {
     if (!business?.id || !newUserEmail || !newUserName || !newUserPassword) {
       toast.error("Please fill in all fields")
+      return
+    }
+
+    if (!validatePassword(newUserPassword)) {
       return
     }
 
@@ -76,6 +90,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       setNewUserEmail("")
       setNewUserName("")
       setNewUserPassword("")
+      setPasswordError("")
       setShowUserDialog(false)
       onRefetch()
     } catch (error: any) {
@@ -155,9 +170,15 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
                       id="password"
                       type="password"
                       value={newUserPassword}
-                      onChange={(e) => setNewUserPassword(e.target.value)}
-                      placeholder="Enter password"
+                      onChange={(e) => {
+                        setNewUserPassword(e.target.value)
+                        validatePassword(e.target.value)
+                      }}
+                      placeholder="Enter password (min. 6 characters)"
                     />
+                    {passwordError && (
+                      <p className="text-sm text-destructive">{passwordError}</p>
+                    )}
                   </div>
                 </div>
                 <DialogFooter>
