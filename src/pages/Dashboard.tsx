@@ -1,19 +1,14 @@
 import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-import { Dashboard as DashboardContent } from "@/components/dashboard/Dashboard"
 import { StoreGrid } from "@/components/dashboard/StoreGrid"
 import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManagement"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { toast } from "sonner"
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
-  const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -100,74 +95,27 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  const { data: storefront, isLoading, error } = useQuery({
-    queryKey: ["storefront", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return null
-
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .single()
-
-      if (error) {
-        console.error("Error fetching storefront:", error)
-        throw error
-      }
-
-      return data
-    },
-    enabled: !!currentStorefrontId && !!session,
-  })
-
   const handleStoreSelect = (storeId: string) => {
     localStorage.setItem('lastStorefrontId', storeId)
-    window.location.reload()
+    navigate(`/store/${storeId}`)
   }
 
   if (!session) return null
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        {!currentStorefrontId ? (
-          <div className="max-w-[1400px] mx-auto space-y-8">
-            <StoreGrid 
-              storefronts={storefronts || []} 
-              business={business}
-              onStoreSelect={handleStoreSelect}
-            />
-            {business && (
-              <BusinessUserManagement 
-                business={business}
-                businessUsers={businessUsers || []}
-                onRefetch={refetchBusinessUsers}
-              />
-            )}
-          </div>
-        ) : (
-          <>
-            {isLoading ? (
-              <div>Loading storefront information...</div>
-            ) : error ? (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Error loading storefront information. Please try refreshing the page.
-                </AlertDescription>
-              </Alert>
-            ) : storefront ? (
-              <DashboardContent storefront={storefront} />
-            ) : (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>
-                  Storefront not found. Please select a different storefront.
-                </AlertDescription>
-              </Alert>
-            )}
-          </>
+      <div className="max-w-[1400px] mx-auto space-y-8">
+        <StoreGrid 
+          storefronts={storefronts || []} 
+          business={business}
+          onStoreSelect={handleStoreSelect}
+        />
+        {business && (
+          <BusinessUserManagement 
+            business={business}
+            businessUsers={businessUsers || []}
+            onRefetch={refetchBusinessUsers}
+          />
         )}
       </div>
     </DashboardLayout>
