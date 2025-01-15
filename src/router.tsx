@@ -23,7 +23,7 @@ export const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/:storefrontSlug",
+    path: "/:storefrontSlug/*",
     element: <PublicHome />,
   },
   
