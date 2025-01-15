@@ -96,7 +96,7 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
                     >
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                          <div className="bg-white rounded-md p-2 w-20 h-20 flex items-center justify-center">
+                          <div className="bg-white rounded-md p-2 w-24 h-24 flex items-center justify-center">
                             {store.logo_url ? (
                               <img
                                 src={store.logo_url}
