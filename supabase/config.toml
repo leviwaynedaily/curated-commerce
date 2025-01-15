@@ -13,5 +13,5 @@ enabled = true
 port = 54323
 
 [[functions]]
-name = "create-business-user"
+[functions.create-business-user]
 verify_jwt = false
