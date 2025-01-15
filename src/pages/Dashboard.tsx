@@ -6,10 +6,12 @@ import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManag
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
+import { Dashboard as StorefrontDashboard } from "@/components/dashboard/Dashboard"
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
+  const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -64,28 +66,54 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
+  const { data: currentStorefront } = useQuery({
+    queryKey: ["current-storefront", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+      console.log("Fetching current storefront:", currentStorefrontId);
+      
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("id", currentStorefrontId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching current storefront:", error);
+        return null;
+      }
+
+      return data;
+    },
+    enabled: !!currentStorefrontId,
+  });
+
   if (!session) return null
 
   return (
     <DashboardLayout>
       <Helmet>
-        <title>Storefronts | Curately</title>
+        <title>{currentStorefront ? `${currentStorefront.name} | Curately` : 'Storefronts | Curately'}</title>
       </Helmet>
       <div className="space-y-8">
-        <div className="space-y-8">
-          <StoreGrid 
-            storefronts={storefronts || []} 
-            business={business}
-            refetchStorefronts={refetchStorefronts}
-          />
-          {business && (
-            <BusinessUserManagement 
+        {currentStorefront ? (
+          <StorefrontDashboard storefront={currentStorefront} />
+        ) : (
+          <div className="space-y-8">
+            <StoreGrid 
+              storefronts={storefronts || []} 
               business={business}
-              businessUsers={[]} 
-              onRefetch={() => {}}
+              refetchStorefronts={refetchStorefronts}
             />
-          )}
-        </div>
+            {business && (
+              <BusinessUserManagement 
+                business={business}
+                businessUsers={[]} 
+                onRefetch={() => {}}
+              />
+            )}
+          </div>
+        )}
       </div>
     </DashboardLayout>
   )
