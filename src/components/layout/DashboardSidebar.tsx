@@ -35,7 +35,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Query to get the current storefront
-  const { data: storefront } = useQuery({
+  const { data: storefront, refetch: refetchStorefront } = useQuery({
     queryKey: ["current-storefront"],
     queryFn: async () => {
       const lastStorefrontId = localStorage.getItem('lastStorefrontId');
@@ -56,11 +56,17 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   });
 
+  const handleBackToDashboard = () => {
+    localStorage.removeItem('lastStorefrontId');
+    refetchStorefront();
+    navigate('/dashboard');
+  };
+
   const mainRoutes = [
     {
       label: 'Back to Dashboard',
       icon: ArrowLeft,
-      href: '/dashboard',
+      onClick: handleBackToDashboard,
       active: location.pathname === '/dashboard',
       alwaysEnabled: true,
       showOnlyInStore: true,
@@ -119,7 +125,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   ];
 
-  const isInStore = location.pathname.startsWith('/store/');
+  const isInStore = location.pathname.startsWith('/store/') || !!storefront;
 
   return (
     <>
@@ -170,7 +176,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 .filter(route => !route.showOnlyInStore || isInStore)
                 .map((route) => (
                 <Button
-                  key={route.href}
+                  key={route.href || route.label}
                   variant={route.active ? "default" : "ghost"}
                   className={cn(
                     "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
@@ -178,18 +184,32 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     isCollapsed && "justify-center px-2",
                     !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
                   )}
-                  asChild
+                  onClick={route.onClick}
+                  asChild={!route.onClick}
                 >
-                  <Link to={route.href} className={cn(
-                    "flex items-center w-full",
-                    isCollapsed ? "justify-center" : ""
-                  )}>
-                    <route.icon className={cn(
-                      "shrink-0 text-white dark:text-white",
-                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
-                    )} />
-                    {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
-                  </Link>
+                  {route.onClick ? (
+                    <div className={cn(
+                      "flex items-center w-full cursor-pointer",
+                      isCollapsed ? "justify-center" : ""
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
+                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                    </div>
+                  ) : (
+                    <Link to={route.href} className={cn(
+                      "flex items-center w-full",
+                      isCollapsed ? "justify-center" : ""
+                    )}>
+                      <route.icon className={cn(
+                        "shrink-0 text-white dark:text-white",
+                        isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                      )} />
+                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                    </Link>
+                  )}
                 </Button>
               ))}
 
