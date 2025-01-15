@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StorefrontForm } from "@/components/forms/StorefrontForm";
-import { Plus, ExternalLink } from "lucide-react";
+import { Plus, ExternalLink, Globe, Smartphone } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -13,6 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Progress } from "@/components/ui/progress";
+import { format } from "date-fns";
 
 interface StoreGridProps {
   storefronts: any[];
@@ -88,63 +89,93 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
           <div className="w-full max-w-4xl mx-auto">
             <Carousel className="w-full">
               <CarouselContent className="-ml-2 md:-ml-4">
-                {storefronts.map((store) => (
-                  <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/2 flex justify-center">
-                    <Card
-                      className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full max-w-md cursor-pointer"
-                      onClick={() => handleStoreSelect(store.id)}
-                    >
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="bg-white rounded-md p-2 w-24 h-24 flex items-center justify-center">
-                            {store.logo_url ? (
-                              <img
-                                src={store.logo_url}
-                                alt={store.name}
-                                className="max-h-full max-w-full object-contain"
-                              />
-                            ) : (
-                              <div className="w-full h-full" />
-                            )}
+                {storefronts.map((store) => {
+                  const activeProducts = store.products?.filter(p => p.status === "active")?.length || 0;
+                  return (
+                    <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/2 flex justify-center">
+                      <Card
+                        className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full max-w-md cursor-pointer"
+                        onClick={() => handleStoreSelect(store.id)}
+                      >
+                        <div className="p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="bg-white rounded-md p-2 w-24 h-24 flex items-center justify-center">
+                              {store.logo_url ? (
+                                <img
+                                  src={store.logo_url}
+                                  alt={store.name}
+                                  className="max-h-full max-w-full object-contain"
+                                />
+                              ) : (
+                                <div className="w-full h-full" />
+                              )}
+                            </div>
+                            <div className="flex flex-col items-end gap-2">
+                              <span className={`px-2 py-1 text-xs rounded-full ${
+                                store.is_published
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}>
+                                {store.is_published ? "Published" : "Draft"}
+                              </span>
+                              {store.is_published && store.slug && (
+                                <a 
+                                  href={getPublicUrl(store.slug)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-primary hover:text-primary/80"
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                </a>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 text-xs rounded-full ${
-                              store.is_published
-                                ? "bg-green-100 text-green-800"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}>
-                              {store.is_published ? "Published" : "Draft"}
-                            </span>
-                            {store.is_published && store.slug && (
-                              <a 
-                                href={getPublicUrl(store.slug)} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="text-primary hover:text-primary/80"
-                              >
-                                <ExternalLink className="h-4 w-4" />
-                              </a>
-                            )}
+                          <h3 className="text-lg font-semibold mb-1">{store.name}</h3>
+                          {store.slug && (
+                            <p className="text-sm text-muted-foreground mb-3">
+                              {store.slug}
+                            </p>
+                          )}
+                          
+                          <div className="space-y-4 mt-4">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Setup Progress</span>
+                              <span className="font-medium">{Math.round(calculateProgress(store))}%</span>
+                            </div>
+                            <Progress value={calculateProgress(store)} className="h-2" />
+                            
+                            <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
+                              <div>
+                                <p className="text-muted-foreground">Active Products</p>
+                                <p className="font-semibold">{activeProducts}</p>
+                              </div>
+                              <div>
+                                <p className="text-muted-foreground">Created</p>
+                                <p className="font-semibold">{format(new Date(store.created_at), 'MMM d, yyyy')}</p>
+                              </div>
+                            </div>
+                            
+                            <div className="flex items-center gap-2 mt-2">
+                              {store.custom_domain && (
+                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                                  <Globe className="h-4 w-4" />
+                                  <span>{store.custom_domain}</span>
+                                </div>
+                              )}
+                              {store.has_pwa && (
+                                <div className="flex items-center gap-1 text-sm text-green-600">
+                                  <Smartphone className="h-4 w-4" />
+                                  <span>PWA Enabled</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <h3 className="text-lg font-semibold mb-1">{store.name}</h3>
-                        {store.slug && (
-                          <p className="text-sm text-muted-foreground mb-3">
-                            {store.slug}
-                          </p>
-                        )}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">Setup Progress</span>
-                            <span className="font-medium">{Math.round(calculateProgress(store))}%</span>
-                          </div>
-                          <Progress value={calculateProgress(store)} className="h-2" />
-                        </div>
-                      </div>
-                    </Card>
-                  </CarouselItem>
-                ))}
+                      </Card>
+                    </CarouselItem>
+                  );
+                })}
               </CarouselContent>
               <CarouselPrevious className="hidden md:flex" />
               <CarouselNext className="hidden md:flex" />
