@@ -122,6 +122,7 @@ export default function Dashboard() {
   })
 
   const handleStoreSelect = (storeId: string) => {
+    localStorage.setItem('lastStorefrontId', storeId)
     window.location.reload()
   }
 
