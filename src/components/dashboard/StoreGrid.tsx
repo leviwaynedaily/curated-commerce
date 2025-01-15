@@ -6,6 +6,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface StoreGridProps {
   storefronts: any[]
@@ -22,7 +29,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/8f8f2cfe-cddd-46aa-a393-b0c516126ab4.png"
+            src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png"
             alt="Curately Logo" 
             className="h-16 w-auto animate-fadeIn"
           />
@@ -64,53 +71,60 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       </Dialog>
 
       {storefronts && storefronts.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {storefronts.map((store) => (
-            <Card
-              key={store.id}
-              className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-              onClick={() => {
-                console.log("Selecting storefront:", store.id)
-                localStorage.setItem('lastStorefrontId', store.id)
-                onStoreSelect(store.id)
-                navigate(`/store/${store.id}`)
-              }}
-            >
-              <div className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 rounded-full bg-brand-green/10">
-                      <Store className="h-6 w-6 text-brand-green" />
+        <div className="w-full flex justify-center">
+          <Carousel className="w-full max-w-5xl">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {storefronts.map((store) => (
+                <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                  <Card
+                    className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+                    onClick={() => {
+                      console.log("Selecting storefront:", store.id)
+                      localStorage.setItem('lastStorefrontId', store.id)
+                      onStoreSelect(store.id)
+                      navigate(`/store/${store.id}`)
+                    }}
+                  >
+                    <div className="p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="p-2 rounded-full bg-brand-green/10">
+                            <Store className="h-6 w-6 text-brand-green" />
+                          </div>
+                          <div>
+                            <h3 className="text-xl font-semibold tracking-tight group-hover:text-brand-green transition-colors font-montserrat">
+                              {store.name}
+                            </h3>
+                            {store.is_published && (
+                              <p className="text-sm text-muted-foreground font-open-sans">
+                                /{store.slug}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-brand-green transition-colors" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm font-open-sans">
+                          <span className="text-muted-foreground">Status</span>
+                          <span className={store.is_published ? "text-green-500" : "text-yellow-500"}>
+                            {store.is_published ? 'Published' : 'Draft'}
+                          </span>
+                        </div>
+                        <Progress 
+                          value={store.is_published ? 100 : 50} 
+                          className="h-2"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-semibold tracking-tight group-hover:text-brand-green transition-colors font-montserrat">
-                        {store.name}
-                      </h3>
-                      {store.is_published && (
-                        <p className="text-sm text-muted-foreground font-open-sans">
-                          /{store.slug}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                  <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-brand-green transition-colors" />
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm font-open-sans">
-                    <span className="text-muted-foreground">Status</span>
-                    <span className={store.is_published ? "text-green-500" : "text-yellow-500"}>
-                      {store.is_published ? 'Published' : 'Draft'}
-                    </span>
-                  </div>
-                  <Progress 
-                    value={store.is_published ? 100 : 50} 
-                    className="h-2"
-                  />
-                </div>
-              </div>
-            </Card>
-          ))}
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
         </div>
       ) : (
         <div className="text-center py-12 bg-muted/30 rounded-lg">
