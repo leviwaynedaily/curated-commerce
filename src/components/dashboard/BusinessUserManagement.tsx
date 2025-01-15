@@ -32,29 +32,19 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       console.log("Adding user to business:", business.id)
       console.log("Searching for user with email:", newUserEmail)
 
-      // First check if user already exists in profiles
+      // First check if user exists in profiles
       const { data: existingProfile } = await supabase
         .from("profiles")
         .select("id")
         .eq("email", newUserEmail)
         .maybeSingle()
 
-      if (existingProfile?.id) {
-        // Check if user already has access
-        const { data: existingAccess } = await supabase
-          .from("business_users")
-          .select("id")
-          .eq("business_id", business.id)
-          .eq("user_id", existingProfile.id)
-          .maybeSingle()
-
-        if (existingAccess) {
-          toast.error("User already has access to this business")
-          return
-        }
+      if (!existingProfile?.id) {
+        toast.error("User not found. Please make sure they have registered first.")
+        return
       }
 
-      // Call the Edge Function to create user if needed and add to business
+      // Call the Edge Function to add user to business
       const { data, error } = await supabase.functions.invoke('create-business-user', {
         body: {
           email: newUserEmail,
@@ -67,17 +57,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         throw error
       }
 
-      const { userId, isNewUser, tempPassword } = data
-
-      if (isNewUser && tempPassword) {
-        toast.success(`User created with temporary password: ${tempPassword}`, {
-          duration: 10000,
-          description: "Please share this password with the user securely"
-        })
-      } else {
-        toast.success("User added successfully")
-      }
-
+      toast.success("User added successfully")
       setNewUserEmail("")
       onRefetch() // Refresh the user list
     } catch (error: any) {
