@@ -3,9 +3,11 @@ import { supabase } from "@/integrations/supabase/client"
 import { Stats } from "./Stats"
 import { QuickActions } from "./QuickActions"
 import { Progress } from "@/components/ui/progress"
-import { AlertCircle } from "lucide-react"
+import { AlertCircle, LogOut } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
 
 const getTimeBasedGreeting = () => {
   const hour = new Date().getHours()
@@ -27,6 +29,8 @@ const calculateSetupProgress = (storefront: any) => {
 }
 
 export function Dashboard({ storefront }: { storefront: any }) {
+  const navigate = useNavigate()
+
   const { data: products, error: productsError } = useQuery({
     queryKey: ["products", storefront.id],
     queryFn: async () => {
@@ -65,6 +69,17 @@ export function Dashboard({ storefront }: { storefront: any }) {
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   })
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      navigate("/login")
+      toast.success("Logged out successfully")
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast.error("Failed to log out")
+    }
+  }
+
   const greeting = getTimeBasedGreeting()
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'there'
   const setupProgress = calculateSetupProgress(storefront)
@@ -82,28 +97,38 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
-      <div className="space-y-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Dashboard for {storefront.name}
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-2">
-            {greeting}, {userName}. Here's an overview of {storefront.name}.
-          </p>
-        </div>
-
-        {storefront.logo_url && (
-          <div className="flex items-center gap-4">
-            <div className="bg-white dark:bg-white rounded-md p-2 w-fit">
-              <img 
-                src={storefront.logo_url} 
-                alt={storefront.name || 'Store logo'} 
-                className="h-12 object-contain"
-              />
-            </div>
+      <div className="flex justify-between items-start">
+        <div className="space-y-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              Dashboard for {storefront.name}
+            </h1>
+            <p className="text-sm md:text-base text-muted-foreground mt-2">
+              {greeting}, {userName}. Here's an overview of {storefront.name}.
+            </p>
           </div>
-        )}
+        </div>
+        <Button 
+          variant="destructive" 
+          onClick={handleLogout}
+          className="flex items-center gap-2"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
       </div>
+
+      {storefront.logo_url && (
+        <div className="flex items-center gap-4">
+          <div className="bg-white dark:bg-white rounded-md p-2 w-fit">
+            <img 
+              src={storefront.logo_url} 
+              alt={storefront.name || 'Store logo'} 
+              className="h-12 object-contain"
+            />
+          </div>
+        </div>
+      )}
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
