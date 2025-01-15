@@ -7,6 +7,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
 import { Dashboard as StorefrontDashboard } from "@/components/dashboard/Dashboard"
+import { Loader2 } from "lucide-react"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -66,7 +67,7 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  const { data: currentStorefront } = useQuery({
+  const { data: currentStorefront, isLoading: isLoadingStorefront } = useQuery({
     queryKey: ["current-storefront", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) return null;
@@ -96,7 +97,11 @@ export default function Dashboard() {
         <title>{currentStorefront ? `${currentStorefront.name} | Curately` : 'Storefronts | Curately'}</title>
       </Helmet>
       <div className="space-y-8">
-        {currentStorefront ? (
+        {isLoadingStorefront ? (
+          <div className="flex items-center justify-center min-h-[200px]">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : currentStorefront ? (
           <StorefrontDashboard storefront={currentStorefront} />
         ) : (
           <div className="space-y-8">

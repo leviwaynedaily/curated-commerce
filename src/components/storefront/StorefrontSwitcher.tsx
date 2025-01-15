@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils"
 export function StorefrontSwitcher() {
   const [showCreateStore, setShowCreateStore] = useState(false)
   const [open, setOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const queryClient = useQueryClient()
 
   const { data: session } = useQuery({
@@ -166,11 +167,21 @@ export function StorefrontSwitcher() {
           <Button 
             variant="ghost" 
             className="w-full -ml-2 h-auto p-2 text-base hover:bg-white/10 text-white hover:text-white/90 justify-between"
+            disabled={isLoading}
           >
-            <span className="truncate">
-              {currentStorefront?.name || "Select store"}
-            </span>
-            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Switching...
+              </div>
+            ) : (
+              <>
+                <span className="truncate">
+                  {currentStorefront?.name || "Select store"}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+              </>
+            )}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-2 bg-brand-green border-white/20">
@@ -180,9 +191,10 @@ export function StorefrontSwitcher() {
                 key={store.id}
                 variant="ghost"
                 className="w-full justify-start font-normal text-white hover:bg-white/10 hover:text-white/90"
-                onClick={() => {
+                onClick={async () => {
+                  setIsLoading(true)
                   localStorage.setItem('lastStorefrontId', store.id)
-                  queryClient.invalidateQueries()
+                  await queryClient.invalidateQueries()
                   setOpen(false)
                   window.location.reload()
                 }}
