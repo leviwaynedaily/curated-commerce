@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CreditCard, ChevronDown, ChevronUp, User, Plus } from "lucide-react"
+import { CreditCard, ChevronDown, ChevronUp, User, Plus, X } from "lucide-react"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 interface BusinessUserManagementProps {
   business: any
@@ -19,29 +20,43 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [isAddingUser, setIsAddingUser] = useState(false)
   const [isUsersExpanded, setIsUsersExpanded] = useState(false)
   const [isBillingExpanded, setIsBillingExpanded] = useState(false)
+  const [showUserDialog, setShowUserDialog] = useState(false)
+  const [newUserName, setNewUserName] = useState("")
+  const [newUserPassword, setNewUserPassword] = useState("")
 
-  const handleAddUser = async (e: React.FormEvent) => {
+  const handleOpenDialog = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!business?.id || !newUserEmail) {
+    if (!newUserEmail) {
       toast.error("Please enter a valid email address")
+      return
+    }
+    setShowUserDialog(true)
+  }
+
+  const handleAddUser = async () => {
+    if (!business?.id || !newUserEmail || !newUserName || !newUserPassword) {
+      toast.error("Please fill in all fields")
       return
     }
 
     try {
       setIsAddingUser(true)
-      console.log("Adding user to business:", business.id)
-      console.log("Searching for user with email:", newUserEmail)
+      console.log("Creating new user:", { email: newUserEmail, name: newUserName })
 
-      // First check if user exists in profiles
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", newUserEmail)
-        .maybeSingle()
+      // First create the user in auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
+        options: {
+          data: {
+            name: newUserName
+          }
+        }
+      })
 
-      if (!existingProfile?.id) {
-        toast.error("User not found. Please make sure they have registered first.")
-        return
+      if (signUpError) {
+        console.error("Error creating user:", signUpError)
+        throw signUpError
       }
 
       // Call the Edge Function to add user to business
@@ -59,7 +74,10 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
       toast.success("User added successfully")
       setNewUserEmail("")
-      onRefetch() // Refresh the user list
+      setNewUserName("")
+      setNewUserPassword("")
+      setShowUserDialog(false)
+      onRefetch()
     } catch (error: any) {
       console.error("Error adding user:", error)
       toast.error(error.message || "Failed to add user. Please try again.")
@@ -89,7 +107,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         </CardHeader>
         {isUsersExpanded && (
           <CardContent>
-            <form onSubmit={handleAddUser} className="flex gap-2 mb-6">
+            <form onSubmit={handleOpenDialog} className="flex gap-2 mb-6">
               <Input
                 type="email"
                 placeholder="Enter user email"
@@ -102,6 +120,56 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
                 Add User
               </Button>
             </form>
+
+            <Dialog open={showUserDialog} onOpenChange={setShowUserDialog}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New User</DialogTitle>
+                  <DialogDescription>
+                    Enter the details for the new user
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid gap-2">
+                    <label htmlFor="name">Name</label>
+                    <Input
+                      id="name"
+                      value={newUserName}
+                      onChange={(e) => setNewUserName(e.target.value)}
+                      placeholder="Enter user's name"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="email">Email</label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={newUserEmail}
+                      readOnly
+                      className="bg-muted"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label htmlFor="password">Password</label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={newUserPassword}
+                      onChange={(e) => setNewUserPassword(e.target.value)}
+                      placeholder="Enter password"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowUserDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddUser} disabled={isAddingUser}>
+                    Add User
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             <Table>
               <TableHeader>
