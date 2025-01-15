@@ -32,46 +32,25 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       console.log("Adding user to business:", business.id)
       console.log("Searching for user with email:", newUserEmail)
 
-      // First check if user exists in profiles
-      const { data: userData, error: userError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", newUserEmail)
-        .maybeSingle()
-
-      if (userError) {
-        console.error("Error finding user:", userError)
-        toast.error("An error occurred while searching for the user")
-        return
-      }
-
-      let userId = userData?.id
-
-      // If user doesn't exist, create them
-      if (!userData) {
-        console.log("User not found, creating new user")
-        const tempPassword = Math.random().toString(36).slice(-8)
-        
-        const { data: newAuthUser, error: createError } = await supabase.auth.admin.createUser({
+      // Call the Edge Function to create/get user
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-business-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
           email: newUserEmail,
-          password: tempPassword,
-          email_confirm: true
+          businessId: business.id
         })
+      })
 
-        if (createError) {
-          console.error("Error creating user:", createError)
-          toast.error("Failed to create user account")
-          return
-        }
-
-        userId = newAuthUser.user.id
-        console.log("Created new user:", userId)
-        
-        toast.success(`User created with temporary password: ${tempPassword}`, {
-          duration: 10000,
-          description: "Please share this password with the user securely"
-        })
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Failed to create user')
       }
+
+      const { userId, isNewUser, tempPassword } = await response.json()
 
       // Check if user already has access
       const { data: existingAccess, error: existingAccessError } = await supabase
@@ -99,7 +78,15 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
       if (addError) throw addError
 
-      toast.success("User added successfully")
+      if (isNewUser && tempPassword) {
+        toast.success(`User created with temporary password: ${tempPassword}`, {
+          duration: 10000,
+          description: "Please share this password with the user securely"
+        })
+      } else {
+        toast.success("User added successfully")
+      }
+
       setNewUserEmail("")
       onRefetch()
     } catch (error) {
