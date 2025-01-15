@@ -7,7 +7,8 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
 import { Dashboard as StorefrontDashboard } from "@/components/dashboard/Dashboard"
-import { Loader2 } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -89,6 +90,11 @@ export default function Dashboard() {
     enabled: !!currentStorefrontId,
   });
 
+  const handleBackToStorefronts = () => {
+    localStorage.removeItem('lastStorefrontId');
+    window.location.reload();
+  };
+
   if (!session) return null
 
   return (
@@ -102,7 +108,17 @@ export default function Dashboard() {
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : currentStorefront ? (
-          <StorefrontDashboard storefront={currentStorefront} />
+          <div className="space-y-8">
+            <Button
+              variant="ghost"
+              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              onClick={handleBackToStorefronts}
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Storefronts
+            </Button>
+            <StorefrontDashboard storefront={currentStorefront} />
+          </div>
         ) : (
           <div className="space-y-8">
             <StoreGrid 
