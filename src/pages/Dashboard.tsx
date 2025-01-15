@@ -103,7 +103,7 @@ export default function Dashboard() {
     enabled: !!business?.id,
   });
 
-  const { data: storefront, isLoadingStorefront: isLoading, error } = useQuery({
+  const { data: storefront, isLoading, error } = useQuery({
     queryKey: ["storefront", currentStorefrontId],
     queryFn: async () => {
       if (!currentStorefrontId) return null;
