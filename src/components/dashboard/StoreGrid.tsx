@@ -22,15 +22,15 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/84642ac2-258f-4fbc-9f65-bb38ba4fae1f.png"
+            src="/lovable-uploads/982a241f-b82d-4f33-879d-d27bf029a82c.png"
             alt="Curately Logo" 
-            className="h-16 w-auto animate-fade-in"
+            className="h-20 w-auto animate-fadeIn"
           />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-brand-dark">
+        <h1 className="text-4xl font-bold tracking-tight text-brand-dark font-montserrat">
           Welcome to Your Digital Storefront
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-open-sans">
           Manage your storefronts and create engaging shopping experiences for your customers.
         </p>
         {business && (
@@ -38,7 +38,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
             onClick={() => setShowCreateStore(true)}
             variant="default"
             size="lg"
-            className="mt-8 animate-fade-in"
+            className="mt-8 animate-fadeIn bg-brand-green hover:bg-brand-green/90 text-white"
           >
             <Plus className="h-5 w-5 mr-2" />
             Create New Store
@@ -83,11 +83,11 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
                       <Store className="h-6 w-6 text-brand-green" />
                     </div>
                     <div>
-                      <h3 className="text-xl font-semibold tracking-tight group-hover:text-brand-green transition-colors">
+                      <h3 className="text-xl font-semibold tracking-tight group-hover:text-brand-green transition-colors font-montserrat">
                         {store.name}
                       </h3>
                       {store.is_published && (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-sm text-muted-foreground font-open-sans">
                           /{store.slug}
                         </p>
                       )}
@@ -97,7 +97,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm font-open-sans">
                     <span className="text-muted-foreground">Status</span>
                     <span className={store.is_published ? "text-green-500" : "text-yellow-500"}>
                       {store.is_published ? 'Published' : 'Draft'}
@@ -115,7 +115,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       ) : (
         <div className="text-center py-12 bg-muted/30 rounded-lg">
           <Store className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground font-open-sans">
             No storefronts found. Create your first storefront to get started.
           </p>
         </div>
