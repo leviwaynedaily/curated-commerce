@@ -3,23 +3,34 @@ import { supabase } from "@/integrations/supabase/client";
 import { PreviewData } from "@/types/preview";
 import { toast } from "sonner";
 
-export function useStorefront(storefrontId: string | undefined | null) {
+export function useStorefront(identifier: string | undefined | null) {
   return useQuery({
-    queryKey: ["storefront", storefrontId],
+    queryKey: ["storefront", identifier],
     queryFn: async () => {
-      console.log("Fetching storefront data for ID:", storefrontId);
+      console.log("Fetching storefront data for identifier:", identifier);
       
-      if (!storefrontId) {
-        console.log("No storefront ID provided");
+      if (!identifier) {
+        console.log("No identifier provided");
         return null;
       }
 
       try {
-        const { data, error } = await supabase
+        // First try to find by slug since it's more common for public access
+        let query = supabase
           .from("storefronts")
-          .select("*")
-          .eq("id", storefrontId)
-          .maybeSingle();
+          .select("*");
+
+        // Check if the identifier is a UUID
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidRegex.test(identifier)) {
+          console.log("Looking up storefront by ID");
+          query = query.eq("id", identifier);
+        } else {
+          console.log("Looking up storefront by slug");
+          query = query.eq("slug", identifier);
+        }
+
+        const { data, error } = await query.maybeSingle();
 
         if (error) {
           console.error("Error fetching storefront:", error);
@@ -28,7 +39,7 @@ export function useStorefront(storefrontId: string | undefined | null) {
         }
 
         if (!data) {
-          console.error("No storefront found with ID:", storefrontId);
+          console.error("No storefront found with identifier:", identifier);
           toast.error("Storefront not found");
           throw new Error("Storefront not found");
         }
@@ -43,6 +54,6 @@ export function useStorefront(storefrontId: string | undefined | null) {
     },
     retry: 1,
     staleTime: 0,
-    enabled: !!storefrontId, // Only run query if storefrontId exists
+    enabled: !!identifier,
   });
 }

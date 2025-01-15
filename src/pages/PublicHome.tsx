@@ -1,22 +1,48 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Store, Shield, Globe, Zap } from "lucide-react";
+import { Preview } from "./Preview";
+import { PreviewError } from "@/components/theme/preview/PreviewError";
+import { PreviewLoading } from "@/components/theme/preview/PreviewLoading";
+import { useStorefront } from "@/hooks/useStorefront";
 
 export default function PublicHome() {
   const navigate = useNavigate();
+  const { storefrontSlug } = useParams();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
+      // Only check auth and redirect on the root path
+      if (!storefrontSlug) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/dashboard");
+        }
       }
     };
     
     checkAuth();
-  }, [navigate]);
+  }, [navigate, storefrontSlug]);
+
+  // If we have a storefront slug, fetch the storefront and render the preview
+  if (storefrontSlug) {
+    console.log("Rendering storefront for slug:", storefrontSlug);
+    
+    const { data: storefront, isLoading, error } = useStorefront(storefrontSlug);
+
+    if (isLoading) {
+      return <PreviewLoading />;
+    }
+
+    if (error || !storefront) {
+      return <PreviewError error="Store not found" />;
+    }
+
+    console.log("Found storefront:", storefront);
+    return <Preview storefrontId={storefront.id} />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
