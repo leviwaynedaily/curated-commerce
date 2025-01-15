@@ -64,7 +64,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
   const mainRoutes = [
     {
-      label: 'Back to Dashboard',
+      label: 'Back to Storefronts',
       icon: ArrowLeft,
       onClick: handleBackToDashboard,
       active: location.pathname === '/dashboard',
