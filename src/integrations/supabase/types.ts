@@ -311,7 +311,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          role: Database["public"]["Enums"]["storefront_user_role"]
+          role: string
           storefront_id: string | null
           updated_at: string
           user_id: string | null
@@ -319,7 +319,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["storefront_user_role"]
+          role?: string
           storefront_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -327,7 +327,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          role?: Database["public"]["Enums"]["storefront_user_role"]
+          role?: string
           storefront_id?: string | null
           updated_at?: string
           user_id?: string | null
@@ -506,7 +506,6 @@ export type Database = {
       product_status: "active" | "inactive"
       pwa_display_mode: "standalone" | "fullscreen" | "minimal-ui" | "browser"
       pwa_orientation: "portrait" | "landscape" | "any"
-      storefront_user_role: "owner" | "member" | "editor"
       theme_category: "grid" | "list" | "masonry" | "carousel"
       verification_type: "none" | "age" | "password" | "both"
     }

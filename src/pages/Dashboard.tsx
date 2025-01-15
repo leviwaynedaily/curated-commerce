@@ -6,15 +6,10 @@ import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManag
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
-import { Dashboard as StorefrontDashboard } from "@/components/dashboard/Dashboard"
-import { Loader2, ArrowLeft, LogOut } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
-  const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,7 +46,7 @@ export default function Dashboard() {
     enabled: !!session,
   })
 
-  const { data: storefronts, refetch: refetchStorefronts } = useQuery({
+  const { data: storefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
       if (!business?.id) return []
@@ -69,100 +64,65 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  const { data: currentStorefront, isLoading: isLoadingStorefront } = useQuery({
-    queryKey: ["current-storefront", currentStorefrontId],
+  const { data: businessUsers, refetch: refetchBusinessUsers } = useQuery({
+    queryKey: ["business-users", business?.id],
     queryFn: async () => {
-      if (!currentStorefrontId) return null;
-      console.log("Fetching current storefront:", currentStorefrontId);
-      
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .maybeSingle();
+      if (!business?.id) return []
+      console.log("Fetching business users for business:", business.id)
 
-      if (error) {
-        console.error("Error fetching current storefront:", error);
-        return null;
-      }
+      const { data: businessUsers, error: businessUsersError } = await supabase
+        .from("business_users")
+        .select("id, role, user_id")
+        .eq("business_id", business.id)
 
-      return data;
+      if (businessUsersError) throw businessUsersError
+
+      const userIds = businessUsers.map(user => user.user_id)
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, email")
+        .in("id", userIds)
+
+      if (profilesError) throw profilesError
+
+      const usersWithProfiles = businessUsers.map(user => ({
+        ...user,
+        profiles: profiles.find(profile => profile.id === user.user_id)
+      }))
+
+      console.log("Business users fetched:", usersWithProfiles)
+      return usersWithProfiles
     },
-    enabled: !!currentStorefrontId,
-  });
+    enabled: !!business?.id,
+  })
 
-  const handleBackToStorefronts = () => {
-    localStorage.removeItem('lastStorefrontId');
-    window.location.reload();
-  };
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut()
-      navigate("/login")
-      toast.success("Logged out successfully")
-    } catch (error) {
-      console.error("Logout error:", error)
-      toast.error("Failed to log out")
-    }
-  };
+  const handleStoreSelect = (storeId: string) => {
+    localStorage.setItem('lastStorefrontId', storeId)
+    navigate(`/store/${storeId}`)
+  }
 
   if (!session) return null
 
   return (
     <DashboardLayout>
       <Helmet>
-        <title>{currentStorefront ? `${currentStorefront.name} | Curately` : 'Storefronts | Curately'}</title>
+        <title>Storefronts | Curately</title>
       </Helmet>
       <div className="space-y-8">
-        {!currentStorefront && (
-          <div className="flex justify-between items-center px-4 md:px-8 py-4 border-b">
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Welcome to Your Digital Storefront
-            </h1>
-            <Button 
-              variant="destructive" 
-              onClick={handleLogout}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        )}
-        
-        {isLoadingStorefront ? (
-          <div className="flex items-center justify-center min-h-[200px]">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-          </div>
-        ) : currentStorefront ? (
-          <div className="space-y-8">
-            <Button
-              variant="ghost"
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-              onClick={handleBackToStorefronts}
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Storefronts
-            </Button>
-            <StorefrontDashboard storefront={currentStorefront} />
-          </div>
-        ) : (
-          <div className="space-y-8">
-            <StoreGrid 
-              storefronts={storefronts || []} 
+        <div className="space-y-8">
+          <StoreGrid 
+            storefronts={storefronts || []} 
+            business={business}
+            onStoreSelect={handleStoreSelect}
+          />
+          {business && (
+            <BusinessUserManagement 
               business={business}
-              refetchStorefronts={refetchStorefronts}
+              businessUsers={businessUsers || []}
+              onRefetch={refetchBusinessUsers}
             />
-            {business && (
-              <BusinessUserManagement 
-                business={business}
-                businessUsers={[]} 
-                onRefetch={() => {}}
-              />
-            )}
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </DashboardLayout>
   )

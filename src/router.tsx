@@ -13,21 +13,10 @@ import Landing from "./pages/Landing"
 import PublicHome from "./pages/PublicHome"
 
 export const router = createBrowserRouter([
-  // Public Routes - These should always be accessible without authentication
   {
     path: "/",
     element: <Landing />,
   },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/:storefrontSlug/*",
-    element: <PublicHome />,
-  },
-  
-  // Protected Routes - Landing & Store Management
   {
     path: "/dashboard",
     element: <Dashboard />,
@@ -36,8 +25,6 @@ export const router = createBrowserRouter([
     path: "/store/:id",
     element: <Store />,
   },
-  
-  // Store Settings & Features - All protected
   {
     path: "/products",
     element: <Products />,
@@ -63,7 +50,15 @@ export const router = createBrowserRouter([
     element: <Preview />,
   },
   {
+    path: "/login",
+    element: <Login />,
+  },
+  {
     path: "/users",
     element: <Users />,
+  },
+  {
+    path: "/:storefrontSlug",
+    element: <PublicHome />,
   },
 ])

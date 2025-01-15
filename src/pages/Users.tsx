@@ -3,7 +3,15 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
 import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
-import { StorefrontUser } from "@/types/storefront";
+
+interface StorefrontUser {
+  id: string;
+  user_id: string;
+  role: string;
+  profiles: {
+    email: string;
+  };
+}
 
 interface Storefront {
   id: string;

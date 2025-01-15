@@ -1,49 +1,22 @@
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Shield, Globe, Zap } from "lucide-react";
-import { Preview } from "@/components/theme/preview/Preview";
-import { PreviewError } from "@/components/theme/preview/PreviewError";
-import { PreviewLoading } from "@/components/theme/preview/PreviewLoading";
-import { useStorefront } from "@/hooks/useStorefront";
+import { ArrowRight, Store, Shield, Globe, Zap } from "lucide-react";
 
 export default function PublicHome() {
   const navigate = useNavigate();
-  const { storefrontSlug } = useParams();
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Only check auth and potentially redirect if we're on the root path
-      if (window.location.pathname === '/') {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          navigate("/dashboard");
-        }
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/dashboard");
       }
     };
     
     checkAuth();
   }, [navigate]);
-
-  // If we have a storefront slug, fetch the storefront and render the preview
-  if (storefrontSlug) {
-    console.log("Rendering storefront for slug:", storefrontSlug);
-    
-    // First get the storefront ID from the slug
-    const { data: storefront, isLoading, error } = useStorefront(storefrontSlug);
-
-    if (isLoading) {
-      return <PreviewLoading />;
-    }
-
-    if (error || !storefront) {
-      return <PreviewError error="Store not found" />;
-    }
-
-    console.log("Found storefront:", storefront);
-    return <Preview storefrontId={storefront.id} />;
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -51,11 +24,7 @@ export default function PublicHome() {
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png" 
-              alt="Curately Logo" 
-              className="h-8 w-auto"
-            />
+            <Store className="h-6 w-6 text-primary" />
             <span className="text-xl font-semibold">Curately</span>
           </div>
           <div className="flex items-center gap-4">
@@ -92,7 +61,7 @@ export default function PublicHome() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex flex-col items-center text-center">
             <div className="rounded-lg bg-primary/10 p-4">
-              <Shield className="h-6 w-6 text-primary" />
+              <Store className="h-6 w-6 text-primary" />
             </div>
             <h3 className="mt-4 text-xl font-semibold">Custom Storefronts</h3>
             <p className="mt-2 text-muted-foreground">

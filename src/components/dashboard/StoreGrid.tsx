@@ -1,192 +1,109 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { StorefrontForm } from "@/components/forms/StorefrontForm";
-import { Plus, ExternalLink, Globe, Smartphone } from "lucide-react";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
-import { Progress } from "@/components/ui/progress";
-import { format } from "date-fns";
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
+import { Plus } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { StorefrontForm } from "@/components/forms/StorefrontForm"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface StoreGridProps {
-  storefronts: any[];
-  business: any;
-  refetchStorefronts: () => void;
+  storefronts: any[]
+  business: any
+  onStoreSelect: (storeId: string) => void
 }
 
-export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGridProps) {
-  const navigate = useNavigate();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  const handleStoreSelect = (storeId: string) => {
-    localStorage.setItem('lastStorefrontId', storeId);
-    navigate('/dashboard');
-  };
-
-  const calculateProgress = (store: any) => {
-    const steps = [
-      !!store.name,
-      !!store.description,
-      !!store.logo_url,
-      !!store.favicon_url,
-    ];
-    return (steps.filter(Boolean).length / steps.length) * 100;
-  };
-
-  const getPublicUrl = (slug: string) => {
-    return `${window.location.origin}/${slug}`;
-  };
+export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridProps) {
+  const [showCreateStore, setShowCreateStore] = useState(false)
+  const navigate = useNavigate()
 
   return (
-    <div className="w-full space-y-8">
-      <div className="text-center space-y-4">
-        <div className="flex justify-center mb-8">
-          <img 
-            src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png"
-            alt="Curately Logo" 
-            className="h-16 w-auto animate-fadeIn"
-          />
+    <div className="space-y-8">
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Select a Storefront</h1>
+          <p className="text-muted-foreground mt-2">
+            Choose a storefront to manage or create a new one
+          </p>
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-brand-dark font-montserrat">
-          Welcome to Your Digital Storefront
-        </h1>
-        <p className="text-sm text-muted-foreground max-w-2xl mx-auto font-open-sans">
-          Manage your storefronts and create engaging shopping experiences for your customers.
-        </p>
         {business && (
-          <div className="pt-4">
-            <Button onClick={() => setIsDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" /> Create New Storefront
-            </Button>
-          </div>
+          <Button
+            onClick={() => setShowCreateStore(true)}
+            variant="default"
+            size="sm"
+            className="shrink-0"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Store
+          </Button>
         )}
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+      <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
+        <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Create New Storefront</DialogTitle>
+            <DialogTitle>Create Store</DialogTitle>
           </DialogHeader>
-          <StorefrontForm
-            businessId={business?.id}
-            onSuccess={() => {
-              setIsDialogOpen(false);
-              refetchStorefronts();
-            }}
-          />
+          {business && (
+            <StorefrontForm
+              businessId={business.id}
+              onSuccess={() => {
+                setShowCreateStore(false)
+                window.location.reload()
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
 
       {storefronts && storefronts.length > 0 ? (
-        <div className="flex justify-center items-center w-full px-4">
-          <div className="w-full max-w-4xl mx-auto">
-            <Carousel className="w-full">
-              <CarouselContent className="-ml-2 md:-ml-4">
-                {storefronts.map((store) => {
-                  const activeProducts = store.products?.filter(p => p.status === "active")?.length || 0;
-                  return (
-                    <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/2 flex justify-center">
-                      <Card
-                        className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full max-w-md cursor-pointer"
-                        onClick={() => handleStoreSelect(store.id)}
-                      >
-                        <div className="p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="bg-white rounded-md p-2 w-24 h-24 flex items-center justify-center">
-                              {store.logo_url ? (
-                                <img
-                                  src={store.logo_url}
-                                  alt={store.name}
-                                  className="max-h-full max-w-full object-contain"
-                                />
-                              ) : (
-                                <div className="w-full h-full" />
-                              )}
-                            </div>
-                            <div className="flex flex-col items-end gap-2">
-                              <span className={`px-2 py-1 text-xs rounded-full ${
-                                store.is_published
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-yellow-100 text-yellow-800"
-                              }`}>
-                                {store.is_published ? "Published" : "Draft"}
-                              </span>
-                              {store.is_published && store.slug && (
-                                <a 
-                                  href={getPublicUrl(store.slug)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  onClick={(e) => e.stopPropagation()}
-                                  className="text-primary hover:text-primary/80"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                          <h3 className="text-lg font-semibold mb-1">{store.name}</h3>
-                          {store.slug && (
-                            <p className="text-sm text-muted-foreground mb-3">
-                              {store.slug}
-                            </p>
-                          )}
-                          
-                          <div className="space-y-4 mt-4">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-muted-foreground">Setup Progress</span>
-                              <span className="font-medium">{Math.round(calculateProgress(store))}%</span>
-                            </div>
-                            <Progress value={calculateProgress(store)} className="h-2" />
-                            
-                            <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-                              <div>
-                                <p className="text-muted-foreground">Active Products</p>
-                                <p className="font-semibold">{activeProducts}</p>
-                              </div>
-                              <div>
-                                <p className="text-muted-foreground">Created</p>
-                                <p className="font-semibold">{format(new Date(store.created_at), 'MMM d, yyyy')}</p>
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-2 mt-2">
-                              {store.custom_domain && (
-                                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                                  <Globe className="h-4 w-4" />
-                                  <span>{store.custom_domain}</span>
-                                </div>
-                              )}
-                              {store.has_pwa && (
-                                <div className="flex items-center gap-1 text-sm text-green-600">
-                                  <Smartphone className="h-4 w-4" />
-                                  <span>PWA Enabled</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </CarouselItem>
-                  );
-                })}
-              </CarouselContent>
-              <CarouselPrevious className="hidden md:flex" />
-              <CarouselNext className="hidden md:flex" />
-            </Carousel>
-          </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {storefronts.map((store) => (
+            <Card
+              key={store.id}
+              className="rounded-lg border bg-card text-card-foreground shadow-sm hover:border-primary/50 cursor-pointer transition-colors"
+              onClick={() => {
+                console.log("Selecting storefront:", store.id)
+                localStorage.setItem('lastStorefrontId', store.id)
+                onStoreSelect(store.id)
+                navigate(`/store/${store.id}`)
+              }}
+            >
+              <div className="p-6 space-y-4">
+                <div className="flex items-center justify-between min-h-[3.5rem]">
+                  <div className="flex flex-col justify-center">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight">
+                      {store.name}
+                    </h3>
+                    {store.is_published && (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        /{store.slug}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Status</span>
+                    <span className={store.is_published ? "text-green-500" : "text-yellow-500"}>
+                      {store.is_published ? 'Published' : 'Draft'}
+                    </span>
+                  </div>
+                  <Progress 
+                    value={store.is_published ? 100 : 50} 
+                    className="h-2"
+                  />
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">No storefronts found. Create one to get started!</p>
+          <p className="text-muted-foreground">No storefronts found. Create your first storefront to get started.</p>
         </div>
       )}
     </div>
-  );
+  )
 }

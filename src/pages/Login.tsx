@@ -4,6 +4,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Store } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -11,8 +12,8 @@ const Login = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        console.log("User logged in, redirecting to dashboard");
-        navigate("/dashboard");
+        console.log("User logged in, redirecting to landing page");
+        navigate("/landing");
       }
     });
 
@@ -22,15 +23,11 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
-        <CardHeader className="text-center space-y-4">
+        <CardHeader className="text-center space-y-2">
           <div className="flex justify-center">
-            <img 
-              src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png" 
-              alt="Curately Logo" 
-              className="h-12 w-auto"
-            />
+            <Store className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-montserrat text-brand-dark">Welcome Back</CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome to Curately</CardTitle>
         </CardHeader>
         <CardContent>
           <Auth
@@ -40,8 +37,8 @@ const Login = () => {
               variables: {
                 default: {
                   colors: {
-                    brand: '#699276',
-                    brandAccent: '#5a8167',
+                    brand: 'rgb(155, 135, 245)',
+                    brandAccent: 'rgb(138, 116, 243)',
                   },
                 },
               },

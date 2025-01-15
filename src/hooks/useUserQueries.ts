@@ -17,10 +17,6 @@ export const useUserQueries = (session: any) => {
           console.error("Error fetching user:", error);
           throw error;
         }
-        if (!user) {
-          console.log("No user found, redirecting to login");
-          throw new Error("No user found");
-        }
         console.log("User data fetched:", user?.id);
         return user;
       } catch (error) {
@@ -38,93 +34,52 @@ export const useUserQueries = (session: any) => {
           description: "Failed to load user data. Please try logging in again.",
           variant: "destructive",
         });
-        // Handle logout and redirect
+        // Handle logout
         supabase.auth.signOut().then(() => navigate("/login"));
       }
     }
   });
 
   const businessQuery = useQuery({
-    queryKey: ["business", userQuery.data?.id],
+    queryKey: ["business"],
     queryFn: async () => {
-      if (!userQuery.data?.id) {
-        console.log("No user ID available for business query");
-        return null;
-      }
+      if (!userQuery.data?.id) return null;
       console.log("Fetching business data for user:", userQuery.data.id);
-      
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
         .eq("user_id", userQuery.data.id)
-        .maybeSingle();
+        .single();
 
-      if (error) {
-        console.error("Business query error:", error);
-        throw error;
-      }
-      
+      if (error) throw error;
       console.log("Business data fetched:", data?.id);
       return data;
     },
-    enabled: !!userQuery.data?.id && !userQuery.isError,
-    retry: 2,
-    meta: {
-      errorHandler: (error: any) => {
-        console.error("Business query error:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load business data. Please try refreshing the page.",
-          variant: "destructive",
-        });
-      }
-    }
+    enabled: !!userQuery.data?.id,
   });
 
   const storefrontsQuery = useQuery({
     queryKey: ["storefronts", businessQuery.data?.id],
     queryFn: async () => {
-      if (!businessQuery.data?.id) {
-        console.log("No business ID available for storefronts query");
-        return [];
-      }
+      if (!businessQuery.data?.id) return [];
       console.log("Fetching storefronts for business:", businessQuery.data.id);
-      
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
         .eq("business_id", businessQuery.data.id)
         .order("name");
 
-      if (error) {
-        console.error("Storefronts query error:", error);
-        throw error;
-      }
-      
+      if (error) throw error;
       console.log("Storefronts fetched:", data?.length);
       return data;
     },
-    enabled: !!businessQuery.data?.id && !businessQuery.isError,
-    retry: 2,
-    meta: {
-      errorHandler: (error: any) => {
-        console.error("Storefronts query error:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load storefronts. Please try refreshing the page.",
-          variant: "destructive",
-        });
-      }
-    }
+    enabled: !!businessQuery.data?.id,
   });
 
   const businessUsersQuery = useQuery({
     queryKey: ["business-users", businessQuery.data?.id],
     queryFn: async () => {
-      if (!businessQuery.data?.id) {
-        console.log("No business ID available for business users query");
-        return [];
-      }
+      if (!businessQuery.data?.id) return [];
       console.log("Fetching business users for business:", businessQuery.data.id);
 
       // First get business users
@@ -159,18 +114,7 @@ export const useUserQueries = (session: any) => {
       console.log("Business users fetched:", usersWithProfiles);
       return usersWithProfiles;
     },
-    enabled: !!businessQuery.data?.id && !businessQuery.isError,
-    retry: 2,
-    meta: {
-      errorHandler: (error: any) => {
-        console.error("Business users query error:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load business users. Please try refreshing the page.",
-          variant: "destructive",
-        });
-      }
-    }
+    enabled: !!businessQuery.data?.id,
   });
 
   return {
@@ -180,7 +124,5 @@ export const useUserQueries = (session: any) => {
     businessUsers: businessUsersQuery.data,
     refetchUser: userQuery.refetch,
     refetchBusinessUsers: businessUsersQuery.refetch,
-    isLoading: userQuery.isLoading || businessQuery.isLoading || storefrontsQuery.isLoading,
-    isError: userQuery.isError || businessQuery.isError || storefrontsQuery.isError,
   };
 };
