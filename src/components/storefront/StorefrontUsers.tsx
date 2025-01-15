@@ -14,15 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-interface StorefrontUser {
-  id: string;
-  user_id: string;
-  role: 'owner' | 'member' | 'editor';
-  profiles: {
-    email: string;
-  };
-}
+import { StorefrontUser, StorefrontUserRole } from "@/types/storefront";
 
 interface StorefrontUsersProps {
   storefrontId: string | null;
