@@ -15,7 +15,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
-  // Function to get the page title and description based on the current route
   const getPageInfo = () => {
     if (!currentStorefrontId) {
       return {
@@ -27,7 +26,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const path = location.pathname.split("/")[1];
     const title = path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
     
-    // Map of route paths to their descriptions
     const descriptions: Record<string, string> = {
       "domain-management": "Configure how customers access your storefront",
       "appearance": "Customize how your storefront looks. Changes are saved automatically.",

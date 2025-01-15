@@ -138,7 +138,6 @@ export default function Dashboard() {
               business={business}
               onStoreSelect={handleStoreSelect}
             />
-
             {business && (
               <BusinessUserManagement 
                 business={business}
