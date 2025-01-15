@@ -32,25 +32,17 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       console.log("Adding user to business:", business.id)
       console.log("Searching for user with email:", newUserEmail)
 
-      // Call the Edge Function to create/get user
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-business-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
+      // Call the Edge Function using Supabase client
+      const { data, error } = await supabase.functions.invoke('create-business-user', {
+        body: {
           email: newUserEmail,
           businessId: business.id
-        })
+        }
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create user')
-      }
+      if (error) throw error
 
-      const { userId, isNewUser, tempPassword } = await response.json()
+      const { userId, isNewUser, tempPassword } = data
 
       // Check if user already has access
       const { data: existingAccess, error: existingAccessError } = await supabase
