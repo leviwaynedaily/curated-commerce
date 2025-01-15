@@ -7,8 +7,9 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
 import { Dashboard as StorefrontDashboard } from "@/components/dashboard/Dashboard"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft, LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -95,6 +96,17 @@ export default function Dashboard() {
     window.location.reload();
   };
 
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut()
+      navigate("/login")
+      toast.success("Logged out successfully")
+    } catch (error) {
+      console.error("Logout error:", error)
+      toast.error("Failed to log out")
+    }
+  };
+
   if (!session) return null
 
   return (
@@ -103,6 +115,22 @@ export default function Dashboard() {
         <title>{currentStorefront ? `${currentStorefront.name} | Curately` : 'Storefronts | Curately'}</title>
       </Helmet>
       <div className="space-y-8">
+        {!currentStorefront && (
+          <div className="flex justify-between items-center px-4 md:px-8 py-4 border-b">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+              Welcome to Your Digital Storefront
+            </h1>
+            <Button 
+              variant="destructive" 
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Logout
+            </Button>
+          </div>
+        )}
+        
         {isLoadingStorefront ? (
           <div className="flex items-center justify-center min-h-[200px]">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
