@@ -25,12 +25,68 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [newUserPassword, setNewUserPassword] = useState("")
   const [passwordError, setPasswordError] = useState("")
 
-  const handleOpenDialog = (e: React.FormEvent) => {
+  const handleOpenDialog = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newUserEmail) {
       toast.error("Please enter a valid email address")
       return
     }
+
+    // First check if user already exists in profiles
+    const { data: existingProfile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('email', newUserEmail)
+      .single()
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error("Error checking profile:", profileError)
+      toast.error("Error checking user status")
+      return
+    }
+
+    if (existingProfile) {
+      // Check if user already has access to this business
+      const { data: existingAccess, error: accessError } = await supabase
+        .from('business_users')
+        .select('*')
+        .eq('business_id', business.id)
+        .eq('user_id', existingProfile.id)
+        .single()
+
+      if (accessError && accessError.code !== 'PGRST116') {
+        console.error("Error checking access:", accessError)
+        toast.error("Error checking user access")
+        return
+      }
+
+      if (existingAccess) {
+        toast.error("User already has access to this business")
+        return
+      }
+
+      // If user exists but doesn't have access, add them directly
+      try {
+        const { error: addError } = await supabase.functions.invoke('create-business-user', {
+          body: {
+            email: newUserEmail,
+            businessId: business.id
+          }
+        })
+
+        if (addError) throw addError
+
+        toast.success("User added successfully")
+        setNewUserEmail("")
+        onRefetch()
+      } catch (error) {
+        console.error("Error adding existing user:", error)
+        toast.error("Failed to add user to business")
+      }
+      return
+    }
+
+    // If user doesn't exist, show dialog to create new user
     setShowUserDialog(true)
   }
 
@@ -69,6 +125,10 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       })
 
       if (signUpError) {
+        if (signUpError.message.includes("already registered")) {
+          toast.error("User already exists. Please use a different email.")
+          return
+        }
         console.error("Error creating user:", signUpError)
         throw signUpError
       }
