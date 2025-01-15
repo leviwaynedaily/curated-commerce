@@ -1,36 +1,31 @@
 import { createBrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
 import Products from "./pages/Products";
 import StorefrontInformation from "./pages/StorefrontInformation";
-import Preview from "./pages/Preview";
+import Appearance from "./pages/Appearance";
 import PWASettings from "./pages/PWASettings";
 import DomainManagement from "./pages/DomainManagement";
-import Appearance from "./pages/Appearance";
-import PublicHome from "./pages/PublicHome";
-import Dashboard from "./pages/Dashboard";
+import Preview from "./pages/Preview";
 import Users from "./pages/Users";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <PublicHome />,
-  },
-  {
-    path: "/dashboard",
-    element: <Dashboard />,
+    element: <Index />,
   },
   {
     path: "/login",
     element: <Login />,
   },
   {
-    path: "/products",
-    element: <Products />,
+    path: "/dashboard",
+    element: <Dashboard />,
   },
   {
-    path: "/users",
-    element: <Users />,
+    path: "/products",
+    element: <Products />,
   },
   {
     path: "/storefront-information",
@@ -53,7 +48,7 @@ export const router = createBrowserRouter([
     element: <Preview />,
   },
   {
-    path: "/:slug",
-    element: <Preview />,
-  }
+    path: "/users",
+    element: <Users />,
+  },
 ]);

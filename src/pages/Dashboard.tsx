@@ -10,12 +10,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { StorefrontForm } from "@/components/forms/StorefrontForm";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [newUserEmail, setNewUserEmail] = useState("");
   const [isAddingUser, setIsAddingUser] = useState(false);
+  const [showCreateStore, setShowCreateStore] = useState(false);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   useEffect(() => {
@@ -207,7 +215,7 @@ export default function Dashboard() {
               </div>
               {business && (
                 <Button
-                  onClick={() => window.location.href = '/stores'}
+                  onClick={() => setShowCreateStore(true)}
                   variant="default"
                   size="sm"
                   className="shrink-0"
@@ -217,6 +225,25 @@ export default function Dashboard() {
                 </Button>
               )}
             </div>
+
+            {/* Create Store Dialog */}
+            <Dialog open={showCreateStore} onOpenChange={setShowCreateStore}>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Create Store</DialogTitle>
+                </DialogHeader>
+                {business && (
+                  <StorefrontForm
+                    businessId={business.id}
+                    onSuccess={() => {
+                      setShowCreateStore(false);
+                      // Refresh the storefronts list
+                      window.location.reload();
+                    }}
+                  />
+                )}
+              </DialogContent>
+            </Dialog>
 
             {storefronts && storefronts.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
