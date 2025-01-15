@@ -29,7 +29,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png"
+            src="/lovable-uploads/9f57155e-9d0d-434f-832e-d97b800e6707.png"
             alt="Curately Logo" 
             className="h-16 w-auto animate-fadeIn"
           />
@@ -37,7 +37,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
         <h1 className="text-4xl font-bold tracking-tight text-brand-dark font-montserrat">
           Welcome to Your Digital Storefront
         </h1>
-        <p className="text-sm text-muted-foreground max-w-2xl mx-auto font-open-sans truncate">
+        <p className="text-sm text-muted-foreground max-w-2xl mx-auto font-open-sans">
           Manage your storefronts and create engaging shopping experiences for your customers.
         </p>
         {business && (
@@ -71,11 +71,11 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       </Dialog>
 
       {storefronts && storefronts.length > 0 ? (
-        <div className="w-full flex justify-center">
-          <Carousel className="w-full max-w-5xl">
+        <div className="flex justify-center w-full">
+          <Carousel className="w-full max-w-4xl">
             <CarouselContent className="-ml-2 md:-ml-4">
               {storefronts.map((store) => (
-                <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/2">
                   <Card
                     className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                     onClick={() => {
