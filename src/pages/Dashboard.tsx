@@ -104,19 +104,28 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-[1400px] mx-auto space-y-8">
-        <StoreGrid 
-          storefronts={storefronts || []} 
-          business={business}
-          onStoreSelect={handleStoreSelect}
-        />
-        {business && (
-          <BusinessUserManagement 
+      <div className="space-y-8 px-4 md:px-8 py-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Welcome to Curately</h1>
+          <p className="text-muted-foreground">
+            Manage your storefronts and business settings from here.
+          </p>
+        </div>
+        
+        <div className="space-y-8">
+          <StoreGrid 
+            storefronts={storefronts || []} 
             business={business}
-            businessUsers={businessUsers || []}
-            onRefetch={refetchBusinessUsers}
+            onStoreSelect={handleStoreSelect}
           />
-        )}
+          {business && (
+            <BusinessUserManagement 
+              business={business}
+              businessUsers={businessUsers || []}
+              onRefetch={refetchBusinessUsers}
+            />
+          )}
+        </div>
       </div>
     </DashboardLayout>
   )
