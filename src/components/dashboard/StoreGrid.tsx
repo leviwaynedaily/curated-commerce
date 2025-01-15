@@ -96,15 +96,17 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
                     >
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                          {store.logo_url && (
-                            <div className="bg-white rounded-md p-2 w-16 h-16 flex items-center justify-center">
+                          <div className="bg-white rounded-md p-2 w-16 h-16 flex items-center justify-center">
+                            {store.logo_url ? (
                               <img
                                 src={store.logo_url}
                                 alt={store.name}
                                 className="max-h-full max-w-full object-contain"
                               />
-                            </div>
-                          )}
+                            ) : (
+                              <div className="w-full h-full" />
+                            )}
+                          </div>
                           <div className="flex items-center gap-2">
                             <span className={`px-2 py-1 text-xs rounded-full ${
                               store.is_published
