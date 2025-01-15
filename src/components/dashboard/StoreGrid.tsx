@@ -12,6 +12,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Progress } from "@/components/ui/progress";
 
 interface StoreGridProps {
   storefronts: any[];
@@ -26,6 +27,16 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
   const handleStoreSelect = (storeId: string) => {
     localStorage.setItem('lastStorefrontId', storeId);
     navigate('/dashboard');
+  };
+
+  const calculateProgress = (store: any) => {
+    const steps = [
+      !!store.name,
+      !!store.description,
+      !!store.logo_url,
+      !!store.favicon_url,
+    ];
+    return (steps.filter(Boolean).length / steps.length) * 100;
   };
 
   return (
@@ -101,9 +112,13 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
                           </span>
                         </div>
                         <h3 className="text-lg font-semibold mb-2">{store.name}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {store.description || "No description available"}
-                        </p>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">Setup Progress</span>
+                            <span className="font-medium">{Math.round(calculateProgress(store))}%</span>
+                          </div>
+                          <Progress value={calculateProgress(store)} className="h-2" />
+                        </div>
                       </div>
                     </Card>
                   </CarouselItem>
