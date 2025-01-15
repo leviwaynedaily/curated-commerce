@@ -54,11 +54,25 @@ Deno.serve(async (req) => {
         email_confirm: true
       })
 
-      if (createError) throw createError
-      
-      userId = newUser.user.id
-      isNewUser = true
-      console.log('Created new user:', userId)
+      if (createError) {
+        // If user already exists in auth but not in profiles, just get their ID
+        if (createError.message.includes('already been registered')) {
+          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.listUsers()
+          if (authError) throw authError
+          
+          const user = authUser.users.find(u => u.email === email)
+          if (!user) throw new Error('User not found')
+          
+          userId = user.id
+          console.log('Found existing auth user:', userId)
+        } else {
+          throw createError
+        }
+      } else {
+        userId = newUser.user.id
+        isNewUser = true
+        console.log('Created new user:', userId)
+      }
     }
 
     return new Response(
