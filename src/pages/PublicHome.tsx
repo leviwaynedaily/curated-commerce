@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Store, Shield, Globe, Zap } from "lucide-react";
-import { Preview } from "./Preview";
+import { Preview } from "@/components/theme/preview/Preview";
 import { PreviewError } from "@/components/theme/preview/PreviewError";
 import { PreviewLoading } from "@/components/theme/preview/PreviewLoading";
 import { useStorefront } from "@/hooks/useStorefront";
