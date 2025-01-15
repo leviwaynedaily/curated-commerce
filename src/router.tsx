@@ -15,6 +15,10 @@ import PublicHome from "./pages/PublicHome"
 export const router = createBrowserRouter([
   // Public Routes
   {
+    path: "/",
+    element: <PublicHome />,
+  },
+  {
     path: "/login",
     element: <Login />,
   },
@@ -24,10 +28,6 @@ export const router = createBrowserRouter([
   },
   
   // Protected Routes - Landing & Store Management
-  {
-    path: "/",
-    element: <Landing />,
-  },
   {
     path: "/dashboard",
     element: <Dashboard />,
