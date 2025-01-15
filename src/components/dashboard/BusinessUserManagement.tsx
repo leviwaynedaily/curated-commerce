@@ -32,6 +32,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       console.log("Adding user to business:", business.id)
       console.log("Searching for user with email:", newUserEmail)
 
+      // First check if user exists in profiles
       const { data: userData, error: userError } = await supabase
         .from("profiles")
         .select("id")
@@ -44,19 +45,40 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         return
       }
 
+      let userId = userData?.id
+
+      // If user doesn't exist, create them
       if (!userData) {
-        console.log("No user found with email:", newUserEmail)
-        toast.error("No user found with this email address")
-        return
+        console.log("User not found, creating new user")
+        const tempPassword = Math.random().toString(36).slice(-8)
+        
+        const { data: newAuthUser, error: createError } = await supabase.auth.admin.createUser({
+          email: newUserEmail,
+          password: tempPassword,
+          email_confirm: true
+        })
+
+        if (createError) {
+          console.error("Error creating user:", createError)
+          toast.error("Failed to create user account")
+          return
+        }
+
+        userId = newAuthUser.user.id
+        console.log("Created new user:", userId)
+        
+        toast.success(`User created with temporary password: ${tempPassword}`, {
+          duration: 10000,
+          description: "Please share this password with the user securely"
+        })
       }
 
-      console.log("User found:", userData.id)
-
+      // Check if user already has access
       const { data: existingAccess, error: existingAccessError } = await supabase
         .from("business_users")
         .select("id")
         .eq("business_id", business.id)
-        .eq("user_id", userData.id)
+        .eq("user_id", userId)
         .maybeSingle()
 
       if (existingAccessError) throw existingAccessError
@@ -66,15 +88,16 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         return
       }
 
-      const { error } = await supabase
+      // Add user to business
+      const { error: addError } = await supabase
         .from("business_users")
         .insert({
           business_id: business.id,
-          user_id: userData.id,
+          user_id: userId,
           role: "member"
         })
 
-      if (error) throw error
+      if (addError) throw addError
 
       toast.success("User added successfully")
       setNewUserEmail("")
