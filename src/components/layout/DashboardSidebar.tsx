@@ -139,11 +139,14 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
         onMouseLeave={() => setIsCollapsed(true)}
       >
         <div className="space-y-4 py-4 flex flex-col h-full">
-          {/* Logo section */}
-          <div className={cn(
-            "px-3 py-2 flex items-center",
-            isCollapsed ? "justify-center" : "justify-start gap-3"
-          )}>
+          {/* Logo section - now clickable */}
+          <button 
+            onClick={handleBackToDashboard}
+            className={cn(
+              "px-3 py-2 flex items-center hover:bg-white/10 rounded-md transition-colors",
+              isCollapsed ? "justify-center" : "justify-start gap-3"
+            )}
+          >
             <div className="rounded-md p-1">
               <img 
                 src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png" 
@@ -156,7 +159,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 curately
               </span>
             )}
-          </div>
+          </button>
 
           {/* Current Store Display */}
           {storefront && !isCollapsed && (
