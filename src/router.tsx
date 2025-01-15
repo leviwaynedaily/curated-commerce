@@ -13,7 +13,7 @@ import Landing from "./pages/Landing"
 import PublicHome from "./pages/PublicHome"
 
 export const router = createBrowserRouter([
-  // Public Routes
+  // Public Routes - These should always be accessible without authentication
   {
     path: "/",
     element: <PublicHome />,
@@ -25,6 +25,7 @@ export const router = createBrowserRouter([
   {
     path: "/:storefrontSlug",
     element: <PublicHome />,
+    index: true, // Make this the index route for the slug parameter
   },
   
   // Protected Routes - Landing & Store Management
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
     element: <Store />,
   },
   
-  // Store Settings & Features
+  // Store Settings & Features - All protected
   {
     path: "/products",
     element: <Products />,

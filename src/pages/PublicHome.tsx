@@ -1,22 +1,26 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Shield, Globe, Zap } from "lucide-react";
 
 export default function PublicHome() {
   const navigate = useNavigate();
+  const { storefrontSlug } = useParams();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate("/dashboard");
+      // Only redirect to dashboard if we're on the root path and user is authenticated
+      if (!storefrontSlug) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          navigate("/dashboard");
+        }
       }
     };
     
     checkAuth();
-  }, [navigate]);
+  }, [navigate, storefrontSlug]);
 
   return (
     <div className="min-h-screen bg-background">
