@@ -30,7 +30,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
         <h1 className="text-4xl font-bold tracking-tight text-brand-dark font-montserrat">
           Welcome to Your Digital Storefront
         </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-open-sans">
+        <p className="text-sm text-muted-foreground max-w-2xl mx-auto font-open-sans truncate">
           Manage your storefronts and create engaging shopping experiences for your customers.
         </p>
         {business && (
