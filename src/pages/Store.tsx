@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom"
 
 export default function Store() {
   const { id } = useParams()
+  console.log("Store page - Storefront ID:", id)
 
   const { data: storefront, isLoading, error } = useQuery({
     queryKey: ["storefront", id],
@@ -18,11 +19,16 @@ export default function Store() {
         .from("storefronts")
         .select("*")
         .eq("id", id)
-        .single()
+        .maybeSingle()
 
       if (error) {
         console.error("Error fetching storefront:", error)
         throw error
+      }
+
+      // Set the last selected storefront ID in localStorage
+      if (data) {
+        localStorage.setItem('lastStorefrontId', data.id)
       }
 
       return data

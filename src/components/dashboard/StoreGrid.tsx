@@ -5,6 +5,7 @@ import { Plus } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 interface StoreGridProps {
   storefronts: any[]
@@ -14,6 +15,7 @@ interface StoreGridProps {
 
 export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridProps) {
   const [showCreateStore, setShowCreateStore] = useState(false)
+  const navigate = useNavigate()
 
   return (
     <div className="space-y-8">
@@ -64,6 +66,7 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
                 console.log("Selecting storefront:", store.id)
                 localStorage.setItem('lastStorefrontId', store.id)
                 onStoreSelect(store.id)
+                navigate(`/store/${store.id}`)
               }}
             >
               <div className="p-6 space-y-4">

@@ -15,6 +15,7 @@ import {
   Palette,
   Users,
   Settings,
+  ArrowLeft
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -57,11 +58,20 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
   const mainRoutes = [
     {
+      label: 'Back to Dashboard',
+      icon: ArrowLeft,
+      href: '/dashboard',
+      active: location.pathname === '/dashboard',
+      alwaysEnabled: true,
+      showOnlyInStore: true,
+    },
+    {
       label: 'Dashboard',
       icon: LayoutDashboard,
       href: '/dashboard',
       active: location.pathname === '/dashboard',
       alwaysEnabled: true,
+      showOnlyInStore: false,
     },
   ];
 
@@ -109,6 +119,8 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   ];
 
+  const isInStore = location.pathname.startsWith('/store/');
+
   return (
     <>
       <div 
@@ -154,7 +166,9 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           <ScrollArea className="flex-1 px-3">
             <div className="space-y-1">
               {/* Dashboard Section */}
-              {mainRoutes.map((route) => (
+              {mainRoutes
+                .filter(route => !route.showOnlyInStore || isInStore)
+                .map((route) => (
                 <Button
                   key={route.href}
                   variant={route.active ? "default" : "ghost"}
