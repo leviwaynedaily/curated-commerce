@@ -7,11 +7,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface StorefrontUser {
   id: string;
   user_id: string;
-  role: string;
+  role: 'owner' | 'member' | 'editor';
   profiles: {
     email: string;
   };
@@ -24,6 +31,7 @@ interface StorefrontUsersProps {
 
 export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
   const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserRole, setNewUserRole] = useState<'member' | 'editor'>('member');
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
@@ -68,23 +76,47 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
         return;
       }
 
-      // Add user to storefront
+      // Add user to storefront with selected role
       const { error } = await supabase
         .from("storefront_users")
         .insert({
           storefront_id: storefrontId,
           user_id: userData.id,
-          role: "member"
+          role: newUserRole
         });
 
       if (error) throw error;
 
       toast.success("User added successfully");
       setNewUserEmail("");
+      setNewUserRole('member');
       queryClient.invalidateQueries({ queryKey: ["storefront-users", storefrontId] });
     } catch (error) {
       console.error("Error adding user:", error);
       toast.error("Failed to add user. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateRole = async (userId: string, newRole: 'member' | 'editor') => {
+    try {
+      setIsLoading(true);
+      console.log("Updating user role:", { userId, newRole });
+
+      const { error } = await supabase
+        .from("storefront_users")
+        .update({ role: newRole })
+        .eq("storefront_id", storefrontId)
+        .eq("user_id", userId);
+
+      if (error) throw error;
+
+      toast.success("User role updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["storefront-users", storefrontId] });
+    } catch (error) {
+      console.error("Error updating user role:", error);
+      toast.error("Failed to update user role. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +160,18 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
               onChange={(e) => setNewUserEmail(e.target.value)}
               className="max-w-md"
             />
+            <Select
+              value={newUserRole}
+              onValueChange={(value: 'member' | 'editor') => setNewUserRole(value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="member">Member</SelectItem>
+                <SelectItem value="editor">Editor</SelectItem>
+              </SelectContent>
+            </Select>
             <Button
               onClick={handleAddUser}
               disabled={isLoading || !newUserEmail}
@@ -143,15 +187,37 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
                 key={user.id}
                 className="flex items-center justify-between p-2 rounded bg-muted"
               >
-                <span>{user.profiles.email}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveUser(user.user_id)}
-                  disabled={isLoading}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <div className="flex items-center gap-4">
+                  <span>{user.profiles.email}</span>
+                  {user.role !== 'owner' && (
+                    <Select
+                      value={user.role}
+                      onValueChange={(value: 'member' | 'editor') => handleUpdateRole(user.user_id, value)}
+                      disabled={isLoading}
+                    >
+                      <SelectTrigger className="w-[120px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {user.role === 'owner' && (
+                    <span className="text-sm text-muted-foreground">Owner</span>
+                  )}
+                </div>
+                {user.role !== 'owner' && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveUser(user.user_id)}
+                    disabled={isLoading}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
