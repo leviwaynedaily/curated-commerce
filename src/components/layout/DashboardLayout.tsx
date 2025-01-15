@@ -14,12 +14,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const location = useLocation();
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
+  const isDashboardRoute = location.pathname === "/dashboard";
 
   const getPageInfo = () => {
     if (!currentStorefrontId) {
       return {
-        title: "Dashboard",
-        description: "Select or create a storefront to get started"
+        title: "",
+        description: ""
       };
     }
 
@@ -73,7 +74,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
-        <DashboardHeader title={title} description={description} />
+        {!isDashboardRoute && <DashboardHeader title={title} description={description} />}
         <div className="px-4 md:px-8 py-8">
           {children}
         </div>

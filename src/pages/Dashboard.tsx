@@ -5,6 +5,7 @@ import { StoreGrid } from "@/components/dashboard/StoreGrid"
 import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManagement"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { Helmet } from "react-helmet"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -104,14 +105,10 @@ export default function Dashboard() {
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 px-4 md:px-8 py-8">
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome to Curately</h1>
-          <p className="text-muted-foreground">
-            Manage your storefronts and business settings from here.
-          </p>
-        </div>
-        
+      <Helmet>
+        <title>Storefronts | Curately</title>
+      </Helmet>
+      <div className="space-y-8">
         <div className="space-y-8">
           <StoreGrid 
             storefronts={storefronts || []} 
