@@ -47,21 +47,30 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
         .from("profiles")
         .select("id")
         .eq("email", newUserEmail)
-        .single();
+        .maybeSingle();
 
-      if (userError || !userData) {
+      if (userError) {
         console.error("Error finding user:", userError);
-        toast.error("User not found. Please check the email address.");
+        throw userError;
+      }
+
+      if (!userData) {
+        toast.error("User not found. Please check the email address and ensure the user has registered.");
         return;
       }
 
       // Check if user already has access
-      const { data: existingAccess } = await supabase
+      const { data: existingAccess, error: existingAccessError } = await supabase
         .from("storefront_users")
         .select("id")
         .eq("storefront_id", storefrontId)
         .eq("user_id", userData.id)
-        .single();
+        .maybeSingle();
+
+      if (existingAccessError) {
+        console.error("Error checking existing access:", existingAccessError);
+        throw existingAccessError;
+      }
 
       if (existingAccess) {
         toast.error("User already has access to this storefront");
@@ -69,7 +78,7 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
       }
 
       // Add user to storefront with selected role
-      const { error } = await supabase
+      const { error: insertError } = await supabase
         .from("storefront_users")
         .insert({
           storefront_id: storefrontId,
@@ -77,7 +86,7 @@ export function StorefrontUsers({ storefrontId, users }: StorefrontUsersProps) {
           role: newUserRole
         });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       toast.success("User added successfully");
       setNewUserEmail("");
