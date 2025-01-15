@@ -13,6 +13,17 @@ import Landing from "./pages/Landing"
 import PublicHome from "./pages/PublicHome"
 
 export const router = createBrowserRouter([
+  // Public Routes
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/:storefrontSlug",
+    element: <PublicHome />,
+  },
+  
+  // Protected Routes - Landing & Store Management
   {
     path: "/",
     element: <Landing />,
@@ -25,6 +36,8 @@ export const router = createBrowserRouter([
     path: "/store/:id",
     element: <Store />,
   },
+  
+  // Store Settings & Features
   {
     path: "/products",
     element: <Products />,
@@ -50,15 +63,7 @@ export const router = createBrowserRouter([
     element: <Preview />,
   },
   {
-    path: "/login",
-    element: <Login />,
-  },
-  {
     path: "/users",
     element: <Users />,
-  },
-  {
-    path: "/:storefrontSlug",
-    element: <PublicHome />,
   },
 ])
