@@ -24,7 +24,11 @@ const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center">
-            <h1 className="text-4xl font-dancing text-brand-green">Curately</h1>
+            <img 
+              src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png" 
+              alt="Curately Logo" 
+              className="h-12 w-auto"
+            />
           </div>
           <CardTitle className="text-2xl font-montserrat text-brand-dark">Welcome Back</CardTitle>
         </CardHeader>
