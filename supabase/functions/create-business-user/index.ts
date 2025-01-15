@@ -43,37 +43,54 @@ Deno.serve(async (req) => {
     let isNewUser = false
     let tempPassword: string | undefined
 
-    // If user doesn't exist, create them
+    // If user doesn't exist in profiles, check auth.users
     if (!existingUser) {
-      console.log('User not found, creating new user')
-      tempPassword = Math.random().toString(36).slice(-8)
-      
-      const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
-        email,
-        password: tempPassword,
-        email_confirm: true
-      })
+      console.log('User not found in profiles, checking auth.users')
+      const { data: authUser } = await supabaseAdmin.auth.admin.listUsers()
+      const existingAuthUser = authUser.users.find(u => u.email === email)
 
-      if (createError) {
-        // If user already exists in auth but not in profiles, just get their ID
-        if (createError.message.includes('already been registered')) {
-          const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.listUsers()
-          if (authError) throw authError
-          
-          const user = authUser.users.find(u => u.email === email)
-          if (!user) throw new Error('User not found')
-          
-          userId = user.id
-          console.log('Found existing auth user:', userId)
-        } else {
-          throw createError
-        }
+      if (existingAuthUser) {
+        userId = existingAuthUser.id
+        console.log('Found user in auth.users:', userId)
+        
+        // Create profile for existing auth user
+        const { error: insertProfileError } = await supabaseAdmin
+          .from('profiles')
+          .insert({
+            id: userId,
+            email: email
+          })
+
+        if (insertProfileError) throw insertProfileError
       } else {
+        // Create new user if they don't exist anywhere
+        console.log('Creating new user')
+        tempPassword = Math.random().toString(36).slice(-8)
+        
+        const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password: tempPassword,
+          email_confirm: true
+        })
+
+        if (createError) throw createError
+
         userId = newUser.user.id
         isNewUser = true
         console.log('Created new user:', userId)
       }
     }
+
+    // Add user to business
+    const { error: addError } = await supabaseAdmin
+      .from('business_users')
+      .insert({
+        business_id: businessId,
+        user_id: userId,
+        role: 'member'
+      })
+
+    if (addError) throw addError
 
     return new Response(
       JSON.stringify({ 
