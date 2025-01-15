@@ -84,25 +84,28 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="space-y-1.5">
         <div className="flex items-center gap-2">
           <User className="h-5 w-5" />
           <h2 className="text-xl font-semibold">Business Users</h2>
         </div>
-        <form onSubmit={handleAddUser} className="flex gap-2">
-          <Input
-            type="email"
-            placeholder="Enter user email"
-            value={newUserEmail}
-            onChange={(e) => setNewUserEmail(e.target.value)}
-            className="w-64"
-          />
-          <Button type="submit" size="sm" disabled={isAddingUser}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add User
-          </Button>
-        </form>
+        <p className="text-sm text-muted-foreground">
+          Manage users that have access to all Curately Storefronts
+        </p>
       </div>
+      <form onSubmit={handleAddUser} className="flex gap-2">
+        <Input
+          type="email"
+          placeholder="Enter user email"
+          value={newUserEmail}
+          onChange={(e) => setNewUserEmail(e.target.value)}
+          className="w-64"
+        />
+        <Button type="submit" size="sm" disabled={isAddingUser}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add User
+        </Button>
+      </form>
       <div className="rounded-lg border">
         <div className="p-4">
           <div className="divide-y">
