@@ -146,7 +146,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           )}>
             <div className="rounded-md p-1">
               <img 
-                src="/lovable-uploads/35884820-a095-4aa8-9d1a-dfbb72cbb7e7.png" 
+                src="/lovable-uploads/8f8f2cfe-cddd-46aa-a393-b0c516126ab4.png" 
                 alt="Curately Logo" 
                 className="h-8 w-auto"
               />
