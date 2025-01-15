@@ -43,17 +43,22 @@ Deno.serve(async (req) => {
     let isNewUser = false
     let tempPassword: string | undefined
 
-    // If user doesn't exist in profiles, check auth.users
+    // If user doesn't exist in profiles
     if (!existingUser) {
       console.log('User not found in profiles, checking auth.users')
-      const { data: authUser } = await supabaseAdmin.auth.admin.listUsers()
-      const existingAuthUser = authUser.users.find(u => u.email === email)
+      
+      // Check if user exists in auth.users
+      const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers()
+      if (authError) throw authError
+
+      const existingAuthUser = authData.users.find(u => u.email === email)
 
       if (existingAuthUser) {
+        // User exists in auth but not in profiles
         userId = existingAuthUser.id
-        console.log('Found user in auth.users:', userId)
+        console.log('Found existing auth user:', userId)
         
-        // Create profile for existing auth user
+        // Create their profile
         const { error: insertProfileError } = await supabaseAdmin
           .from('profiles')
           .insert({
@@ -61,9 +66,12 @@ Deno.serve(async (req) => {
             email: email
           })
 
-        if (insertProfileError) throw insertProfileError
+        if (insertProfileError) {
+          console.error('Error creating profile:', insertProfileError)
+          throw insertProfileError
+        }
       } else {
-        // Create new user if they don't exist anywhere
+        // User doesn't exist anywhere, create new user
         console.log('Creating new user')
         tempPassword = Math.random().toString(36).slice(-8)
         
@@ -81,6 +89,18 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Check if user already has access to this business
+    const { data: existingAccess } = await supabaseAdmin
+      .from('business_users')
+      .select('id')
+      .eq('business_id', businessId)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (existingAccess) {
+      throw new Error('User already has access to this business')
+    }
+
     // Add user to business
     const { error: addError } = await supabaseAdmin
       .from('business_users')
@@ -90,7 +110,10 @@ Deno.serve(async (req) => {
         role: 'member'
       })
 
-    if (addError) throw addError
+    if (addError) {
+      console.error('Error adding user to business:', addError)
+      throw addError
+    }
 
     return new Response(
       JSON.stringify({ 
