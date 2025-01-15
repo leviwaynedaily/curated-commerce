@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowRight, Store, Shield, Globe, Zap } from "lucide-react";
+import { ArrowRight, Shield, Globe, Zap } from "lucide-react";
 
 export default function PublicHome() {
   const navigate = useNavigate();
@@ -24,7 +24,11 @@ export default function PublicHome() {
       <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <Store className="h-6 w-6 text-primary" />
+            <img 
+              src="/lovable-uploads/676a7b0a-3b60-49d7-bee1-49a8b896e630.png" 
+              alt="Curately Logo" 
+              className="h-8 w-auto"
+            />
             <span className="text-xl font-semibold">Curately</span>
           </div>
           <div className="flex items-center gap-4">
@@ -61,7 +65,7 @@ export default function PublicHome() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div className="flex flex-col items-center text-center">
             <div className="rounded-lg bg-primary/10 p-4">
-              <Store className="h-6 w-6 text-primary" />
+              <Shield className="h-6 w-6 text-primary" />
             </div>
             <h3 className="mt-4 text-xl font-semibold">Custom Storefronts</h3>
             <p className="mt-2 text-muted-foreground">
