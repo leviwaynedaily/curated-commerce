@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 
 interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -60,7 +61,11 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       icon: LayoutDashboard,
       href: '/dashboard',
       active: location.pathname === '/dashboard',
+      alwaysEnabled: true,
     },
+  ];
+
+  const storefrontRoutes = [
     {
       label: 'Products',
       icon: Package2,
@@ -135,9 +140,20 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             )}
           </div>
 
+          {/* Active Storefront Display */}
+          {storefront && !isCollapsed && (
+            <div className="px-3 py-2">
+              <div className="text-sm text-white/70">Current Store:</div>
+              <div className="text-white font-medium truncate">
+                {storefront.name}
+              </div>
+            </div>
+          )}
+
           {/* Main navigation */}
-          <ScrollArea className="flex-1 px-3 py-2">
+          <ScrollArea className="flex-1 px-3">
             <div className="space-y-1">
+              {/* Dashboard Section */}
               {mainRoutes.map((route) => (
                 <Button
                   key={route.href}
@@ -148,6 +164,42 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     isCollapsed && "justify-center px-2",
                     !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
                   )}
+                  asChild
+                >
+                  <Link to={route.href} className={cn(
+                    "flex items-center w-full",
+                    isCollapsed ? "justify-center" : ""
+                  )}>
+                    <route.icon className={cn(
+                      "shrink-0 text-white dark:text-white",
+                      isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
+                    )} />
+                    {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                  </Link>
+                </Button>
+              ))}
+
+              {/* Separator */}
+              {!isCollapsed && (
+                <Separator className="my-4 bg-brand-peach/30" />
+              )}
+              {isCollapsed && (
+                <div className="my-4" />
+              )}
+
+              {/* Storefront Routes */}
+              {storefrontRoutes.map((route) => (
+                <Button
+                  key={route.href}
+                  variant={route.active ? "default" : "ghost"}
+                  className={cn(
+                    "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
+                    route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
+                    isCollapsed && "justify-center px-2",
+                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                    !storefront && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={!storefront}
                   onClick={route.onClick}
                   asChild={!route.onClick}
                 >
