@@ -16,7 +16,7 @@ export const router = createBrowserRouter([
   // Public Routes - These should always be accessible without authentication
   {
     path: "/",
-    element: <PublicHome />,
+    element: <Landing />,
   },
   {
     path: "/login",
@@ -25,7 +25,6 @@ export const router = createBrowserRouter([
   {
     path: "/:storefrontSlug",
     element: <PublicHome />,
-    index: true, // Make this the index route for the slug parameter
   },
   
   // Protected Routes - Landing & Store Management
