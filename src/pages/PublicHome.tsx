@@ -10,8 +10,8 @@ export default function PublicHome() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Only redirect to dashboard if we're on the root path and user is authenticated
-      if (!storefrontSlug) {
+      // Only check auth and potentially redirect if we're on the root path
+      if (window.location.pathname === '/') {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
           navigate("/dashboard");
@@ -20,7 +20,13 @@ export default function PublicHome() {
     };
     
     checkAuth();
-  }, [navigate, storefrontSlug]);
+  }, [navigate]);
+
+  // If we have a storefront slug, we should render the storefront component
+  if (storefrontSlug) {
+    // You can add loading state or fetch storefront data here
+    return null; // This will be replaced by your storefront component
+  }
 
   return (
     <div className="min-h-screen bg-background">
