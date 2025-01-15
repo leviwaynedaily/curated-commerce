@@ -22,9 +22,9 @@ export function StoreGrid({ storefronts, business, onStoreSelect }: StoreGridPro
       <div className="text-center space-y-4">
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/982a241f-b82d-4f33-879d-d27bf029a82c.png"
+            src="/lovable-uploads/8f8f2cfe-cddd-46aa-a393-b0c516126ab4.png"
             alt="Curately Logo" 
-            className="h-20 w-auto animate-fadeIn"
+            className="h-16 w-auto animate-fadeIn"
           />
         </div>
         <h1 className="text-4xl font-bold tracking-tight text-brand-dark font-montserrat">
