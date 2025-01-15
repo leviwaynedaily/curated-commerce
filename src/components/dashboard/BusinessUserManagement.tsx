@@ -32,27 +32,29 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       return
     }
 
+    console.log("Checking if user exists:", newUserEmail)
     // First check if user already exists in profiles
     const { data: existingProfile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
       .eq('email', newUserEmail)
-      .single()
+      .maybeSingle()
 
-    if (profileError && profileError.code !== 'PGRST116') {
+    if (profileError) {
       console.error("Error checking profile:", profileError)
       toast.error("Error checking user status")
       return
     }
 
     if (existingProfile) {
+      console.log("Found existing profile:", existingProfile)
       // Check if user already has access to this business
       const { data: existingAccess, error: accessError } = await supabase
         .from('business_users')
         .select('*')
         .eq('business_id', business.id)
         .eq('user_id', existingProfile.id)
-        .single()
+        .maybeSingle()
 
       if (accessError && accessError.code !== 'PGRST116') {
         console.error("Error checking access:", accessError)
