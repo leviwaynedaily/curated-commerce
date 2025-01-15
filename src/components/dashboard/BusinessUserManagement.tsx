@@ -17,8 +17,8 @@ interface BusinessUserManagementProps {
 export function BusinessUserManagement({ business, businessUsers, onRefetch }: BusinessUserManagementProps) {
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
-  const [isUsersExpanded, setIsUsersExpanded] = useState(true)
-  const [isBillingExpanded, setIsBillingExpanded] = useState(true)
+  const [isUsersExpanded, setIsUsersExpanded] = useState(false)
+  const [isBillingExpanded, setIsBillingExpanded] = useState(false)
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
