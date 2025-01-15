@@ -32,7 +32,29 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       console.log("Adding user to business:", business.id)
       console.log("Searching for user with email:", newUserEmail)
 
-      // Call the Edge Function using Supabase client
+      // First check if user already exists in profiles
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", newUserEmail)
+        .maybeSingle()
+
+      if (existingProfile?.id) {
+        // Check if user already has access
+        const { data: existingAccess } = await supabase
+          .from("business_users")
+          .select("id")
+          .eq("business_id", business.id)
+          .eq("user_id", existingProfile.id)
+          .maybeSingle()
+
+        if (existingAccess) {
+          toast.error("User already has access to this business")
+          return
+        }
+      }
+
+      // Call the Edge Function to create user if needed and add to business
       const { data, error } = await supabase.functions.invoke('create-business-user', {
         body: {
           email: newUserEmail,
@@ -40,35 +62,12 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         }
       })
 
-      if (error) throw error
-
-      const { userId, isNewUser, tempPassword } = data
-
-      // Check if user already has access
-      const { data: existingAccess, error: existingAccessError } = await supabase
-        .from("business_users")
-        .select("id")
-        .eq("business_id", business.id)
-        .eq("user_id", userId)
-        .maybeSingle()
-
-      if (existingAccessError) throw existingAccessError
-
-      if (existingAccess) {
-        toast.error("User already has access to this business")
-        return
+      if (error) {
+        console.error("Edge function error:", error)
+        throw error
       }
 
-      // Add user to business
-      const { error: addError } = await supabase
-        .from("business_users")
-        .insert({
-          business_id: business.id,
-          user_id: userId,
-          role: "member"
-        })
-
-      if (addError) throw addError
+      const { userId, isNewUser, tempPassword } = data
 
       if (isNewUser && tempPassword) {
         toast.success(`User created with temporary password: ${tempPassword}`, {
@@ -80,10 +79,10 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       }
 
       setNewUserEmail("")
-      onRefetch()
-    } catch (error) {
+      onRefetch() // Refresh the user list
+    } catch (error: any) {
       console.error("Error adding user:", error)
-      toast.error("Failed to add user. Please try again.")
+      toast.error(error.message || "Failed to add user. Please try again.")
     } finally {
       setIsAddingUser(false)
     }
