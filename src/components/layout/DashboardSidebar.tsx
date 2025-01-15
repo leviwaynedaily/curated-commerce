@@ -131,7 +131,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     <>
       <div 
         className={cn(
-          "relative h-full bg-brand-green dark:bg-brand-green border-r border-brand-peach dark:border-brand-peach transition-all duration-300",
+          "relative h-full bg-brand-green border-r border-brand-peach/20 transition-all duration-300",
           isCollapsed ? "w-16" : "w-[240px]",
           className
         )}
@@ -144,25 +144,25 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             "px-3 py-2 flex items-center",
             isCollapsed ? "justify-center" : "justify-start gap-3"
           )}>
-            <div className="rounded-md p-1 dark:bg-transparent">
+            <div className="rounded-md p-1">
               <img 
-                src="/lovable-uploads/84642ac2-258f-4fbc-9f65-bb38ba4fae1f.png" 
-                alt="Logo" 
+                src="/lovable-uploads/35884820-a095-4aa8-9d1a-dfbb72cbb7e7.png" 
+                alt="Curately Logo" 
                 className="h-8 w-auto"
               />
             </div>
             {!isCollapsed && (
-              <span className="font-montserrat font-bold text-white dark:text-white text-xl">
+              <span className="font-montserrat font-bold text-white text-xl">
                 curately
               </span>
             )}
           </div>
 
-          {/* Active Storefront Display */}
+          {/* Current Store Display */}
           {storefront && !isCollapsed && (
             <div className="px-3 py-2">
-              <div className="text-sm text-white/70">Current Store:</div>
-              <div className="text-white font-medium truncate">
+              <div className="text-sm text-white/70 font-open-sans">Current Store:</div>
+              <div className="text-white font-medium truncate font-montserrat">
                 {storefront.name}
               </div>
             </div>
@@ -179,10 +179,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                   key={route.href || route.label}
                   variant={route.active ? "default" : "ghost"}
                   className={cn(
-                    "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                    route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
+                    "w-full justify-start transition-colors border-b border-brand-peach/10",
+                    route.active && "bg-white/10 hover:bg-white/20 text-white",
                     isCollapsed && "justify-center px-2",
-                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
+                    !route.active && "hover:bg-white/10 text-white hover:text-white"
                   )}
                   onClick={route.onClick}
                   asChild={!route.onClick}
@@ -193,10 +193,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                       isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
-                        "shrink-0 text-white dark:text-white",
+                        "shrink-0 text-white",
                         isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                       )} />
-                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                      {!isCollapsed && <span className="truncate text-white font-open-sans">{route.label}</span>}
                     </div>
                   ) : (
                     <Link to={route.href} className={cn(
@@ -204,10 +204,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                       isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
-                        "shrink-0 text-white dark:text-white",
+                        "shrink-0 text-white",
                         isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                       )} />
-                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                      {!isCollapsed && <span className="truncate text-white font-open-sans">{route.label}</span>}
                     </Link>
                   )}
                 </Button>
@@ -215,7 +215,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
 
               {/* Separator */}
               {!isCollapsed && (
-                <Separator className="my-4 bg-brand-peach/30" />
+                <Separator className="my-4 bg-white/20" />
               )}
               {isCollapsed && (
                 <div className="my-4" />
@@ -227,10 +227,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                   key={route.href}
                   variant={route.active ? "default" : "ghost"}
                   className={cn(
-                    "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                    route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
+                    "w-full justify-start transition-colors border-b border-brand-peach/10",
+                    route.active && "bg-white/10 hover:bg-white/20 text-white",
                     isCollapsed && "justify-center px-2",
-                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                    !route.active && "hover:bg-white/10 text-white hover:text-white",
                     !storefront && "opacity-50 cursor-not-allowed"
                   )}
                   disabled={!storefront}
@@ -243,10 +243,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                       isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
-                        "shrink-0 text-white dark:text-white",
+                        "shrink-0 text-white",
                         isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                       )} />
-                      {!isCollapsed && <span className="truncate text-white dark:text-white ml-2">{route.label}</span>}
+                      {!isCollapsed && <span className="truncate text-white font-open-sans">{route.label}</span>}
                     </div>
                   ) : (
                     <Link to={route.href} className={cn(
@@ -254,10 +254,10 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                       isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
-                        "shrink-0 text-white dark:text-white",
+                        "shrink-0 text-white",
                         isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
                       )} />
-                      {!isCollapsed && <span className="truncate text-white dark:text-white">{route.label}</span>}
+                      {!isCollapsed && <span className="truncate text-white font-open-sans">{route.label}</span>}
                     </Link>
                   )}
                 </Button>
@@ -270,17 +270,17 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
             <Button
               variant="ghost"
               className={cn(
-                "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
-                "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
+                "w-full justify-start transition-colors border-b border-brand-peach/10",
+                "hover:bg-white/10 text-white hover:text-white",
                 isCollapsed && "justify-center px-2"
               )}
               onClick={() => setIsSettingsOpen(true)}
             >
               <Settings className={cn(
-                "shrink-0 text-white dark:text-white",
+                "shrink-0 text-white",
                 isCollapsed ? "h-5 w-5" : "mr-2 h-4 w-4"
               )} />
-              {!isCollapsed && <span className="truncate text-white dark:text-white">Settings</span>}
+              {!isCollapsed && <span className="truncate text-white font-open-sans">Settings</span>}
             </Button>
           </div>
         </div>
@@ -294,14 +294,14 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-white">Store Management</h3>
+              <h3 className="text-lg font-semibold text-white font-montserrat">Store Management</h3>
               <StorefrontSwitcher />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-white">User Management</h3>
+              <h3 className="text-lg font-semibold text-white font-montserrat">User Management</h3>
               <Link 
                 to="/users" 
-                className="flex items-center space-x-2 px-2 py-1.5 rounded-md hover:bg-white/10"
+                className="flex items-center space-x-2 px-2 py-1.5 rounded-md hover:bg-white/10 font-open-sans"
                 onClick={() => setIsSettingsOpen(false)}
               >
                 <Users className="h-4 w-4" />
