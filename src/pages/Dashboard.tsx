@@ -15,7 +15,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [newUserEmail, setNewUserEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAddingUser, setIsAddingUser] = useState(false);
   const currentStorefrontId = localStorage.getItem('lastStorefrontId');
 
   useEffect(() => {
@@ -103,27 +103,6 @@ export default function Dashboard() {
     enabled: !!business?.id,
   });
 
-  const { data: storefront, isLoading, error } = useQuery({
-    queryKey: ["storefront", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return null;
-
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!currentStorefrontId && !!session,
-  });
-
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business?.id || !newUserEmail) {
@@ -132,7 +111,7 @@ export default function Dashboard() {
     }
 
     try {
-      setIsLoading(true);
+      setIsAddingUser(true);
       console.log("Adding user to business:", business.id);
       console.log("Searching for user with email:", newUserEmail);
 
@@ -187,9 +166,30 @@ export default function Dashboard() {
       console.error("Error adding user:", error);
       toast.error("Failed to add user. Please try again.");
     } finally {
-      setIsLoading(false);
+      setIsAddingUser(false);
     }
   };
+
+  const { data: storefront, isLoading, error } = useQuery({
+    queryKey: ["storefront", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!currentStorefrontId && !!session,
+  });
 
   if (!session) return null;
 
@@ -281,7 +281,7 @@ export default function Dashboard() {
                       onChange={(e) => setNewUserEmail(e.target.value)}
                       className="w-64"
                     />
-                    <Button type="submit" size="sm" disabled={isLoading}>
+                    <Button type="submit" size="sm" disabled={isAddingUser}>
                       <Plus className="h-4 w-4 mr-2" />
                       Add User
                     </Button>
