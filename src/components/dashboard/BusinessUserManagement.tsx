@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { CreditCard, Plus, User } from "lucide-react"
+import { CreditCard, ChevronDown, ChevronUp, User, Plus } from "lucide-react"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
@@ -17,6 +17,8 @@ interface BusinessUserManagementProps {
 export function BusinessUserManagement({ business, businessUsers, onRefetch }: BusinessUserManagementProps) {
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
+  const [isUsersExpanded, setIsUsersExpanded] = useState(true)
+  const [isBillingExpanded, setIsBillingExpanded] = useState(true)
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,91 +90,109 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   return (
     <div className="grid gap-6">
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
-            <CardTitle>Business Users</CardTitle>
+        <CardHeader className="cursor-pointer" onClick={() => setIsUsersExpanded(!isUsersExpanded)}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-primary" />
+              <CardTitle>User Management</CardTitle>
+            </div>
+            {isUsersExpanded ? (
+              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            )}
           </div>
           <CardDescription>
             Manage users that have access to all Curately Storefronts
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAddUser} className="flex gap-2 mb-6">
-            <Input
-              type="email"
-              placeholder="Enter user email"
-              value={newUserEmail}
-              onChange={(e) => setNewUserEmail(e.target.value)}
-              className="w-64"
-            />
-            <Button type="submit" size="sm" disabled={isAddingUser}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add User
-            </Button>
-          </form>
+        {isUsersExpanded && (
+          <CardContent>
+            <form onSubmit={handleAddUser} className="flex gap-2 mb-6">
+              <Input
+                type="email"
+                placeholder="Enter user email"
+                value={newUserEmail}
+                onChange={(e) => setNewUserEmail(e.target.value)}
+                className="w-64"
+              />
+              <Button type="submit" size="sm" disabled={isAddingUser}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add User
+              </Button>
+            </form>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>User</TableHead>
-                <TableHead>Role</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {businessUsers?.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                        <User className="h-4 w-4 text-primary" />
-                      </div>
-                      <span>{user.profiles.email}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="capitalize">
-                      {user.role}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {(!businessUsers || businessUsers.length === 0) && (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={2} className="text-center text-muted-foreground">
-                    No users found. Add users to collaborate on your business.
-                  </TableCell>
+                  <TableHead>User</TableHead>
+                  <TableHead>Role</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
+              </TableHeader>
+              <TableBody>
+                {businessUsers?.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <User className="h-4 w-4 text-primary" />
+                        </div>
+                        <span>{user.profiles.email}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="capitalize">
+                        {user.role}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {(!businessUsers || businessUsers.length === 0) && (
+                  <TableRow>
+                    <TableCell colSpan={2} className="text-center text-muted-foreground">
+                      No users found. Add users to collaborate on your business.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        )}
       </Card>
 
       <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-primary" />
-            <CardTitle>Billing</CardTitle>
+        <CardHeader className="cursor-pointer" onClick={() => setIsBillingExpanded(!isBillingExpanded)}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-primary" />
+              <CardTitle>Billing</CardTitle>
+            </div>
+            {isBillingExpanded ? (
+              <ChevronUp className="h-5 w-5 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-5 w-5 text-muted-foreground" />
+            )}
           </div>
           <CardDescription>
             Manage your subscription and billing details
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
-            <div className="space-y-1">
-              <h4 className="text-sm font-medium">Billing Coming Soon</h4>
-              <p className="text-sm text-muted-foreground">
-                We're working on adding billing features. Stay tuned!
-              </p>
+        {isBillingExpanded && (
+          <CardContent>
+            <div className="flex items-center justify-between p-4 rounded-lg bg-muted">
+              <div className="space-y-1">
+                <h4 className="text-sm font-medium">Billing Coming Soon</h4>
+                <p className="text-sm text-muted-foreground">
+                  We're working on adding billing features. Stay tuned!
+                </p>
+              </div>
+              <Button variant="secondary" disabled>
+                <CreditCard className="h-4 w-4 mr-2" />
+                Configure
+              </Button>
             </div>
-            <Button variant="secondary" disabled>
-              <CreditCard className="h-4 w-4 mr-2" />
-              Configure
-            </Button>
-          </div>
-        </CardContent>
+          </CardContent>
+        )}
       </Card>
     </div>
   )
