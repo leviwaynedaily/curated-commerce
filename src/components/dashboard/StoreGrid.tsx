@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { StorefrontForm } from "@/components/storefront/StorefrontForm";
+import { StorefrontForm } from "@/components/forms/StorefrontForm";
 import { Plus } from "lucide-react";
 import {
   Carousel,
@@ -22,6 +22,11 @@ interface StoreGridProps {
 export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGridProps) {
   const navigate = useNavigate();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleStoreSelect = (storeId: string) => {
+    localStorage.setItem('lastStorefrontId', storeId);
+    navigate('/dashboard');
+  };
 
   return (
     <div className="w-full space-y-8">
@@ -54,11 +59,11 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
             <DialogTitle>Create New Storefront</DialogTitle>
           </DialogHeader>
           <StorefrontForm
+            businessId={business?.id}
             onSuccess={() => {
               setIsDialogOpen(false);
               refetchStorefronts();
             }}
-            business={business}
           />
         </DialogContent>
       </Dialog>
@@ -71,11 +76,8 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
                 {storefronts.map((store) => (
                   <CarouselItem key={store.id} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/2 flex justify-center">
                     <Card
-                      className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full max-w-md"
-                      onClick={() => {
-                        localStorage.setItem('lastStorefrontId', store.id);
-                        navigate('/dashboard');
-                      }}
+                      className="group relative overflow-hidden rounded-xl border bg-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 w-full max-w-md cursor-pointer"
+                      onClick={() => handleStoreSelect(store.id)}
                     >
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">

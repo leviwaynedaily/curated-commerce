@@ -46,7 +46,7 @@ export default function Dashboard() {
     enabled: !!session,
   })
 
-  const { data: storefronts } = useQuery({
+  const { data: storefronts, refetch: refetchStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
       if (!business?.id) return []
@@ -64,43 +64,6 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  const { data: businessUsers, refetch: refetchBusinessUsers } = useQuery({
-    queryKey: ["business-users", business?.id],
-    queryFn: async () => {
-      if (!business?.id) return []
-      console.log("Fetching business users for business:", business.id)
-
-      const { data: businessUsers, error: businessUsersError } = await supabase
-        .from("business_users")
-        .select("id, role, user_id")
-        .eq("business_id", business.id)
-
-      if (businessUsersError) throw businessUsersError
-
-      const userIds = businessUsers.map(user => user.user_id)
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .in("id", userIds)
-
-      if (profilesError) throw profilesError
-
-      const usersWithProfiles = businessUsers.map(user => ({
-        ...user,
-        profiles: profiles.find(profile => profile.id === user.user_id)
-      }))
-
-      console.log("Business users fetched:", usersWithProfiles)
-      return usersWithProfiles
-    },
-    enabled: !!business?.id,
-  })
-
-  const handleStoreSelect = (storeId: string) => {
-    localStorage.setItem('lastStorefrontId', storeId)
-    navigate(`/store/${storeId}`)
-  }
-
   if (!session) return null
 
   return (
@@ -113,13 +76,13 @@ export default function Dashboard() {
           <StoreGrid 
             storefronts={storefronts || []} 
             business={business}
-            onStoreSelect={handleStoreSelect}
+            refetchStorefronts={refetchStorefronts}
           />
           {business && (
             <BusinessUserManagement 
               business={business}
-              businessUsers={businessUsers || []}
-              onRefetch={refetchBusinessUsers}
+              businessUsers={[]} 
+              onRefetch={() => {}}
             />
           )}
         </div>
