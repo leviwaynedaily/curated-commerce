@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StorefrontForm } from "@/components/forms/StorefrontForm";
-import { Plus } from "lucide-react";
+import { Plus, ExternalLink } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
@@ -37,6 +37,10 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
       !!store.favicon_url,
     ];
     return (steps.filter(Boolean).length / steps.length) * 100;
+  };
+
+  const getPublicUrl = (slug: string) => {
+    return `${window.location.origin}/${slug}`;
   };
 
   return (
@@ -92,26 +96,42 @@ export function StoreGrid({ storefronts, business, refetchStorefronts }: StoreGr
                     >
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-4">
-                          {store.logo_url ? (
-                            <div className="bg-white rounded-md p-2 w-12 h-12 flex items-center justify-center">
+                          {store.logo_url && (
+                            <div className="bg-white rounded-md p-2 w-16 h-16 flex items-center justify-center">
                               <img
                                 src={store.logo_url}
                                 alt={store.name}
                                 className="max-h-full max-w-full object-contain"
                               />
                             </div>
-                          ) : (
-                            <div className="w-12 h-12 bg-gray-100 rounded-md" />
                           )}
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            store.is_published
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}>
-                            {store.is_published ? "Published" : "Draft"}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              store.is_published
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}>
+                              {store.is_published ? "Published" : "Draft"}
+                            </span>
+                            {store.is_published && store.slug && (
+                              <a 
+                                href={getPublicUrl(store.slug)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="text-primary hover:text-primary/80"
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </a>
+                            )}
+                          </div>
                         </div>
-                        <h3 className="text-lg font-semibold mb-2">{store.name}</h3>
+                        <h3 className="text-lg font-semibold mb-1">{store.name}</h3>
+                        {store.slug && (
+                          <p className="text-sm text-muted-foreground mb-3">
+                            {store.slug}
+                          </p>
+                        )}
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-muted-foreground">Setup Progress</span>
