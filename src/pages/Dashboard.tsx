@@ -103,6 +103,27 @@ export default function Dashboard() {
     enabled: !!business?.id,
   });
 
+  const { data: storefront, isLoadingStorefront: isLoading, error } = useQuery({
+    queryKey: ["storefront", currentStorefrontId],
+    queryFn: async () => {
+      if (!currentStorefrontId) return null;
+
+      const { data, error } = await supabase
+        .from("storefronts")
+        .select("*")
+        .eq("id", currentStorefrontId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching storefront:", error);
+        throw error;
+      }
+
+      return data;
+    },
+    enabled: !!currentStorefrontId && !!session,
+  });
+
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!business?.id || !newUserEmail) {
@@ -169,27 +190,6 @@ export default function Dashboard() {
       setIsAddingUser(false);
     }
   };
-
-  const { data: storefront, isLoading, error } = useQuery({
-    queryKey: ["storefront", currentStorefrontId],
-    queryFn: async () => {
-      if (!currentStorefrontId) return null;
-
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", currentStorefrontId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching storefront:", error);
-        throw error;
-      }
-
-      return data;
-    },
-    enabled: !!currentStorefrontId && !!session,
-  });
 
   if (!session) return null;
 
