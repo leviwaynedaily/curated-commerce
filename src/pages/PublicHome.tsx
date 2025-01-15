@@ -3,6 +3,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Shield, Globe, Zap } from "lucide-react";
+import { Preview } from "@/components/theme/preview/Preview";
+import { PreviewError } from "@/components/theme/preview/PreviewError";
+import { PreviewLoading } from "@/components/theme/preview/PreviewLoading";
+import { useStorefront } from "@/hooks/useStorefront";
 
 export default function PublicHome() {
   const navigate = useNavigate();
@@ -22,10 +26,23 @@ export default function PublicHome() {
     checkAuth();
   }, [navigate]);
 
-  // If we have a storefront slug, we should render the storefront component
+  // If we have a storefront slug, fetch the storefront and render the preview
   if (storefrontSlug) {
-    // You can add loading state or fetch storefront data here
-    return null; // This will be replaced by your storefront component
+    console.log("Rendering storefront for slug:", storefrontSlug);
+    
+    // First get the storefront ID from the slug
+    const { data: storefront, isLoading, error } = useStorefront(storefrontSlug);
+
+    if (isLoading) {
+      return <PreviewLoading />;
+    }
+
+    if (error || !storefront) {
+      return <PreviewError error="Store not found" />;
+    }
+
+    console.log("Found storefront:", storefront);
+    return <Preview storefrontId={storefront.id} />;
   }
 
   return (
