@@ -49,19 +49,19 @@ export const useUserQueries = (session: any) => {
       
       try {
         console.log("Fetching business data for user:", userQuery.data.id);
-        const response = await supabase
+        const { data, error } = await supabase
           .from("businesses")
           .select("*")
           .eq("user_id", userQuery.data.id)
-          .maybeSingle();
+          .single();
 
-        if (response.error) {
-          console.error("Business query error:", response.error);
-          throw response.error;
+        if (error) {
+          console.error("Business query error:", error);
+          throw error;
         }
 
-        console.log("Business data fetched:", response.data?.id);
-        return response.data;
+        console.log("Business data fetched:", data?.id);
+        return data;
       } catch (error) {
         console.error("Business query error:", error);
         throw error;
@@ -79,19 +79,25 @@ export const useUserQueries = (session: any) => {
         return [];
       }
       console.log("Fetching storefronts for business:", businessQuery.data.id);
-      const { data, error } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("business_id", businessQuery.data.id)
-        .order("name");
+      
+      try {
+        const { data, error } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("business_id", businessQuery.data.id)
+          .order("name");
 
-      if (error) {
-        console.error("Storefronts query error:", error);
+        if (error) {
+          console.error("Storefronts query error:", error);
+          throw error;
+        }
+        
+        console.log("Storefronts fetched:", data?.length);
+        return data || [];
+      } catch (error) {
+        console.error("Error fetching storefronts:", error);
         throw error;
       }
-      
-      console.log("Storefronts fetched:", data?.length);
-      return data || [];
     },
     enabled: !!businessQuery.data?.id,
   });
@@ -105,34 +111,39 @@ export const useUserQueries = (session: any) => {
       }
       console.log("Fetching business users for business:", businessQuery.data.id);
 
-      const { data: businessUsers, error: businessUsersError } = await supabase
-        .from("business_users")
-        .select("id, role, user_id")
-        .eq("business_id", businessQuery.data.id);
+      try {
+        const { data: businessUsers, error: businessUsersError } = await supabase
+          .from("business_users")
+          .select("id, role, user_id")
+          .eq("business_id", businessQuery.data.id);
 
-      if (businessUsersError) {
-        console.error("Error fetching business users:", businessUsersError);
-        throw businessUsersError;
+        if (businessUsersError) {
+          console.error("Error fetching business users:", businessUsersError);
+          throw businessUsersError;
+        }
+
+        const userIds = businessUsers.map(user => user.user_id);
+        const { data: profiles, error: profilesError } = await supabase
+          .from("profiles")
+          .select("id, email")
+          .in("id", userIds);
+
+        if (profilesError) {
+          console.error("Error fetching profiles:", profilesError);
+          throw profilesError;
+        }
+
+        const usersWithProfiles = businessUsers.map(user => ({
+          ...user,
+          profiles: profiles.find(profile => profile.id === user.user_id)
+        }));
+
+        console.log("Business users fetched:", usersWithProfiles);
+        return usersWithProfiles;
+      } catch (error) {
+        console.error("Error fetching business users:", error);
+        throw error;
       }
-
-      const userIds = businessUsers.map(user => user.user_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .in("id", userIds);
-
-      if (profilesError) {
-        console.error("Error fetching profiles:", profilesError);
-        throw profilesError;
-      }
-
-      const usersWithProfiles = businessUsers.map(user => ({
-        ...user,
-        profiles: profiles.find(profile => profile.id === user.user_id)
-      }));
-
-      console.log("Business users fetched:", usersWithProfiles);
-      return usersWithProfiles;
     },
     enabled: !!businessQuery.data?.id,
   });
