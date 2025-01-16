@@ -36,6 +36,7 @@ const Users = () => {
       if (!business?.id) return [];
       console.log("Fetching storefronts with users for business:", business.id);
 
+      // First, get all storefronts for the business
       const { data: storefrontsData, error: storefrontsError } = await supabase
         .from("storefronts")
         .select(`
@@ -44,7 +45,10 @@ const Users = () => {
           storefront_users (
             id,
             user_id,
-            role
+            role,
+            profiles:user_id (
+              email
+            )
           )
         `)
         .eq("business_id", business.id);
@@ -54,35 +58,8 @@ const Users = () => {
         throw storefrontsError;
       }
 
-      // Get all unique user IDs from storefront users
-      const userIds = [...new Set(
-        storefrontsData.flatMap(s => 
-          s.storefront_users.map(u => u.user_id)
-        )
-      )];
-
-      // Fetch profiles for all users
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .in("id", userIds);
-
-      if (profilesError) {
-        console.error("Error fetching profiles:", profilesError);
-        throw profilesError;
-      }
-
-      // Map profiles to storefront users
-      const transformedData = storefrontsData.map(storefront => ({
-        ...storefront,
-        storefront_users: storefront.storefront_users.map(user => ({
-          ...user,
-          profiles: profiles.find(p => p.id === user.user_id) || { email: '' }
-        }))
-      }));
-
-      console.log("Fetched storefronts with users:", transformedData);
-      return transformedData as Storefront[];
+      console.log("Fetched storefronts with users:", storefrontsData);
+      return storefrontsData as Storefront[];
     },
     enabled: !!business?.id,
   });
