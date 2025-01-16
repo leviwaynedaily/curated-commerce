@@ -48,45 +48,56 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
+        console.log("Parsed CSV data:", results.data)
         const validProducts: ProductCSVRow[] = []
         const errors: string[] = []
 
-        results.data.forEach((row: ParsedProduct, index: number) => {
+        results.data.forEach((row: any, index: number) => {
           try {
-            // Required field validation
-            if (!row.name) {
+            // Required field validation - only name is required
+            if (!row.name?.trim()) {
               throw new Error(`Missing product name at row ${index + 1}`)
             }
 
-            // Convert and validate numeric fields
-            const in_town_price = row.in_town_price ? parseFloat(row.in_town_price.toString()) : 0
-            const shipping_price = row.shipping_price ? parseFloat(row.shipping_price.toString()) : 0
+            // Convert and validate numeric fields with defaults
+            const in_town_price = row.in_town_price ? 
+              parseFloat(row.in_town_price.toString()) : 
+              0
+            
+            const shipping_price = row.shipping_price ? 
+              parseFloat(row.shipping_price.toString()) : 
+              0
 
-            if (isNaN(in_town_price)) {
+            // Only validate numeric fields if they're provided
+            if (row.in_town_price && isNaN(in_town_price)) {
               throw new Error(`Invalid in-town price at row ${index + 1}`)
             }
-            if (isNaN(shipping_price)) {
+            if (row.shipping_price && isNaN(shipping_price)) {
               throw new Error(`Invalid shipping price at row ${index + 1}`)
             }
 
-            // Status validation
+            // Status validation with default
             const status = row.status?.toLowerCase() || 'active'
-            if (status !== 'active' && status !== 'inactive') {
+            if (row.status && status !== 'active' && status !== 'inactive') {
               throw new Error(`Invalid status at row ${index + 1}. Must be either 'active' or 'inactive'`)
             }
 
-            // Convert category string to array
-            const category = row.category ? row.category.split(',').map(c => c.trim()) : []
+            // Convert category string to array, empty array if not provided
+            const category = row.category ? 
+              row.category.split(',').map((c: string) => c.trim()).filter(Boolean) : 
+              []
 
             validProducts.push({
-              name: row.name,
-              description: row.description || undefined,
+              name: row.name.trim(),
+              description: row.description?.trim() || undefined,
               in_town_price,
               shipping_price,
               category,
               status: status as 'active' | 'inactive',
-              stock_number: row.stock_number || undefined
+              stock_number: row.stock_number?.trim() || undefined
             })
+
+            console.log(`Validated product at row ${index + 1}:`, validProducts[validProducts.length - 1])
           } catch (error) {
             if (error instanceof Error) {
               errors.push(error.message)
@@ -95,20 +106,25 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
         })
 
         if (errors.length > 0) {
+          console.error("CSV validation errors:", errors)
           toast.error(`Validation errors in CSV: ${errors.join(', ')}`)
           reject(new Error('CSV validation failed'))
           return
         }
 
         if (validProducts.length === 0) {
+          console.error("No valid products found in CSV")
+          toast.error('No valid products found in CSV')
           reject(new Error('No valid products found in CSV'))
           return
         }
 
+        console.log("Successfully validated products:", validProducts)
         resolve(validProducts)
       },
       error: (error) => {
         console.error('Error parsing CSV:', error)
+        toast.error('Failed to parse CSV file')
         reject(new Error('Failed to parse CSV file'))
       }
     })

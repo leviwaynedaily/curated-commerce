@@ -223,7 +223,10 @@ const Products = () => {
 
     try {
       setIsImporting(true)
+      console.log("Starting CSV import process")
+      
       const validProducts = await parseAndValidateCSV(file)
+      console.log("Valid products parsed from CSV:", validProducts)
 
       const productsToInsert = validProducts.map(product => ({
         ...product,
@@ -232,17 +235,25 @@ const Products = () => {
         sort_order: 0
       }))
 
+      console.log("Attempting to insert products:", productsToInsert)
       const { error } = await supabase
         .from("products")
         .insert(productsToInsert)
 
-      if (error) throw error
+      if (error) {
+        console.error("Error inserting products:", error)
+        throw error
+      }
 
       toast.success(`Successfully imported ${validProducts.length} products`)
       queryClient.invalidateQueries({ queryKey: ["products"] })
     } catch (error) {
       console.error("Import error:", error)
-      toast.error("Failed to import products")
+      if (error instanceof Error) {
+        toast.error(`Failed to import products: ${error.message}`)
+      } else {
+        toast.error('Failed to import products')
+      }
     } finally {
       setIsImporting(false)
       if (fileInputRef.current) {
