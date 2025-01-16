@@ -46,7 +46,7 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
       header: true,
-      skipEmptyLines: true,
+      skipEmptyLines: 'greedy', // Skip truly empty rows
       complete: (results) => {
         console.log("Parsed CSV data:", results.data)
         const validProducts: ProductCSVRow[] = []
@@ -54,7 +54,12 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
 
         results.data.forEach((row: any, index: number) => {
           try {
-            // Required field validation - only name is required
+            // Skip completely empty rows
+            if (Object.values(row).every(value => !value)) {
+              return
+            }
+
+            // Required field validation
             if (!row.name?.trim()) {
               throw new Error(`Missing product name at row ${index + 1}`)
             }
@@ -68,7 +73,7 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
               parseFloat(row.shipping_price.toString()) : 
               0
 
-            // Only validate numeric fields if they're provided
+            // Validate numeric fields if provided
             if (row.in_town_price && isNaN(in_town_price)) {
               throw new Error(`Invalid in-town price at row ${index + 1}`)
             }
@@ -87,7 +92,7 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
               row.category.split(',').map((c: string) => c.trim()).filter(Boolean) : 
               []
 
-            validProducts.push({
+            const validProduct = {
               name: row.name.trim(),
               description: row.description?.trim() || undefined,
               in_town_price,
@@ -95,9 +100,10 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
               category,
               status: status as 'active' | 'inactive',
               stock_number: row.stock_number?.trim() || undefined
-            })
+            }
 
-            console.log(`Validated product at row ${index + 1}:`, validProducts[validProducts.length - 1])
+            validProducts.push(validProduct)
+            console.log(`Validated product at row ${index + 1}:`, validProduct)
           } catch (error) {
             if (error instanceof Error) {
               errors.push(error.message)
@@ -114,7 +120,7 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
 
         if (validProducts.length === 0) {
           console.error("No valid products found in CSV")
-          toast.error('No valid products found in CSV')
+          toast.error('No valid products found in CSV. Please check the file format.')
           reject(new Error('No valid products found in CSV'))
           return
         }
@@ -124,7 +130,7 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
       },
       error: (error) => {
         console.error('Error parsing CSV:', error)
-        toast.error('Failed to parse CSV file')
+        toast.error('Failed to parse CSV file. Please check the file format.')
         reject(new Error('Failed to parse CSV file'))
       }
     })
