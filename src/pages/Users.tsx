@@ -3,6 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
 import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface StorefrontUser {
   id: string;
@@ -21,6 +26,9 @@ interface Storefront {
 
 const Users = () => {
   const { business } = useUserQueries({});
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
 
   const { data: storefronts = [], isLoading } = useQuery({
     queryKey: ["storefronts-with-users", business?.id],
@@ -79,6 +87,40 @@ const Users = () => {
     enabled: !!business?.id,
   });
 
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserEmail || !newUserPassword) {
+      toast.error("Please enter both email and password");
+      return;
+    }
+
+    try {
+      setIsCreatingUser(true);
+      console.log("Creating new user with email:", newUserEmail);
+
+      const { data, error } = await supabase.auth.admin.createUser({
+        email: newUserEmail,
+        password: newUserPassword,
+        email_confirm: true
+      });
+
+      if (error) {
+        console.error("Error creating user:", error);
+        toast.error(error.message);
+        return;
+      }
+
+      toast.success("User created successfully!");
+      setNewUserEmail("");
+      setNewUserPassword("");
+    } catch (error) {
+      console.error("Error creating user:", error);
+      toast.error("Failed to create user. Please try again.");
+    } finally {
+      setIsCreatingUser(false);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -88,6 +130,37 @@ const Users = () => {
             Manage users across your storefronts
           </p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Create New User</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateUser} className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Email"
+                    value={newUserEmail}
+                    onChange={(e) => setNewUserEmail(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={newUserPassword}
+                    onChange={(e) => setNewUserPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button type="submit" disabled={isCreatingUser}>
+                Create User
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
 
         {storefronts.map((storefront) => (
           <div key={storefront.id} className="space-y-4">
