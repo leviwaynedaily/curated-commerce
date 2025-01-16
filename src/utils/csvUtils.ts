@@ -1,15 +1,6 @@
 import Papa from 'papaparse'
 import { toast } from 'sonner'
-
-interface ProductCSVRow {
-  name: string
-  description?: string
-  in_town_price?: string | number
-  shipping_price?: string | number
-  category?: string
-  status?: 'active' | 'inactive'
-  stock_number?: string
-}
+import { ProductCSVRow } from '@/types/product'
 
 export const generateTemplate = () => {
   const headers = [
@@ -29,8 +20,8 @@ export const exportProducts = (products: any[]) => {
   const exportData = products.map(product => ({
     name: product.name || '',
     description: product.description || '',
-    in_town_price: product.in_town_price || '0',
-    shipping_price: product.shipping_price || '0',
+    in_town_price: product.in_town_price?.toString() || '0',
+    shipping_price: product.shipping_price?.toString() || '0',
     category: Array.isArray(product.category) ? product.category.join(', ') : '',
     status: product.status || 'active',
     stock_number: product.stock_number || ''
@@ -47,6 +38,10 @@ export const exportProducts = (products: any[]) => {
   document.body.removeChild(link)
 }
 
+interface ParsedProduct extends Omit<ProductCSVRow, 'category'> {
+  category: string;
+}
+
 export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
   return new Promise((resolve, reject) => {
     Papa.parse(file, {
@@ -56,14 +51,16 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
         const validProducts: ProductCSVRow[] = []
         const errors: string[] = []
 
-        results.data.forEach((row: any, index: number) => {
+        results.data.forEach((row: ParsedProduct, index: number) => {
           try {
-            // Convert empty strings to null or appropriate default values
-            const category = row.category ? row.category.split(',').map((c: string) => c.trim()) : []
-            
-            // Validate and convert numeric fields
-            const in_town_price = row.in_town_price ? parseFloat(row.in_town_price) : 0
-            const shipping_price = row.shipping_price ? parseFloat(row.shipping_price) : 0
+            // Required field validation
+            if (!row.name) {
+              throw new Error(`Missing product name at row ${index + 1}`)
+            }
+
+            // Convert and validate numeric fields
+            const in_town_price = row.in_town_price ? parseFloat(row.in_town_price.toString()) : 0
+            const shipping_price = row.shipping_price ? parseFloat(row.shipping_price.toString()) : 0
 
             if (isNaN(in_town_price)) {
               throw new Error(`Invalid in-town price at row ${index + 1}`)
@@ -72,25 +69,23 @@ export const parseAndValidateCSV = (file: File): Promise<ProductCSVRow[]> => {
               throw new Error(`Invalid shipping price at row ${index + 1}`)
             }
 
-            // Required field validation
-            if (!row.name) {
-              throw new Error(`Missing product name at row ${index + 1}`)
-            }
-
             // Status validation
             const status = row.status?.toLowerCase() || 'active'
             if (status !== 'active' && status !== 'inactive') {
               throw new Error(`Invalid status at row ${index + 1}. Must be either 'active' or 'inactive'`)
             }
 
+            // Convert category string to array
+            const category = row.category ? row.category.split(',').map(c => c.trim()) : []
+
             validProducts.push({
               name: row.name,
-              description: row.description || null,
+              description: row.description || undefined,
               in_town_price,
               shipping_price,
               category,
-              status,
-              stock_number: row.stock_number || null
+              status: status as 'active' | 'inactive',
+              stock_number: row.stock_number || undefined
             })
           } catch (error) {
             if (error instanceof Error) {

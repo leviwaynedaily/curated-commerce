@@ -225,14 +225,11 @@ const Products = () => {
       setIsImporting(true)
       const validProducts = await parseAndValidateCSV(file)
 
-      if (validProducts.length === 0) {
-        toast.error("No valid products found in CSV")
-        return
-      }
-
       const productsToInsert = validProducts.map(product => ({
         ...product,
-        storefront_id: currentStorefrontId
+        storefront_id: currentStorefrontId,
+        images: [],
+        sort_order: 0
       }))
 
       const { error } = await supabase
