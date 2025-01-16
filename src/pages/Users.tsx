@@ -36,7 +36,7 @@ const Users = () => {
       if (!business?.id) return [];
       console.log("Fetching storefronts with users for business:", business.id);
 
-      // First, get all storefronts for the business
+      // First get all storefronts and their users
       const { data: storefrontsData, error: storefrontsError } = await supabase
         .from("storefronts")
         .select(`
@@ -46,7 +46,7 @@ const Users = () => {
             id,
             user_id,
             role,
-            profiles:user_id (
+            user:user_id (
               email
             )
           )
@@ -58,8 +58,19 @@ const Users = () => {
         throw storefrontsError;
       }
 
-      console.log("Fetched storefronts with users:", storefrontsData);
-      return storefrontsData as Storefront[];
+      // Transform the data to match our expected types
+      const transformedData = storefrontsData.map(storefront => ({
+        ...storefront,
+        storefront_users: storefront.storefront_users.map(user => ({
+          ...user,
+          profiles: {
+            email: user.user.email
+          }
+        }))
+      }));
+
+      console.log("Fetched storefronts with users:", transformedData);
+      return transformedData as Storefront[];
     },
     enabled: !!business?.id,
   });
