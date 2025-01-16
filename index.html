@@ -13,10 +13,17 @@
           const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
           console.log('Using manifest URL:', manifestUrl);
           
+          // Remove any existing manifest link
+          const existingManifest = document.querySelector('link[rel="manifest"]');
+          if (existingManifest) {
+            existingManifest.remove();
+          }
+          
           // Create and add the manifest link
           const manifestLink = document.createElement('link');
           manifestLink.rel = 'manifest';
           manifestLink.href = manifestUrl;
+          manifestLink.crossOrigin = 'use-credentials';
           document.head.appendChild(manifestLink);
           console.log('Added manifest link to head:', manifestLink);
         } else {

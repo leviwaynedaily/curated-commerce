@@ -17,12 +17,12 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // For manifest.json requests, let the browser handle it directly
+  // Completely bypass any requests for manifest.json
   if (event.request.url.includes('manifest.json')) {
+    console.log('Bypassing service worker for manifest request:', event.request.url);
     return;
   }
   
-  // Handle all other requests
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
