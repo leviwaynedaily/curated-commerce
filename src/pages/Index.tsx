@@ -14,8 +14,12 @@ const Index = () => {
     queryKey: ["business"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      if (!user) {
+        console.log("No authenticated user found")
+        return null
+      }
 
+      console.log("Fetching business for user:", user.id)
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
@@ -27,6 +31,7 @@ const Index = () => {
         return null
       }
       
+      console.log("Business data fetched:", data)
       return data
     },
   })
@@ -34,7 +39,10 @@ const Index = () => {
   const { data: storefront, isLoading: isLoadingStorefront } = useQuery({
     queryKey: ["storefront", business?.id],
     queryFn: async () => {
-      if (!business?.id) return null
+      if (!business?.id) {
+        console.log("No business ID available, skipping storefront fetch")
+        return null
+      }
 
       // First try to get the last accessed storefront from localStorage
       const lastStorefrontId = localStorage.getItem('lastStorefrontId')
@@ -46,9 +54,13 @@ const Index = () => {
 
       if (lastStorefrontId) {
         // If we have a last accessed storefront, try to get that one
-        const { data: specificStorefront } = await query
+        const { data: specificStorefront, error: specificError } = await query
           .eq('id', lastStorefrontId)
           .maybeSingle()
+        
+        if (specificError) {
+          console.error("Error fetching specific storefront:", specificError)
+        }
         
         if (specificStorefront) {
           console.log("Using last accessed storefront:", specificStorefront.id)
