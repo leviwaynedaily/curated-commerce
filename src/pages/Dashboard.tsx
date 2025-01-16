@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BusinessForm } from "@/components/forms/BusinessForm"
+import { UserButton } from "@/components/auth/UserButton"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -123,6 +124,9 @@ export default function Dashboard() {
         <Helmet>
           <title>Welcome | Curately</title>
         </Helmet>
+        <div className="flex justify-end p-4">
+          <UserButton />
+        </div>
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 px-4">
           <img 
             src="/lovable-uploads/35d2c47a-30a1-48fb-8a09-a38f89a571d3.png" 
@@ -161,6 +165,9 @@ export default function Dashboard() {
       <Helmet>
         <title>Storefronts | Curately</title>
       </Helmet>
+      <div className="flex justify-end p-4">
+        <UserButton />
+      </div>
       <div className="space-y-8">
         <div className="space-y-8">
           <StoreGrid 

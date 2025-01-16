@@ -6,7 +6,6 @@ import { Progress } from "@/components/ui/progress"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { toast } from "sonner"
-import { UserButton } from "@/components/auth/UserButton"
 
 const getTimeBasedGreeting = () => {
   const hour = new Date().getHours()
@@ -73,9 +72,6 @@ export function Dashboard({ storefront }: { storefront: any }) {
   if (productsError || userError) {
     return (
       <div className="min-h-screen">
-        <div className="flex justify-end p-4">
-          <UserButton />
-        </div>
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -88,16 +84,13 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            {storefront ? `Dashboard for ${storefront.name}` : "Select a Storefront"}
-          </h1>
-          <p className="text-sm md:text-base text-muted-foreground mt-2">
-            {greeting}, {userName}. {storefront ? `Here's an overview of ${storefront.name}.` : "Choose a storefront to manage or create a new one."}
-          </p>
-        </div>
-        <UserButton />
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          {storefront ? `Dashboard for ${storefront.name}` : "Select a Storefront"}
+        </h1>
+        <p className="text-sm md:text-base text-muted-foreground mt-2">
+          {greeting}, {userName}. {storefront ? `Here's an overview of ${storefront.name}.` : "Choose a storefront to manage or create a new one."}
+        </p>
       </div>
 
       {storefront && (
