@@ -1,7 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -9,12 +9,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
-import type { TablesInsert } from "@/integrations/supabase/types";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { useNavigate } from "react-router-dom"
+import { supabase } from "@/integrations/supabase/client"
+import { toast } from "sonner"
+import { TablesInsert } from "@/integrations/supabase/types"
 
 // Use the correct types from Supabase
 type BusinessInsert = TablesInsert<"businesses">;
@@ -40,27 +40,39 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof businessSchema>) => {
+  async function onSubmit(values: z.infer<typeof businessSchema>) {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Creating business with values:", values);
+
+      // First get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
       
-      if (!user) {
-        toast.error("You must be logged in to create a business");
+      if (userError) {
+        console.error("Error getting user:", userError);
+        toast.error("Failed to get user information");
         return;
       }
 
-      // Create the business insert object with the correct types
-      const businessData: BusinessInsert = {
-        name: values.name,
-        email: values.email,
-        phone: values.phone,
-        user_id: user.id,
-      };
+      if (!user) {
+        console.error("No user found");
+        toast.error("Please log in to create a business");
+        return;
+      }
 
-      const { error } = await supabase.from("businesses").insert(businessData);
+      console.log("Creating business for user:", user.id);
 
-      if (error) throw error;
+      const { error } = await supabase.from("businesses").insert({
+        ...values,
+        user_id: user.id, // Make sure we set the user_id
+        status: 'active'
+      } as BusinessInsert);
 
+      if (error) {
+        console.error("Error creating business:", error);
+        throw error;
+      }
+
+      console.log("Business created successfully");
       toast.success("Business created successfully!");
       
       if (onSuccess) {
@@ -72,7 +84,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
       console.error("Error creating business:", error);
       toast.error("Failed to create business. Please try again.");
     }
-  };
+  }
 
   return (
     <Form {...form}>
@@ -90,6 +102,7 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="email"
@@ -97,25 +110,27 @@ export function BusinessForm({ onSuccess }: BusinessFormProps) {
             <FormItem>
               <FormLabel>Business Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="Enter your business email" {...field} />
+                <Input placeholder="Enter your business email" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number (Optional)</FormLabel>
+              <FormLabel>Business Phone (Optional)</FormLabel>
               <FormControl>
-                <Input type="tel" placeholder="Enter your phone number" {...field} />
+                <Input placeholder="Enter your business phone" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <Button type="submit" className="w-full">
           Create Business
         </Button>
