@@ -1,10 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Plus, User } from "lucide-react"
+import { Plus, User, Trash2, KeyRound } from "lucide-react"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface BusinessUserManagementProps {
   business: any
@@ -16,6 +26,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
   const [lastCreatedUserCredentials, setLastCreatedUserCredentials] = useState<{email: string, password: string} | null>(null)
+  const [userToDelete, setUserToDelete] = useState<{ id: string, email: string } | null>(null)
 
   const generateTemporaryPassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -126,6 +137,47 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     }
   }
 
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return
+
+    try {
+      console.log("Deleting user from business:", userToDelete.id)
+      
+      const { error: deleteError } = await supabase
+        .from("business_users")
+        .delete()
+        .eq("user_id", userToDelete.id)
+        .eq("business_id", business.id)
+
+      if (deleteError) throw deleteError
+
+      toast.success("User removed from business successfully")
+      onRefetch()
+    } catch (error) {
+      console.error("Error deleting user:", error)
+      toast.error("Failed to remove user from business")
+    } finally {
+      setUserToDelete(null)
+    }
+  }
+
+  const handleResetPassword = async (email: string) => {
+    try {
+      console.log("Resetting password for user:", email)
+      
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
+
+      if (error) throw error
+
+      toast.success("Password reset email sent successfully")
+    } catch (error) {
+      console.error("Error resetting password:", error)
+      toast.error("Failed to send password reset email")
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="space-y-1.5">
@@ -174,7 +226,23 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
                   </div>
                   <span>{user.profiles.email}</span>
                 </div>
-                <span className="text-sm text-muted-foreground capitalize">{user.role}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground capitalize">{user.role}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleResetPassword(user.profiles.email)}
+                  >
+                    <KeyRound className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setUserToDelete({ id: user.user_id, email: user.profiles.email })}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             ))}
             {(!businessUsers || businessUsers.length === 0) && (
@@ -183,6 +251,21 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
           </div>
         </div>
       </div>
+
+      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove {userToDelete?.email} from the business. They will no longer have access to any storefronts.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteUser}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
