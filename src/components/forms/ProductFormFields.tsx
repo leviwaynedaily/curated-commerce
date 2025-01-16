@@ -68,6 +68,19 @@ export function ProductFormFields({ form, isUploading, onUpload }: ProductFormFi
       />
       <FormField
         control={form.control}
+        name="stock_number"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Stock Number</FormLabel>
+            <FormControl>
+              <Input placeholder="Optional stock/SKU number" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
         name="description"
         render={({ field }) => (
           <FormItem>

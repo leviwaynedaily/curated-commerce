@@ -159,6 +159,7 @@ export type Database = {
           shipping_price: number | null
           sort_order: number | null
           status: Database["public"]["Enums"]["product_status"] | null
+          stock_number: string | null
           storefront_id: string | null
           updated_at: string | null
         }
@@ -173,6 +174,7 @@ export type Database = {
           shipping_price?: number | null
           sort_order?: number | null
           status?: Database["public"]["Enums"]["product_status"] | null
+          stock_number?: string | null
           storefront_id?: string | null
           updated_at?: string | null
         }
@@ -187,6 +189,7 @@ export type Database = {
           shipping_price?: number | null
           sort_order?: number | null
           status?: Database["public"]["Enums"]["product_status"] | null
+          stock_number?: string | null
           storefront_id?: string | null
           updated_at?: string | null
         }
