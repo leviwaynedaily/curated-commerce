@@ -16,6 +16,8 @@ import { PWAManifestUrl } from "./PWAManifestUrl";
 import { saveManifest } from "@/utils/manifestUtils";
 import { useState, useEffect } from "react";
 
+const PALMTREE_MANIFEST_URL = "https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/palmtree-smokes/manifest.json";
+
 export function PWASettingsForm() {
   const { toast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
@@ -102,27 +104,13 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
-      // First get the storefront slug
-      const { data: storefront, error: slugError } = await supabase
-        .from("storefronts")
-        .select("slug")
-        .eq("id", currentStorefrontId)
-        .single();
-
-      if (slugError || !storefront) {
-        throw new Error("Failed to get storefront slug");
-      }
-
-      // Generate manifest URL using the slug
-      const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${storefront.slug}/manifest.json`;
-
       const values = form.getValues();
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
         name: values.name || "",
         short_name: values.short_name || "",
-        manifest_url: manifestUrl
+        manifest_url: PALMTREE_MANIFEST_URL
       };
       
       console.log("Saving PWA settings draft:", dataToSave);
@@ -152,7 +140,7 @@ export function PWASettingsForm() {
   };
 
   const publishPWA = async () => {
-    if (!currentStorefrontId || !manifestUrl) {
+    if (!currentStorefrontId) {
       toast({
         title: "Error",
         description: "No manifest URL available. Please save the manifest first.",
@@ -179,7 +167,7 @@ export function PWASettingsForm() {
       const { error: updateError } = await supabase
         .from("storefronts")
         .update({
-          pwa_manifest_url: manifestUrl,
+          pwa_manifest_url: PALMTREE_MANIFEST_URL,
           has_pwa: true
         } as any)
         .eq('id', currentStorefrontId);
@@ -214,27 +202,13 @@ export function PWASettingsForm() {
 
     setIsSaving(true);
     try {
-      // First get the storefront slug
-      const { data: storefront, error: slugError } = await supabase
-        .from("storefronts")
-        .select("slug")
-        .eq("id", currentStorefrontId)
-        .single();
-
-      if (slugError || !storefront) {
-        throw new Error("Failed to get storefront slug");
-      }
-
-      // Generate manifest URL using the slug
-      const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${storefront.slug}/manifest.json`;
-
       // Save PWA settings with the manifest URL first
       const dataToSave = {
         ...values,
         storefront_id: currentStorefrontId,
         name: values.name || "",
         short_name: values.short_name || "",
-        manifest_url: manifestUrl
+        manifest_url: PALMTREE_MANIFEST_URL
       };
       
       console.log("Saving PWA settings:", dataToSave);
@@ -285,7 +259,7 @@ export function PWASettingsForm() {
 
       // Save manifest file
       await saveManifest(currentStorefrontId, manifestData);
-      setManifestUrl(manifestUrl);
+      setManifestUrl(PALMTREE_MANIFEST_URL);
       setManifestJson(JSON.stringify(manifestData, null, 2));
 
       toast({
