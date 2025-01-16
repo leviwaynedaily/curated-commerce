@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ArrowRight, Store, Shield, Globe, Zap } from "lucide-react";
-import Preview from "./Preview";
+import { Preview } from "@/components/theme/preview/Preview";
 import { PreviewError } from "@/components/theme/preview/PreviewError";
 import { PreviewLoading } from "@/components/theme/preview/PreviewLoading";
 import { useStorefront } from "@/hooks/useStorefront";
@@ -14,7 +14,6 @@ export default function PublicHome() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Only check auth and redirect on the root path
       if (!storefrontSlug) {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
@@ -26,7 +25,6 @@ export default function PublicHome() {
     checkAuth();
   }, [navigate, storefrontSlug]);
 
-  // If we have a storefront slug, fetch the storefront and render the preview
   if (storefrontSlug) {
     console.log("Rendering storefront for slug:", storefrontSlug);
     
@@ -186,4 +184,3 @@ export default function PublicHome() {
       </section>
     </div>
   );
-}
