@@ -227,6 +227,12 @@ export function ProductTable({
                 onSort={handleSort}
               />
               <ProductTableHeader
+                field="stock_number"
+                label="Stock #"
+                currentSort={sortConfig}
+                onSort={handleSort}
+              />
+              <ProductTableHeader
                 field="status"
                 label="Status"
                 currentSort={sortConfig}
