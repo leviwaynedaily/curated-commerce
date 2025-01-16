@@ -1,3 +1,4 @@
+# Project configuration
 project_id = "bplsogdsyabqfftwclka"
 
 [api]
@@ -12,6 +13,21 @@ port = 54322
 enabled = true
 port = 54323
 
-[[functions]]
-name = "get-manifest"
+[inbucket]
+enabled = true
+
+[storage]
+enabled = true
+
+[auth]
+enabled = true
+
+[realtime]
+enabled = true
+
+[functions]
+[functions.get-manifest]
+verify_jwt = false
+
+[functions.generate-storefront]
 verify_jwt = false

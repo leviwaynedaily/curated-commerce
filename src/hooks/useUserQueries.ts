@@ -43,15 +43,28 @@ export const useUserQueries = (session: any) => {
   const businessQuery = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
-      if (!userQuery.data?.id) return null;
+      if (!userQuery.data?.id) {
+        console.log("No user ID available, skipping business fetch");
+        return null;
+      }
+      
       console.log("Fetching business data for user:", userQuery.data.id);
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
         .eq("user_id", userQuery.data.id)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Business query error:", error);
+        throw error;
+      }
+
+      if (!data) {
+        console.log("No business found for user");
+        return null;
+      }
+
       console.log("Business data fetched:", data?.id);
       return data;
     },
@@ -61,7 +74,10 @@ export const useUserQueries = (session: any) => {
   const storefrontsQuery = useQuery({
     queryKey: ["storefronts", businessQuery.data?.id],
     queryFn: async () => {
-      if (!businessQuery.data?.id) return [];
+      if (!businessQuery.data?.id) {
+        console.log("No business ID available, skipping storefronts fetch");
+        return [];
+      }
       console.log("Fetching storefronts for business:", businessQuery.data.id);
       const { data, error } = await supabase
         .from("storefronts")
@@ -69,9 +85,13 @@ export const useUserQueries = (session: any) => {
         .eq("business_id", businessQuery.data.id)
         .order("name");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Storefronts query error:", error);
+        throw error;
+      }
+      
       console.log("Storefronts fetched:", data?.length);
-      return data;
+      return data || [];
     },
     enabled: !!businessQuery.data?.id,
   });
@@ -79,7 +99,10 @@ export const useUserQueries = (session: any) => {
   const businessUsersQuery = useQuery({
     queryKey: ["business-users", businessQuery.data?.id],
     queryFn: async () => {
-      if (!businessQuery.data?.id) return [];
+      if (!businessQuery.data?.id) {
+        console.log("No business ID available, skipping business users fetch");
+        return [];
+      }
       console.log("Fetching business users for business:", businessQuery.data.id);
 
       // First get business users

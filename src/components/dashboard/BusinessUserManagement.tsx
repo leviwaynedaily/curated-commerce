@@ -4,6 +4,7 @@ import { Plus, User } from "lucide-react"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface BusinessUserManagementProps {
   business: any
@@ -14,6 +15,15 @@ interface BusinessUserManagementProps {
 export function BusinessUserManagement({ business, businessUsers, onRefetch }: BusinessUserManagementProps) {
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
+  const [lastCreatedUserCredentials, setLastCreatedUserCredentials] = useState<{email: string, password: string} | null>(null)
+
+  const generateTemporaryPassword = () => {
+    // Generate a random 12-character password
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    return Array.from(crypto.getRandomValues(new Uint32Array(12)))
+      .map((x) => chars[x % chars.length])
+      .join('')
+  }
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,33 +35,69 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     try {
       setIsAddingUser(true)
       console.log("Adding user to business:", business.id)
-      console.log("Searching for user with email:", newUserEmail)
 
-      const { data: userData, error: userError } = await supabase
-        .from("profiles")
+      // First verify the current user has permission to add users to this business
+      const { data: businessCheck, error: businessCheckError } = await supabase
+        .from("businesses")
         .select("id")
-        .eq("email", newUserEmail)
-        .maybeSingle()
+        .eq("id", business.id)
+        .single()
 
-      if (userError) {
-        console.error("Error finding user:", userError)
-        toast.error("An error occurred while searching for the user")
+      if (businessCheckError || !businessCheck) {
+        console.error("Error checking business permissions:", businessCheckError)
+        toast.error("You don't have permission to add users to this business")
+        return
+      }
+      
+      const tempPassword = generateTemporaryPassword()
+      
+      // Try to create the user - if they exist, we'll get an error with their ID
+      const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: tempPassword,
+      })
+
+      console.log("Sign up response:", { newUser, signUpError })
+
+      let userId: string | undefined
+
+      if (signUpError) {
+        if (signUpError.message.includes("already registered")) {
+          // User exists, get their ID from profiles table
+          const { data: existingProfile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("email", newUserEmail)
+            .single()
+          
+          userId = existingProfile?.id
+          console.log("Found existing user:", userId)
+        } else {
+          console.error("Error creating user:", signUpError)
+          toast.error("Failed to create user account")
+          return
+        }
+      } else {
+        userId = newUser.user?.id
+        // Store the credentials for display
+        setLastCreatedUserCredentials({
+          email: newUserEmail,
+          password: tempPassword
+        })
+        toast.success("New user account created successfully")
+      }
+
+      if (!userId) {
+        toast.error("Failed to get user ID")
         return
       }
 
-      if (!userData) {
-        console.log("No user found with email:", newUserEmail)
-        toast.error("No user found with this email address")
-        return
-      }
-
-      console.log("User found:", userData.id)
-
+      // Check if user already has access
       const { data: existingAccess, error: existingAccessError } = await supabase
         .from("business_users")
         .select("id")
         .eq("business_id", business.id)
-        .eq("user_id", userData.id)
+        .eq("user_id", userId)
         .maybeSingle()
 
       if (existingAccessError) throw existingAccessError
@@ -61,22 +107,23 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         return
       }
 
-      const { error } = await supabase
+      // Add user to business
+      const { error: addError } = await supabase
         .from("business_users")
         .insert({
           business_id: business.id,
-          user_id: userData.id,
+          user_id: userId,
           role: "member"
         })
 
-      if (error) throw error
+      if (addError) throw addError
 
-      toast.success("User added successfully")
+      toast.success("User added successfully to business")
       setNewUserEmail("")
       onRefetch()
     } catch (error) {
-      console.error("Error adding user:", error)
-      toast.error("Failed to add user. Please try again.")
+      console.error("Error in user management:", error)
+      toast.error("Failed to manage user. Please try again.")
     } finally {
       setIsAddingUser(false)
     }
@@ -93,6 +140,18 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
           Manage users that have access to all Curately Storefronts
         </p>
       </div>
+
+      {lastCreatedUserCredentials && (
+        <Alert>
+          <AlertDescription className="space-y-2">
+            <p><strong>New user created!</strong></p>
+            <p>Email: {lastCreatedUserCredentials.email}</p>
+            <p>Temporary Password: <strong>{lastCreatedUserCredentials.password}</strong></p>
+            <p className="text-sm text-muted-foreground">Please save these credentials - they won't be shown again!</p>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <form onSubmit={handleAddUser} className="flex gap-2">
         <Input
           type="email"
@@ -106,6 +165,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
           Add User
         </Button>
       </form>
+
       <div className="rounded-lg border">
         <div className="p-4">
           <div className="divide-y">
