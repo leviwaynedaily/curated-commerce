@@ -165,6 +165,17 @@ export function PWASettingsForm() {
     try {
       console.log("Publishing PWA for storefront:", currentStorefrontId);
       
+      // Generate static files first
+      const { error: generateError } = await supabase.functions
+        .invoke('generate-storefront', {
+          body: { storefrontId: currentStorefrontId }
+        });
+
+      if (generateError) {
+        throw new Error('Failed to generate static files: ' + generateError.message);
+      }
+
+      // Update storefront with PWA settings
       const { error: updateError } = await supabase
         .from("storefronts")
         .update({
@@ -183,7 +194,7 @@ export function PWASettingsForm() {
       console.error("Error publishing PWA:", error);
       toast({
         title: "Error",
-        description: "Failed to publish PWA",
+        description: "Failed to publish PWA: " + error.message,
         variant: "destructive",
       });
     } finally {
