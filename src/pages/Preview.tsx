@@ -76,11 +76,20 @@ export default function Preview() {
   useEffect(() => {
     if (storefront) {
       console.log("Updating document title and favicon for storefront:", storefront.name);
+      // Update page title
+      document.title = storefront.page_title || storefront.name;
+      
       // Update favicon if provided
       if (storefront.favicon_url) {
         const favicon = document.querySelector("link[rel='icon']") as HTMLLinkElement;
         if (favicon) {
           favicon.href = storefront.favicon_url;
+        } else {
+          const newFavicon = document.createElement('link');
+          newFavicon.rel = 'icon';
+          newFavicon.type = 'image/x-icon';
+          newFavicon.href = storefront.favicon_url;
+          document.head.appendChild(newFavicon);
         }
       }
     }
