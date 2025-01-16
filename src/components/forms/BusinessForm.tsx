@@ -19,13 +19,17 @@ import type { TablesInsert } from "@/integrations/supabase/types";
 // Use the correct types from Supabase
 type BusinessInsert = TablesInsert<"businesses">;
 
+interface BusinessFormProps {
+  onSuccess?: () => void;
+}
+
 const businessSchema = z.object({
   name: z.string().min(2, "Business name must be at least 2 characters"),
   email: z.string().email("Please enter a valid email address"),
   phone: z.string().optional(),
 });
 
-export function BusinessForm() {
+export function BusinessForm({ onSuccess }: BusinessFormProps) {
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof businessSchema>>({
     resolver: zodResolver(businessSchema),
@@ -58,7 +62,12 @@ export function BusinessForm() {
       if (error) throw error;
 
       toast.success("Business created successfully!");
-      navigate("/");
+      
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Error creating business:", error);
       toast.error("Failed to create business. Please try again.");
