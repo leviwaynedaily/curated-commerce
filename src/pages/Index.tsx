@@ -26,8 +26,7 @@ const Index = () => {
           .from("businesses")
           .select("*")
           .eq("user_id", user.id)
-          .limit(1)
-          .single()
+          .maybeSingle()
 
         if (error) {
           console.error("Business query error:", error)
