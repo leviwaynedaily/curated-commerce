@@ -36,7 +36,6 @@ const Users = () => {
       if (!business?.id) return [];
       console.log("Fetching storefronts with users for business:", business.id);
 
-      // First get all storefronts and their users
       const { data: storefrontsData, error: storefrontsError } = await supabase
         .from("storefronts")
         .select(`
@@ -46,7 +45,7 @@ const Users = () => {
             id,
             user_id,
             role,
-            user:profiles!storefront_users_user_id_fkey (
+            user:user_id (
               email
             )
           )
