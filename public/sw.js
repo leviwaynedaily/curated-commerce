@@ -45,7 +45,12 @@ self.addEventListener('fetch', (event) => {
             console.error('Manifest Request: No slug found in path');
             return new Response(JSON.stringify({ error: 'No slug provided' }), {
               status: 400,
-              headers: { 'Content-Type': 'application/json' }
+              headers: {
+                'Content-Type': 'application/json',
+                'Service-Worker-Allowed': '/',
+                'Cache-Control': 'no-cache',
+                'Access-Control-Allow-Origin': '*'
+              }
             });
           }
           
@@ -58,14 +63,23 @@ self.addEventListener('fetch', (event) => {
           
           if (cachedResponse) {
             console.log('Manifest Request: Using cached manifest');
-            return cachedResponse;
+            // Validate cached JSON
+            try {
+              await cachedResponse.clone().json();
+              return cachedResponse;
+            } catch (e) {
+              console.log('Manifest Request: Cached manifest invalid, fetching fresh copy');
+              // If cached JSON is invalid, remove it and fetch fresh
+              await cache.delete(manifestUrl);
+            }
           }
           
           console.log('Manifest Request: Fetching from storage:', manifestUrl);
           const response = await fetch(manifestUrl, {
             headers: {
               'Content-Type': 'application/json',
-              'Service-Worker-Allowed': '/'
+              'Service-Worker-Allowed': '/',
+              'Cache-Control': 'no-cache'
             }
           });
           
@@ -98,7 +112,12 @@ self.addEventListener('fetch', (event) => {
           console.error('Manifest Request Error:', error);
           return new Response(JSON.stringify({ error: error.message }), {
             status: 500,
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+              'Content-Type': 'application/json',
+              'Service-Worker-Allowed': '/',
+              'Cache-Control': 'no-cache',
+              'Access-Control-Allow-Origin': '*'
+            }
           });
         }
       })()
