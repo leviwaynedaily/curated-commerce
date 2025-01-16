@@ -15,15 +15,15 @@ export default function Store() {
     queryFn: async () => {
       if (!id) return null
 
-      const { data, error } = await supabase
+      const { data, error: queryError } = await supabase
         .from("storefronts")
         .select("*")
         .eq("id", id)
-        .maybeSingle()
+        .single()
 
-      if (error) {
-        console.error("Error fetching storefront:", error)
-        throw error
+      if (queryError) {
+        console.error("Error fetching storefront:", queryError)
+        throw queryError
       }
 
       // Set the last selected storefront ID in localStorage
@@ -33,6 +33,7 @@ export default function Store() {
 
       return data
     },
+    retry: 1,
     enabled: !!id,
   })
 
