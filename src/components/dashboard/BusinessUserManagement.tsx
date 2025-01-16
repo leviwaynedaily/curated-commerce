@@ -34,26 +34,29 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
     try {
       setIsAddingUser(true)
-      console.log("Checking if user exists:", newUserEmail)
+      console.log("Adding user to business:", business.id)
+      console.log("Searching for user with email:", newUserEmail)
 
-      // First check if user already exists
-      const { data: existingUser, error: userError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", newUserEmail)
-        .maybeSingle()
+      // First check if user exists in auth.users (via getUser)
+      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers({
+        filters: {
+          email: newUserEmail
+        }
+      })
 
-      if (userError) {
-        console.error("Error checking user:", userError)
+      if (getUserError) {
+        console.error("Error checking auth user:", getUserError)
         toast.error("An error occurred while checking user")
         return
       }
 
-      let userId = existingUser?.id
+      let userId: string | undefined
 
-      // If user doesn't exist, create them
-      if (!existingUser) {
-        console.log("User doesn't exist, creating new account")
+      // If user doesn't exist in auth.users, create them
+      if (!users || users.length === 0) {
+        console.log("No user found with email:", newUserEmail)
+        console.log("Creating new user account")
+        
         const tempPassword = generateTemporaryPassword()
         
         const { data: newUser, error: signUpError } = await supabase.auth.signUp({
@@ -76,6 +79,13 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         })
         
         toast.success("New user account created successfully")
+      } else {
+        userId = users[0].id
+      }
+
+      if (!userId) {
+        toast.error("Failed to get user ID")
+        return
       }
 
       // Check if user already has access
