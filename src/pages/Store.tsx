@@ -15,23 +15,43 @@ export default function Store() {
     queryFn: async () => {
       if (!id) return null
 
-      const { data, error: queryError } = await supabase
-        .from("storefronts")
-        .select("*")
-        .eq("id", id)
-        .single()
+      try {
+        // First try to get published storefronts (no auth needed)
+        const { data: publicData, error: publicError } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("id", id)
+          .eq("is_published", true)
+          .single()
 
-      if (queryError) {
-        console.error("Error fetching storefront:", queryError)
-        throw queryError
+        if (publicData) {
+          console.log("Found published storefront:", publicData.id)
+          return publicData
+        }
+
+        // If not found or error, try authenticated query
+        const { data: privateData, error: privateError } = await supabase
+          .from("storefronts")
+          .select("*")
+          .eq("id", id)
+          .single()
+
+        if (privateError) {
+          console.error("Error fetching storefront:", privateError)
+          throw privateError
+        }
+
+        if (!privateData) {
+          console.error("No storefront found with ID:", id)
+          throw new Error("Storefront not found")
+        }
+
+        console.log("Found private storefront:", privateData.id)
+        return privateData
+      } catch (error) {
+        console.error("Failed to fetch storefront:", error)
+        throw error
       }
-
-      // Set the last selected storefront ID in localStorage
-      if (data) {
-        localStorage.setItem('lastStorefrontId', data.id)
-      }
-
-      return data
     },
     retry: 1,
     enabled: !!id,
