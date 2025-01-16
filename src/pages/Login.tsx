@@ -12,8 +12,8 @@ const Login = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session) {
-        console.log("User logged in, redirecting to landing page");
-        navigate("/landing");
+        console.log("User logged in, redirecting to dashboard");
+        navigate("/dashboard");
       }
     });
 

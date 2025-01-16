@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StorefrontSwitcher } from "@/components/storefront/StorefrontSwitcher";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -31,20 +31,21 @@ interface DashboardSidebarProps extends React.HTMLAttributes<HTMLDivElement> {}
 export function DashboardSidebar({ className }: DashboardSidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { id: storefrontId } = useParams(); // Get storefront ID from URL params
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Query to get the current storefront
   const { data: storefront, refetch: refetchStorefront } = useQuery({
-    queryKey: ["current-storefront"],
+    queryKey: ["current-storefront", storefrontId],
     queryFn: async () => {
-      const lastStorefrontId = localStorage.getItem('lastStorefrontId');
-      if (!lastStorefrontId) return null;
+      const currentId = storefrontId || localStorage.getItem('lastStorefrontId');
+      if (!currentId) return null;
 
       const { data, error } = await supabase
         .from("storefronts")
         .select("*")
-        .eq("id", lastStorefrontId)
+        .eq("id", currentId)
         .maybeSingle();
 
       if (error) {
@@ -116,8 +117,9 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
       label: 'Live Preview',
       icon: Eye,
       onClick: () => {
-        if (storefront?.id) {
-          navigate(`/preview?storefrontId=${storefront.id}`);
+        const currentId = storefrontId || localStorage.getItem('lastStorefrontId');
+        if (currentId) {
+          window.open(`/preview?storefrontId=${currentId}`, '_blank');
         }
       },
       href: '#',
@@ -125,7 +127,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
     },
   ];
 
-  const isInStore = location.pathname.startsWith('/store/') || !!storefront;
+  const isInStore = !!storefrontId || !!storefront;
 
   return (
     <>

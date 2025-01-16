@@ -2,119 +2,41 @@ import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserQueries } from "@/hooks/useUserQueries";
-import { StorefrontUsers } from "@/components/storefront/StorefrontUsers";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-interface StorefrontUser {
-  id: string;
-  user_id: string;
-  role: string;
-  profiles: {
-    email: string;
-  };
-}
-
-interface Storefront {
-  id: string;
-  name: string;
-  storefront_users: StorefrontUser[];
-}
+import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManagement";
+import { Card } from "@/components/ui/card";
 
 const Users = () => {
   const { business } = useUserQueries({});
-  const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserPassword, setNewUserPassword] = useState("");
-  const [isCreatingUser, setIsCreatingUser] = useState(false);
 
-  const { data: storefronts = [], isLoading } = useQuery({
-    queryKey: ["storefronts-with-users", business?.id],
+  const { data: businessUsers = [], refetch } = useQuery({
+    queryKey: ["business-users", business?.id],
     queryFn: async () => {
       if (!business?.id) return [];
-      console.log("Fetching storefronts with users for business:", business.id);
+      console.log("Fetching business users for business:", business.id);
 
-      const { data: storefrontsData, error: storefrontsError } = await supabase
-        .from("storefronts")
+      const { data, error } = await supabase
+        .from("business_users")
         .select(`
           id,
-          name,
-          storefront_users (
+          role,
+          user_id,
+          profiles!business_users_user_id_fkey (
             id,
-            user_id,
-            role
+            email
           )
         `)
         .eq("business_id", business.id);
 
-      if (storefrontsError) {
-        console.error("Error fetching storefronts:", storefrontsError);
-        throw storefrontsError;
+      if (error) {
+        console.error("Error fetching business users:", error);
+        throw error;
       }
 
-      // Get all unique user IDs from storefront users
-      const userIds = [...new Set(
-        storefrontsData.flatMap(s => 
-          s.storefront_users.map(u => u.user_id)
-        )
-      )];
-
-      // Fetch profiles for all users
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, email")
-        .in("id", userIds);
-
-      if (profilesError) {
-        console.error("Error fetching profiles:", profilesError);
-        throw profilesError;
-      }
-
-      // Map profiles to storefront users
-      const transformedData = storefrontsData.map(storefront => ({
-        ...storefront,
-        storefront_users: storefront.storefront_users.map(user => ({
-          ...user,
-          profiles: profiles.find(p => p.id === user.user_id) || { email: '' }
-        }))
-      }));
-
-      console.log("Fetched storefronts with users:", transformedData);
-      return transformedData as Storefront[];
+      console.log("Business users fetched:", data);
+      return data;
     },
     enabled: !!business?.id,
   });
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUserEmail || !newUserPassword) {
-      toast.error("Please enter both email and password");
-      return;
-    }
-
-    try {
-      setIsCreatingUser(true);
-      console.log("Creating new user with email:", newUserEmail);
-
-      const { data, error } = await supabase.auth.signUp({
-        email: newUserEmail,
-        password: newUserPassword,
-      });
-
-      if (error) throw error;
-
-      toast.success("User created successfully! They will need to verify their email.");
-      setNewUserEmail("");
-      setNewUserPassword("");
-    } catch (error) {
-      console.error("Error creating user:", error);
-      toast.error(error.message || "Failed to create user. Please try again.");
-    } finally {
-      setIsCreatingUser(false);
-    }
-  };
 
   return (
     <DashboardLayout>
@@ -122,50 +44,17 @@ const Users = () => {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
           <p className="text-muted-foreground mt-2">
-            Manage users across your storefronts
+            Manage users across your business
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Create New User</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateUser} className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="Email"
-                    value={newUserEmail}
-                    onChange={(e) => setNewUserEmail(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Input
-                    type="password"
-                    placeholder="Password"
-                    value={newUserPassword}
-                    onChange={(e) => setNewUserPassword(e.target.value)}
-                  />
-                </div>
-              </div>
-              <Button type="submit" disabled={isCreatingUser}>
-                Create User
-              </Button>
-            </form>
-          </CardContent>
+        <Card className="p-6">
+          <BusinessUserManagement 
+            business={business} 
+            businessUsers={businessUsers}
+            onRefetch={refetch}
+          />
         </Card>
-
-        {storefronts.map((storefront) => (
-          <div key={storefront.id} className="space-y-4">
-            <h2 className="text-2xl font-semibold">{storefront.name}</h2>
-            <StorefrontUsers 
-              storefrontId={storefront.id} 
-              users={storefront.storefront_users} 
-            />
-          </div>
-        ))}
       </div>
     </DashboardLayout>
   );
