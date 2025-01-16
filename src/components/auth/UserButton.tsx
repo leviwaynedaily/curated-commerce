@@ -1,4 +1,4 @@
-import { LogOut, User, Settings } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,8 +87,8 @@ export function UserButton() {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="bg-white border shadow-lg">
           <DropdownMenuItem onClick={() => setIsProfileOpen(true)}>
-            <Settings className="mr-2 h-4 w-4" />
-            Edit Profile
+            <User className="mr-2 h-4 w-4" />
+            Profile
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
