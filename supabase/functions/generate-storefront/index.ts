@@ -20,7 +20,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get storefront and PWA settings
+    // Get storefront details
     const { data: storefront, error: storefrontError } = await supabase
       .from('storefronts')
       .select('*, pwa_settings(*)')
@@ -34,7 +34,10 @@ serve(async (req) => {
 
     console.log('Found storefront:', storefront.slug)
 
-    // Generate index.html content
+    // Generate manifest URL using the predictable pattern
+    const manifestUrl = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/public/storefront-assets/pwa/${storefront.slug}/manifest.json`
+
+    // Generate index.html content with the manifest URL
     const indexHtml = `<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -42,8 +45,7 @@ serve(async (req) => {
     <link rel="icon" type="image/x-icon" href="${storefront.favicon_url || '/favicon.ico'}" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>${storefront.page_title || storefront.name}</title>
-    ${storefront.pwa_settings?.manifest_url ? 
-      `<link rel="manifest" href="${storefront.pwa_settings.manifest_url}" />` : ''}
+    <link rel="manifest" href="${manifestUrl}" />
   </head>
   <body>
     <div id="root"></div>
