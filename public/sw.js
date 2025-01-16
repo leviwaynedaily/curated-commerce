@@ -22,7 +22,6 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Only call respondWith once
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

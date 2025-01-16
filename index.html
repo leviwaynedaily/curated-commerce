@@ -12,13 +12,19 @@
     <script type="module" src="/src/main.tsx"></script>
     <script>
       window.addEventListener('load', async () => {
-        console.log('Window loaded, checking for slug parameter');
-        const slug = new URLSearchParams(window.location.search).get('slug');
+        console.log('Window loaded, checking for URL parameters');
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+        const pathSegments = window.location.pathname.split('/');
+        const storeId = pathSegments[pathSegments.indexOf('store') + 1];
         
-        if (slug) {
-          console.log('Found slug:', slug);
-          try {
-            // First get the storefront by slug
+        console.log('URL parameters:', { slug, storeId });
+        
+        let storefrontId = null;
+        
+        try {
+          if (slug) {
+            console.log('Looking up storefront by slug:', slug);
             const { data: storefront } = await fetch(
               `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${slug}&select=id`,
               {
@@ -27,38 +33,42 @@
                 }
               }
             ).then(r => r.json());
-
+            
             if (storefront && storefront[0]) {
-              console.log('Found storefront:', storefront[0].id);
-              
-              // Then get the PWA settings for this storefront
-              const { data: pwaSettings } = await fetch(
-                `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${storefront[0].id}&select=manifest_url`,
-                {
-                  headers: {
-                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5OTg0ODEsImV4cCI6MjA1MTU3NDQ4MX0.bQo5CgIk3t0BGth_XjP-4Qx1M1PMCu6ZIzrUnMKfddE'
-                  }
-                }
-              ).then(r => r.json());
-
-              if (pwaSettings && pwaSettings[0] && pwaSettings[0].manifest_url) {
-                console.log('Found manifest URL:', pwaSettings[0].manifest_url);
-                const manifestLink = document.createElement('link');
-                manifestLink.rel = 'manifest';
-                manifestLink.href = pwaSettings[0].manifest_url;
-                document.head.appendChild(manifestLink);
-                console.log('Added manifest link');
-              } else {
-                console.log('No manifest URL found in PWA settings');
-              }
-            } else {
-              console.log('No storefront found for slug:', slug);
+              storefrontId = storefront[0].id;
+              console.log('Found storefront ID from slug:', storefrontId);
             }
-          } catch (error) {
-            console.error('Error setting up manifest:', error);
+          } else if (storeId) {
+            console.log('Using store ID directly:', storeId);
+            storefrontId = storeId;
           }
-        } else {
-          console.log('No slug parameter found in URL');
+
+          if (storefrontId) {
+            console.log('Fetching PWA settings for storefront:', storefrontId);
+            const { data: pwaSettings } = await fetch(
+              `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${storefrontId}&select=manifest_url`,
+              {
+                headers: {
+                  'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5OTg0ODEsImV4cCI6MjA1MTU3NDQ4MX0.bQo5CgIk3t0BGth_XjP-4Qx1M1PMCu6ZIzrUnMKfddE'
+                }
+              }
+            ).then(r => r.json());
+
+            if (pwaSettings && pwaSettings[0] && pwaSettings[0].manifest_url) {
+              console.log('Found manifest URL:', pwaSettings[0].manifest_url);
+              const manifestLink = document.createElement('link');
+              manifestLink.rel = 'manifest';
+              manifestLink.href = pwaSettings[0].manifest_url;
+              document.head.appendChild(manifestLink);
+              console.log('Added manifest link to head');
+            } else {
+              console.log('No manifest URL found in PWA settings');
+            }
+          } else {
+            console.log('No valid storefront identifier found');
+          }
+        } catch (error) {
+          console.error('Error setting up manifest:', error);
         }
       });
 
