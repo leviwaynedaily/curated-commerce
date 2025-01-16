@@ -5,8 +5,11 @@ import { useQuery } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
 import { StorefrontForm } from "@/components/forms/StorefrontForm"
 import { Dashboard } from "@/components/dashboard/Dashboard"
+import { useNavigate } from "react-router-dom"
 
 const Index = () => {
+  const navigate = useNavigate()
+
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
@@ -49,6 +52,8 @@ const Index = () => {
         
         if (specificStorefront) {
           console.log("Using last accessed storefront:", specificStorefront.id)
+          // Navigate to the store page with the selected storefront
+          navigate(`/store/${specificStorefront.id}`)
           return specificStorefront
         }
       }
@@ -64,10 +69,11 @@ const Index = () => {
         return null
       }
 
-      // Store the storefront ID for next time
+      // Store the storefront ID for next time and navigate if found
       if (data) {
         localStorage.setItem('lastStorefrontId', data.id)
         console.log("Setting new current storefront:", data.id)
+        navigate(`/store/${data.id}`)
       }
       
       return data
