@@ -11,52 +11,68 @@ import { Plus } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { BusinessForm } from "@/components/forms/BusinessForm"
 import { UserButton } from "@/components/auth/UserButton"
+import { toast } from "sonner"
 
 export default function Dashboard() {
   const navigate = useNavigate()
-  const [session, setSession] = useState(null)
   const [showCreateBusiness, setShowCreateBusiness] = useState(false)
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession()
-      if (!currentSession) {
-        navigate("/login")
-        return
+  // Get current session
+  const { data: session, isLoading: isLoadingSession } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error("Session error:", error)
+        toast.error("Failed to load session")
+        return null
       }
-      setSession(currentSession)
+      console.log("Session loaded:", session?.user?.id)
+      return session
+    },
+  })
+
+  useEffect(() => {
+    if (!isLoadingSession && !session) {
+      console.log("No session found, redirecting to login")
+      navigate("/login")
     }
-    
-    checkAuth()
-  }, [navigate])
+  }, [session, isLoadingSession, navigate])
 
   const { data: business, isLoading: isLoadingBusiness } = useQuery({
-    queryKey: ["business"],
+    queryKey: ["business", session?.user?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return null
+      if (!session?.user?.id) {
+        console.log("No user ID available for business query")
+        return null
+      }
 
-      console.log("Fetching business data for user:", user.id)
+      console.log("Fetching business data for user:", session.user.id)
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_id", session.user.id)
         .maybeSingle()
 
       if (error) {
         console.error("Business query error:", error)
+        toast.error("Failed to load business data")
         return null
       }
       
+      console.log("Business data loaded:", data?.id)
       return data
     },
-    enabled: !!session,
+    enabled: !!session?.user?.id,
   })
 
   const { data: storefronts, isLoading: isLoadingStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
-      if (!business?.id) return []
+      if (!business?.id) {
+        console.log("No business ID available for storefronts query")
+        return []
+      }
       console.log("Fetching storefronts for business:", business.id)
       const { data, error } = await supabase
         .from("storefronts")
@@ -64,9 +80,14 @@ export default function Dashboard() {
         .eq("business_id", business.id)
         .order("name")
 
-      if (error) throw error
+      if (error) {
+        console.error("Storefronts query error:", error)
+        toast.error("Failed to load storefronts")
+        return []
+      }
+
       console.log("Storefronts fetched:", data?.length)
-      return data
+      return data || []
     },
     enabled: !!business?.id,
   })
@@ -74,7 +95,10 @@ export default function Dashboard() {
   const { data: businessUsers, refetch: refetchBusinessUsers } = useQuery({
     queryKey: ["business-users", business?.id],
     queryFn: async () => {
-      if (!business?.id) return []
+      if (!business?.id) {
+        console.log("No business ID available for business users query")
+        return []
+      }
       console.log("Fetching business users for business:", business.id)
 
       const { data: businessUsers, error: businessUsersError } = await supabase
@@ -82,7 +106,11 @@ export default function Dashboard() {
         .select("id, role, user_id")
         .eq("business_id", business.id)
 
-      if (businessUsersError) throw businessUsersError
+      if (businessUsersError) {
+        console.error("Business users query error:", businessUsersError)
+        toast.error("Failed to load business users")
+        return []
+      }
 
       const userIds = businessUsers.map(user => user.user_id)
       const { data: profiles, error: profilesError } = await supabase
@@ -90,7 +118,11 @@ export default function Dashboard() {
         .select("id, email")
         .in("id", userIds)
 
-      if (profilesError) throw profilesError
+      if (profilesError) {
+        console.error("Profiles query error:", profilesError)
+        toast.error("Failed to load user profiles")
+        return []
+      }
 
       const usersWithProfiles = businessUsers.map(user => ({
         ...user,
@@ -103,9 +135,9 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  if (!session) return null
+  const isLoading = isLoadingSession || isLoadingBusiness || isLoadingStorefronts
 
-  if (isLoadingBusiness || isLoadingStorefronts) {
+  if (isLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[400px]">
