@@ -17,12 +17,24 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Completely bypass any requests for manifest.json
+  // Let manifest.json requests go directly to the network
   if (event.request.url.includes('manifest.json')) {
-    console.log('Bypassing service worker for manifest request:', event.request.url);
+    console.log('Manifest request detected:', event.request.url);
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          console.log('Manifest fetch response:', response);
+          return response;
+        })
+        .catch(error => {
+          console.error('Error fetching manifest:', error);
+          return new Response(null, { status: 404 });
+        })
+    );
     return;
   }
   
+  // Handle all other requests with cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then((response) => {

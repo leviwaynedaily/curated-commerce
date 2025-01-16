@@ -5,8 +5,14 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Curately</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
+    <script type="module" src="/src/main.tsx"></script>
     <script>
       window.addEventListener('load', () => {
+        console.log('Window loaded, checking for slug parameter');
         const slug = new URLSearchParams(window.location.search).get('slug');
         if (slug) {
           console.log('Setting up manifest for slug:', slug);
@@ -16,6 +22,7 @@
           // Remove any existing manifest link
           const existingManifest = document.querySelector('link[rel="manifest"]');
           if (existingManifest) {
+            console.log('Removing existing manifest link');
             existingManifest.remove();
           }
           
@@ -23,22 +30,24 @@
           const manifestLink = document.createElement('link');
           manifestLink.rel = 'manifest';
           manifestLink.href = manifestUrl;
-          manifestLink.crossOrigin = 'use-credentials';
           document.head.appendChild(manifestLink);
           console.log('Added manifest link to head:', manifestLink);
+
+          // Verify manifest was added
+          const addedManifest = document.querySelector('link[rel="manifest"]');
+          if (addedManifest) {
+            console.log('Manifest link verified in document head:', addedManifest.href);
+          } else {
+            console.error('Failed to add manifest link to head');
+          }
         } else {
           console.log('No slug parameter found in URL');
         }
       });
-    </script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
-    <script type="module" src="/src/main.tsx"></script>
-    <script>
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          console.log('Registering service worker...');
           navigator.serviceWorker.register('/sw.js')
             .then(registration => {
               console.log('ServiceWorker registration successful:', registration);
