@@ -25,7 +25,8 @@ export const useUserQueries = (session: any) => {
       }
     },
     enabled: !!session,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
     meta: {
       errorHandler: () => {
         console.error("User query failed");
@@ -53,7 +54,7 @@ export const useUserQueries = (session: any) => {
           .from("businesses")
           .select("*")
           .eq("user_id", userQuery.data.id)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error("Business query error:", error);
@@ -68,7 +69,8 @@ export const useUserQueries = (session: any) => {
       }
     },
     enabled: !!userQuery.data?.id,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   const storefrontsQuery = useQuery({
@@ -100,6 +102,8 @@ export const useUserQueries = (session: any) => {
       }
     },
     enabled: !!businessQuery.data?.id,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   const businessUsersQuery = useQuery({
@@ -146,6 +150,8 @@ export const useUserQueries = (session: any) => {
       }
     },
     enabled: !!businessQuery.data?.id,
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
   });
 
   return {
