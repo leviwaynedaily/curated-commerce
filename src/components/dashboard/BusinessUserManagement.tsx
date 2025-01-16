@@ -4,6 +4,7 @@ import { Plus, User } from "lucide-react"
 import { useState } from "react"
 import { supabase } from "@/integrations/supabase/client"
 import { toast } from "sonner"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface BusinessUserManagementProps {
   business: any
@@ -14,6 +15,7 @@ interface BusinessUserManagementProps {
 export function BusinessUserManagement({ business, businessUsers, onRefetch }: BusinessUserManagementProps) {
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
+  const [lastCreatedUserCredentials, setLastCreatedUserCredentials] = useState<{email: string, password: string} | null>(null)
 
   const generateTemporaryPassword = () => {
     // Generate a random 12-character password
@@ -67,10 +69,13 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
         userId = newUser.user?.id
         
-        // Show temporary password to admin
-        toast.success(`User created! Temporary password: ${tempPassword}`, {
-          duration: 10000, // Show for 10 seconds
+        // Store the credentials for display
+        setLastCreatedUserCredentials({
+          email: newUserEmail,
+          password: tempPassword
         })
+        
+        toast.success("New user account created successfully")
       }
 
       // Check if user already has access
@@ -121,6 +126,18 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
           Manage users that have access to all Curately Storefronts
         </p>
       </div>
+
+      {lastCreatedUserCredentials && (
+        <Alert>
+          <AlertDescription className="space-y-2">
+            <p><strong>New user created!</strong></p>
+            <p>Email: {lastCreatedUserCredentials.email}</p>
+            <p>Temporary Password: <strong>{lastCreatedUserCredentials.password}</strong></p>
+            <p className="text-sm text-muted-foreground">Please save these credentials - they won't be shown again!</p>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <form onSubmit={handleAddUser} className="flex gap-2">
         <Input
           type="email"
@@ -134,6 +151,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
           Add User
         </Button>
       </form>
+
       <div className="rounded-lg border">
         <div className="p-4">
           <div className="divide-y">
