@@ -39,7 +39,8 @@ export default function Dashboard() {
     }
   }, [session, isLoadingSession, navigate])
 
-  const { data: business, isLoading: isLoadingBusiness } = useQuery({
+  // Query for business data with better error handling
+  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
     queryKey: ["business", session?.user?.id],
     queryFn: async () => {
       if (!session?.user?.id) {
@@ -47,23 +48,34 @@ export default function Dashboard() {
         return null
       }
 
-      console.log("Fetching business data for user:", session.user.id)
-      const { data, error } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .maybeSingle()
+      try {
+        console.log("Fetching business data for user:", session.user.id)
+        const { data, error } = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .maybeSingle()
 
-      if (error) {
-        console.error("Business query error:", error)
-        toast.error("Failed to load business data")
-        return null
+        if (error) {
+          console.error("Business query error:", error)
+          // Check for specific error types
+          if (error.code === '42P17') {
+            toast.error("There was an issue accessing your business data. Please try again.")
+          } else {
+            toast.error("Failed to load business data")
+          }
+          throw error
+        }
+        
+        console.log("Business data loaded:", data?.id)
+        return data
+      } catch (err) {
+        console.error("Unexpected error in business query:", err)
+        throw err
       }
-      
-      console.log("Business data loaded:", data?.id)
-      return data
     },
     enabled: !!session?.user?.id,
+    retry: 1,
   })
 
   const { data: storefronts, isLoading: isLoadingStorefronts } = useQuery({
@@ -145,6 +157,28 @@ export default function Dashboard() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
             <p className="text-muted-foreground">Loading...</p>
           </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
+  // Show error state if business query failed
+  if (businessError) {
+    return (
+      <DashboardLayout>
+        <div className="flex justify-end p-4">
+          <UserButton />
+        </div>
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 px-4">
+          <div className="text-center space-y-2 max-w-md">
+            <h1 className="text-2xl font-bold tracking-tight text-red-600">Error Loading Business Data</h1>
+            <p className="text-muted-foreground">
+              There was an error loading your business information. Please try refreshing the page.
+            </p>
+          </div>
+          <Button onClick={() => window.location.reload()} variant="outline">
+            Refresh Page
+          </Button>
         </div>
       </DashboardLayout>
     )
