@@ -60,7 +60,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           <SheetTrigger asChild>
             <Button
               variant="ghost"
-              className="md:hidden fixed left-4 top-4 z-40"
+              className="md:hidden fixed left-4 top-4 z-40 ml-2"
               size="icon"
             >
               <Menu className="h-5 w-5" />
@@ -74,7 +74,11 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-x-hidden">
-        {!isDashboardRoute && <DashboardHeader title={title} description={description} />}
+        {!isDashboardRoute && (
+          <div className="md:ml-0 ml-16">
+            <DashboardHeader title={title} description={description} />
+          </div>
+        )}
         <div className="px-4 md:px-8 py-8">
           {children}
         </div>
