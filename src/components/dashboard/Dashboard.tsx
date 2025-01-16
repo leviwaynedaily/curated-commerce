@@ -72,76 +72,83 @@ export function Dashboard({ storefront }: { storefront: any }) {
 
   if (productsError || userError) {
     return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          There was an error loading the dashboard. Please try refreshing the page.
-        </AlertDescription>
-      </Alert>
+      <div className="min-h-screen">
+        <div className="flex justify-end p-4">
+          <UserButton />
+        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            There was an error loading the dashboard. Please try refreshing the page.
+          </AlertDescription>
+        </Alert>
+      </div>
     )
   }
 
   return (
     <div className="space-y-6 md:space-y-8 fade-in px-4 md:px-0">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-              Dashboard for {storefront.name}
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground mt-2">
-              {greeting}, {userName}. Here's an overview of {storefront.name}.
-            </p>
-          </div>
-          <UserButton />
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+            {storefront ? `Dashboard for ${storefront.name}` : "Select a Storefront"}
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground mt-2">
+            {greeting}, {userName}. {storefront ? `Here's an overview of ${storefront.name}.` : "Choose a storefront to manage or create a new one."}
+          </p>
         </div>
+        <UserButton />
+      </div>
 
-        {storefront.logo_url && (
-          <div className="flex items-center gap-4">
-            <div className="bg-white dark:bg-white rounded-md p-2 w-fit">
-              <img 
-                src={storefront.logo_url} 
-                alt={storefront.name || 'Store logo'} 
-                className="h-12 object-contain"
-              />
+      {storefront && (
+        <>
+          {storefront.logo_url && (
+            <div className="flex items-center gap-4">
+              <div className="bg-white dark:bg-white rounded-md p-2 w-fit">
+                <img 
+                  src={storefront.logo_url} 
+                  alt={storefront.name || 'Store logo'} 
+                  className="h-12 object-contain"
+                />
+              </div>
             </div>
+          )}
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  Storefront Status: {storefront.is_published ? (
+                    <span className="text-green-500">Published</span>
+                  ) : (
+                    <span className="text-yellow-500">Draft</span>
+                  )}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Setup Progress: {setupProgress}% complete
+                </p>
+              </div>
+            </div>
+
+            <Progress value={setupProgress} className="h-2" />
+
+            {setupProgress < 100 && (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Complete your storefront setup to ensure the best experience for your customers.
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-sm font-medium">
-              Storefront Status: {storefront.is_published ? (
-                <span className="text-green-500">Published</span>
-              ) : (
-                <span className="text-yellow-500">Draft</span>
-              )}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Setup Progress: {setupProgress}% complete
-            </p>
+          <Stats products={products || []} />
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <QuickActions />
           </div>
-        </div>
-
-        <Progress value={setupProgress} className="h-2" />
-
-        {setupProgress < 100 && (
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Complete your storefront setup to ensure the best experience for your customers.
-            </AlertDescription>
-          </Alert>
-        )}
-      </div>
-
-      <Stats products={products || []} />
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <QuickActions />
-      </div>
+        </>
+      )}
     </div>
   )
 }
