@@ -29,8 +29,8 @@ function App() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session?.user?.id);
       
-      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
-        console.log("User signed out or deleted, clearing query cache");
+      if (event === 'SIGNED_OUT') {
+        console.log("User signed out, clearing query cache");
         queryClient.clear();
         localStorage.removeItem('lastStorefrontId');
         window.location.href = '/login';
@@ -54,7 +54,10 @@ function App() {
         const { data, error } = await supabase.auth.refreshSession();
         if (error) {
           console.error("Error refreshing session:", error);
-          if (error.message.includes('session_not_found') || error.message.includes('invalid_token')) {
+          if (error.message.includes('session_not_found') || 
+              error.message.includes('invalid_token') || 
+              error.message.includes('refresh_token_not_found')) {
+            console.log("Invalid or expired session, redirecting to login");
             toast.error("Session expired. Please sign in again.");
             queryClient.clear();
             localStorage.removeItem('lastStorefrontId');
