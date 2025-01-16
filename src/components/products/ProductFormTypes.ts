@@ -14,6 +14,7 @@ export const productFormSchema = z.object({
   category: z.array(z.string()).default([]),
   images: z.array(z.string()).optional(),
   status: z.enum(["active", "inactive"]).default("active"),
+  stock_number: z.string().optional(),
 })
 
 export type ProductFormValues = z.infer<typeof productFormSchema>
