@@ -18,7 +18,6 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [lastCreatedUserCredentials, setLastCreatedUserCredentials] = useState<{email: string, password: string} | null>(null)
 
   const generateTemporaryPassword = () => {
-    // Generate a random 12-character password
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     return Array.from(crypto.getRandomValues(new Uint32Array(12)))
       .map((x) => chars[x % chars.length])
@@ -51,34 +50,32 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
       
       const tempPassword = generateTemporaryPassword()
       
-      // Try to create the user - if they exist, we'll get an error with their ID
-      const { data: newUser, error: signUpError } = await supabase.auth.signUp({
-        email: newUserEmail,
-        password: tempPassword,
+      // Use the Edge Function to create the user instead of direct signup
+      const { data: newUser, error: createError } = await supabase.functions.invoke('create-user', {
+        body: { email: newUserEmail, password: tempPassword }
       })
 
-      console.log("Sign up response:", { newUser, signUpError })
+      console.log("Create user response:", { newUser, createError })
 
-      let userId: string | undefined
+      if (createError) {
+        console.error("Error creating user:", createError)
+        toast.error("Failed to create user account")
+        return
+      }
 
-      if (signUpError) {
-        if (signUpError.message.includes("already registered")) {
-          // User exists, get their ID from profiles table
-          const { data: existingProfile } = await supabase
-            .from("profiles")
-            .select("id")
-            .eq("email", newUserEmail)
-            .single()
-          
-          userId = existingProfile?.id
-          console.log("Found existing user:", userId)
-        } else {
-          console.error("Error creating user:", signUpError)
-          toast.error("Failed to create user account")
-          return
-        }
+      let userId = newUser?.data?.user?.id
+
+      if (!userId) {
+        // If user wasn't created, try to find existing user
+        const { data: existingProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("email", newUserEmail)
+          .single()
+        
+        userId = existingProfile?.id
+        console.log("Found existing user:", userId)
       } else {
-        userId = newUser.user?.id
         // Store the credentials for display
         setLastCreatedUserCredentials({
           email: newUserEmail,
