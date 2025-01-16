@@ -10,32 +10,15 @@
         const slug = new URLSearchParams(window.location.search).get('slug');
         if (slug) {
           console.log('Setting up manifest for slug:', slug);
-          
-          // Construct the manifest URL using the slug
           const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
           console.log('Using manifest URL:', manifestUrl);
           
-          // Remove any existing manifest link
-          const existingManifest = document.querySelector('link[rel="manifest"]');
-          if (existingManifest) {
-            console.log('Removing existing manifest link');
-            existingManifest.remove();
-          }
-          
-          // Create and add the new manifest link
+          // Create and add the manifest link
           const manifestLink = document.createElement('link');
           manifestLink.rel = 'manifest';
           manifestLink.href = manifestUrl;
           document.head.appendChild(manifestLink);
           console.log('Added manifest link to head:', manifestLink);
-          
-          // Trigger service worker update to pick up new manifest
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-              console.log('Updating service worker to pick up new manifest');
-              registration.update();
-            });
-          }
         } else {
           console.log('No slug parameter found in URL');
         }
