@@ -85,6 +85,12 @@ export function ProductTableRow({
             {product[field] || "—"}
           </span>
         )
+      case "stock_number":
+        return (
+          <span className="cursor-pointer hover:text-primary dark:text-gray-200">
+            {product[field] || "—"}
+          </span>
+        )
       case "in_town_price":
       case "shipping_price":
         return <span className="cursor-pointer hover:text-primary">${product[field]}</span>
@@ -140,6 +146,11 @@ export function ProductTableRow({
       <TableCell onClick={() => onCellClick(product.id, "description")}>
         <span className="line-clamp-2 text-sm text-muted-foreground cursor-pointer hover:text-primary dark:text-gray-300">
           {product.description || "—"}
+        </span>
+      </TableCell>
+      <TableCell onClick={() => onCellClick(product.id, "stock_number")}>
+        <span className="cursor-pointer hover:text-primary dark:text-gray-200">
+          {product.stock_number || "—"}
         </span>
       </TableCell>
       <TableCell>

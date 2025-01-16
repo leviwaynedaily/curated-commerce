@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
 import { Button } from "@/components/ui/button"
 import { ProductTable } from "@/components/products/ProductTable"
@@ -6,6 +6,7 @@ import { ProductFilters } from "@/components/products/ProductFilters"
 import { ProductBulkActions } from "@/components/products/ProductBulkActions"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
+import { type ProductStatus } from "@/types/product"
 import {
   Dialog,
   DialogContent,
@@ -16,10 +17,9 @@ import { ProductForm } from "@/components/forms/ProductForm"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, RotateCw } from "lucide-react"
+import { AlertCircle, RotateCw, Download, Upload } from "lucide-react"
 import { Loader2 } from "lucide-react"
-
-type ProductStatus = "active" | "inactive" | "all"
+import { generateTemplate, exportProducts, parseAndValidateCSV } from "@/utils/csvUtils"
 
 const LoadingState = () => (
   <div className="flex items-center justify-center min-h-[400px]">
@@ -71,6 +71,8 @@ const Products = () => {
   const [showCreateProduct, setShowCreateProduct] = useState(false)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [isImporting, setIsImporting] = useState(false)
 
   const currentStorefrontId = localStorage.getItem('lastStorefrontId')
 
@@ -89,7 +91,6 @@ const Products = () => {
     retry: 1,
   })
 
-  // Effect to handle authentication and storefront changes
   useEffect(() => {
     if (!isLoadingAuth && !session) {
       console.log("No active session, redirecting to login")
@@ -104,7 +105,6 @@ const Products = () => {
       navigate("/stores")
     } else {
       console.log("Current storefront ID:", currentStorefrontId)
-      // Invalidate queries when storefront changes
       queryClient.invalidateQueries({ queryKey: ["storefront"] })
       queryClient.invalidateQueries({ queryKey: ["products"] })
     }
@@ -136,10 +136,9 @@ const Products = () => {
     },
     enabled: !!currentStorefrontId && !!session,
     retry: 1,
-    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    staleTime: 1000 * 60 * 5,
   })
 
-  // Handle loading states
   if (isLoadingAuth || isStorefrontLoading) {
     return (
       <DashboardLayout>
@@ -148,7 +147,6 @@ const Products = () => {
     )
   }
 
-  // Handle authentication error
   if (!session) {
     return (
       <DashboardLayout>
@@ -168,7 +166,6 @@ const Products = () => {
     )
   }
 
-  // Handle storefront errors
   if (storefrontError) {
     console.error("Error loading storefront:", storefrontError)
     return (
@@ -186,6 +183,85 @@ const Products = () => {
     )
   }
 
+  const handleExport = async () => {
+    try {
+      if (!currentStorefrontId) {
+        toast.error("No storefront selected")
+        return
+      }
+
+      const { data: products, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("storefront_id", currentStorefrontId)
+
+      if (error) throw error
+
+      exportProducts(products)
+      toast.success("Products exported successfully!")
+    } catch (error) {
+      console.error("Export error:", error)
+      toast.error("Failed to export products")
+    }
+  }
+
+  const handleDownloadTemplate = () => {
+    const csv = generateTemplate()
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", "products_template.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file || !currentStorefrontId) return
+
+    try {
+      setIsImporting(true)
+      console.log("Starting CSV import process")
+      
+      const validProducts = await parseAndValidateCSV(file)
+      console.log("Valid products parsed from CSV:", validProducts)
+
+      const productsToInsert = validProducts.map(product => ({
+        ...product,
+        storefront_id: currentStorefrontId,
+        images: [],
+        sort_order: 0
+      }))
+
+      console.log("Attempting to insert products:", productsToInsert)
+      const { error } = await supabase
+        .from("products")
+        .insert(productsToInsert)
+
+      if (error) {
+        console.error("Error inserting products:", error)
+        throw error
+      }
+
+      toast.success(`Successfully imported ${validProducts.length} products`)
+      queryClient.invalidateQueries({ queryKey: ["products"] })
+    } catch (error) {
+      console.error("Import error:", error)
+      if (error instanceof Error) {
+        toast.error(`Failed to import products: ${error.message}`)
+      } else {
+        toast.error('Failed to import products')
+      }
+    } finally {
+      setIsImporting(false)
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""
+      }
+    }
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-4">
@@ -197,8 +273,46 @@ const Products = () => {
             onSearchChange={setSearchQuery}
           />
           <div className="flex items-center gap-2">
-            <Button variant="outline">Export</Button>
-            <Button variant="outline">Import</Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={handleExport}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleImport}
+                  ref={fileInputRef}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isImporting}
+                  className="flex items-center gap-2"
+                >
+                  {isImporting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="h-4 w-4" />
+                  )}
+                  Import
+                </Button>
+              </div>
+              <Button
+                variant="outline"
+                onClick={handleDownloadTemplate}
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Template
+              </Button>
+            </div>
             <Button 
               variant="default"
               onClick={() => setShowCreateProduct(true)}

@@ -230,8 +230,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                     "w-full justify-start transition-colors border-b border-brand-peach dark:border-brand-peach",
                     route.active && "bg-brand-peach/20 hover:bg-brand-peach/30 text-white",
                     isCollapsed && "justify-center px-2",
-                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white",
-                    !storefront && "opacity-50 cursor-not-allowed"
+                    !route.active && "hover:bg-brand-peach/10 text-white dark:text-white hover:text-white dark:hover:text-white"
                   )}
                   disabled={!storefront}
                   onClick={route.onClick}
@@ -239,7 +238,7 @@ export function DashboardSidebar({ className }: DashboardSidebarProps) {
                 >
                   {route.onClick ? (
                     <div className={cn(
-                      "flex items-center w-full",
+                      "flex items-center w-full cursor-pointer",
                       isCollapsed ? "justify-center" : ""
                     )}>
                       <route.icon className={cn(
