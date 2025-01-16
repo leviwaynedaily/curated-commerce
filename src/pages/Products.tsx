@@ -6,6 +6,7 @@ import { ProductFilters } from "@/components/products/ProductFilters"
 import { ProductBulkActions } from "@/components/products/ProductBulkActions"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/integrations/supabase/client"
+import { type ProductStatus } from "@/types/product"
 import {
   Dialog,
   DialogContent,
