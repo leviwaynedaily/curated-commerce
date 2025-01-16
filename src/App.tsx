@@ -29,21 +29,21 @@ function App() {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("Auth state changed:", event, session?.user?.id);
       
-      if (event === 'SIGNED_OUT') {
-        console.log("User signed out, clearing query cache");
+      if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+        console.log("User signed out or deleted, clearing query cache");
         queryClient.clear();
         localStorage.removeItem('lastStorefrontId');
+        window.location.href = '/login';
       }
 
       if (event === 'TOKEN_REFRESHED') {
-        console.log("Session token refreshed");
+        console.log("Session token refreshed successfully");
+        toast.success("Session refreshed");
       }
 
-      // Handle session expiration
-      if (event === 'SIGNED_OUT') {
-        toast.error("Session expired. Please sign in again.");
-        queryClient.clear();
-        window.location.href = '/login';
+      if (event === 'USER_UPDATED') {
+        console.log("User profile updated");
+        queryClient.invalidateQueries();
       }
     });
 
@@ -54,9 +54,10 @@ function App() {
         const { data, error } = await supabase.auth.refreshSession();
         if (error) {
           console.error("Error refreshing session:", error);
-          if (error.message.includes('session_not_found')) {
+          if (error.message.includes('session_not_found') || error.message.includes('invalid_token')) {
             toast.error("Session expired. Please sign in again.");
             queryClient.clear();
+            localStorage.removeItem('lastStorefrontId');
             window.location.href = '/login';
           }
         } else {
@@ -64,6 +65,8 @@ function App() {
         }
       } catch (err) {
         console.error("Unexpected error refreshing session:", err);
+        toast.error("An unexpected error occurred. Please try signing in again.");
+        window.location.href = '/login';
       }
     };
 
