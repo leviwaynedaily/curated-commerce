@@ -40,7 +40,7 @@ function App() {
       }
 
       // Handle session expiration
-      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT') {
         toast.error("Session expired. Please sign in again.");
         queryClient.clear();
         window.location.href = '/login';
