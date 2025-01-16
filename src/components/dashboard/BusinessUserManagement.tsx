@@ -15,6 +15,14 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [newUserEmail, setNewUserEmail] = useState("")
   const [isAddingUser, setIsAddingUser] = useState(false)
 
+  const generateTemporaryPassword = () => {
+    // Generate a random 12-character password
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    return Array.from(crypto.getRandomValues(new Uint32Array(12)))
+      .map((x) => chars[x % chars.length])
+      .join('')
+  }
+
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!business?.id || !newUserEmail) {
@@ -24,34 +32,53 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
 
     try {
       setIsAddingUser(true)
-      console.log("Adding user to business:", business.id)
-      console.log("Searching for user with email:", newUserEmail)
+      console.log("Checking if user exists:", newUserEmail)
 
-      const { data: userData, error: userError } = await supabase
+      // First check if user already exists
+      const { data: existingUser, error: userError } = await supabase
         .from("profiles")
         .select("id")
         .eq("email", newUserEmail)
         .maybeSingle()
 
       if (userError) {
-        console.error("Error finding user:", userError)
-        toast.error("An error occurred while searching for the user")
+        console.error("Error checking user:", userError)
+        toast.error("An error occurred while checking user")
         return
       }
 
-      if (!userData) {
-        console.log("No user found with email:", newUserEmail)
-        toast.error("No user found with this email address")
-        return
+      let userId = existingUser?.id
+
+      // If user doesn't exist, create them
+      if (!existingUser) {
+        console.log("User doesn't exist, creating new account")
+        const tempPassword = generateTemporaryPassword()
+        
+        const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+          email: newUserEmail,
+          password: tempPassword,
+        })
+
+        if (signUpError) {
+          console.error("Error creating user:", signUpError)
+          toast.error("Failed to create user account")
+          return
+        }
+
+        userId = newUser.user?.id
+        
+        // Show temporary password to admin
+        toast.success(`User created! Temporary password: ${tempPassword}`, {
+          duration: 10000, // Show for 10 seconds
+        })
       }
 
-      console.log("User found:", userData.id)
-
+      // Check if user already has access
       const { data: existingAccess, error: existingAccessError } = await supabase
         .from("business_users")
         .select("id")
         .eq("business_id", business.id)
-        .eq("user_id", userData.id)
+        .eq("user_id", userId)
         .maybeSingle()
 
       if (existingAccessError) throw existingAccessError
@@ -61,22 +88,23 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         return
       }
 
-      const { error } = await supabase
+      // Add user to business
+      const { error: addError } = await supabase
         .from("business_users")
         .insert({
           business_id: business.id,
-          user_id: userData.id,
+          user_id: userId,
           role: "member"
         })
 
-      if (error) throw error
+      if (addError) throw addError
 
-      toast.success("User added successfully")
+      toast.success("User added successfully to business")
       setNewUserEmail("")
       onRefetch()
     } catch (error) {
-      console.error("Error adding user:", error)
-      toast.error("Failed to add user. Please try again.")
+      console.error("Error in user management:", error)
+      toast.error("Failed to manage user. Please try again.")
     } finally {
       setIsAddingUser(false)
     }
