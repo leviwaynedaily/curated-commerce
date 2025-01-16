@@ -34,41 +34,41 @@ export const useUserQueries = (session: any) => {
           description: "Failed to load user data. Please try logging in again.",
           variant: "destructive",
         });
-        // Handle logout
         supabase.auth.signOut().then(() => navigate("/login"));
       }
     }
   });
 
   const businessQuery = useQuery({
-    queryKey: ["business"],
+    queryKey: ["business", userQuery.data?.id],
     queryFn: async () => {
       if (!userQuery.data?.id) {
         console.log("No user ID available, skipping business fetch");
         return null;
       }
       
-      console.log("Fetching business data for user:", userQuery.data.id);
-      const { data, error } = await supabase
-        .from("businesses")
-        .select("*")
-        .eq("user_id", userQuery.data.id)
-        .maybeSingle();
+      try {
+        console.log("Fetching business data for user:", userQuery.data.id);
+        const response = await supabase
+          .from("businesses")
+          .select("*")
+          .eq("user_id", userQuery.data.id)
+          .maybeSingle();
 
-      if (error) {
+        if (response.error) {
+          console.error("Business query error:", response.error);
+          throw response.error;
+        }
+
+        console.log("Business data fetched:", response.data?.id);
+        return response.data;
+      } catch (error) {
         console.error("Business query error:", error);
         throw error;
       }
-
-      if (!data) {
-        console.log("No business found for user");
-        return null;
-      }
-
-      console.log("Business data fetched:", data?.id);
-      return data;
     },
     enabled: !!userQuery.data?.id,
+    retry: 1,
   });
 
   const storefrontsQuery = useQuery({
@@ -105,7 +105,6 @@ export const useUserQueries = (session: any) => {
       }
       console.log("Fetching business users for business:", businessQuery.data.id);
 
-      // First get business users
       const { data: businessUsers, error: businessUsersError } = await supabase
         .from("business_users")
         .select("id, role, user_id")
@@ -116,7 +115,6 @@ export const useUserQueries = (session: any) => {
         throw businessUsersError;
       }
 
-      // Then get the profiles for those users
       const userIds = businessUsers.map(user => user.user_id);
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
@@ -128,7 +126,6 @@ export const useUserQueries = (session: any) => {
         throw profilesError;
       }
 
-      // Combine the data
       const usersWithProfiles = businessUsers.map(user => ({
         ...user,
         profiles: profiles.find(profile => profile.id === user.user_id)
@@ -145,6 +142,8 @@ export const useUserQueries = (session: any) => {
     business: businessQuery.data,
     storefronts: storefrontsQuery.data,
     businessUsers: businessUsersQuery.data,
+    isLoading: userQuery.isLoading || businessQuery.isLoading || storefrontsQuery.isLoading || businessUsersQuery.isLoading,
+    error: userQuery.error || businessQuery.error || storefrontsQuery.error || businessUsersQuery.error,
     refetchUser: userQuery.refetch,
     refetchBusinessUsers: businessUsersQuery.refetch,
   };

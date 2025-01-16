@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { BusinessForm } from "@/components/forms/BusinessForm"
 import { UserButton } from "@/components/auth/UserButton"
 import { toast } from "sonner"
+import { useUserQueries } from "@/hooks/useUserQueries"
 
 export default function Dashboard() {
   const navigate = useNavigate()
@@ -39,44 +40,8 @@ export default function Dashboard() {
     }
   }, [session, isLoadingSession, navigate])
 
-  // Query for business data with better error handling
-  const { data: business, isLoading: isLoadingBusiness, error: businessError } = useQuery({
-    queryKey: ["business", session?.user?.id],
-    queryFn: async () => {
-      if (!session?.user?.id) {
-        console.log("No user ID available for business query")
-        return null
-      }
-
-      try {
-        console.log("Fetching business data for user:", session.user.id)
-        const { data, error } = await supabase
-          .from("businesses")
-          .select("*")
-          .eq("user_id", session.user.id)
-          .maybeSingle()
-
-        if (error) {
-          console.error("Business query error:", error)
-          // Check for specific error types
-          if (error.code === '42P17') {
-            toast.error("There was an issue accessing your business data. Please try again.")
-          } else {
-            toast.error("Failed to load business data")
-          }
-          throw error
-        }
-        
-        console.log("Business data loaded:", data?.id)
-        return data
-      } catch (err) {
-        console.error("Unexpected error in business query:", err)
-        throw err
-      }
-    },
-    enabled: !!session?.user?.id,
-    retry: 1,
-  })
+  // Use the useUserQueries hook for business data
+  const { business, isLoading: isLoadingBusiness, error: businessError } = useUserQueries(session)
 
   const { data: storefronts, isLoading: isLoadingStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
