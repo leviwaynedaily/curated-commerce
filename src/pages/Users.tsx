@@ -98,25 +98,14 @@ const Users = () => {
       setIsCreatingUser(true);
       console.log("Creating new user with email:", newUserEmail);
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          email: newUserEmail,
-          password: newUserPassword
-        })
+      const { data, error } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
       });
 
-      const result = await response.json();
+      if (error) throw error;
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to create user');
-      }
-
-      toast.success("User created successfully!");
+      toast.success("User created successfully! They will need to verify their email.");
       setNewUserEmail("");
       setNewUserPassword("");
     } catch (error) {
