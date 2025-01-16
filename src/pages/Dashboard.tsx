@@ -6,10 +6,15 @@ import { BusinessUserManagement } from "@/components/dashboard/BusinessUserManag
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Helmet } from "react-helmet"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { BusinessForm } from "@/components/forms/BusinessForm"
 
 export default function Dashboard() {
   const navigate = useNavigate()
   const [session, setSession] = useState(null)
+  const [showCreateBusiness, setShowCreateBusiness] = useState(false)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -24,12 +29,13 @@ export default function Dashboard() {
     checkAuth()
   }, [navigate])
 
-  const { data: business } = useQuery({
+  const { data: business, isLoading: isLoadingBusiness } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return null
 
+      console.log("Fetching business data for user:", user.id)
       const { data, error } = await supabase
         .from("businesses")
         .select("*")
@@ -46,7 +52,7 @@ export default function Dashboard() {
     enabled: !!session,
   })
 
-  const { data: storefronts } = useQuery({
+  const { data: storefronts, isLoading: isLoadingStorefronts } = useQuery({
     queryKey: ["storefronts", business?.id],
     queryFn: async () => {
       if (!business?.id) return []
@@ -96,12 +102,59 @@ export default function Dashboard() {
     enabled: !!business?.id,
   })
 
-  const handleStoreSelect = (storeId: string) => {
-    localStorage.setItem('lastStorefrontId', storeId)
-    navigate(`/store/${storeId}`)
+  if (!session) return null
+
+  if (isLoadingBusiness || isLoadingStorefronts) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center space-y-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
   }
 
-  if (!session) return null
+  if (!business) {
+    return (
+      <DashboardLayout>
+        <Helmet>
+          <title>Welcome | Curately</title>
+        </Helmet>
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 px-4">
+          <img 
+            src="/lovable-uploads/35d2c47a-30a1-48fb-8a09-a38f89a571d3.png" 
+            alt="Welcome" 
+            className="w-32 h-32 object-contain"
+          />
+          <div className="text-center space-y-2 max-w-md">
+            <h1 className="text-2xl font-bold tracking-tight">Welcome to Curately</h1>
+            <p className="text-muted-foreground">
+              To get started, create your business profile. This will allow you to manage your storefronts and products.
+            </p>
+          </div>
+          <Button onClick={() => setShowCreateBusiness(true)} className="gap-2">
+            <Plus className="h-4 w-4" />
+            Create Business Profile
+          </Button>
+        </div>
+
+        <Dialog open={showCreateBusiness} onOpenChange={setShowCreateBusiness}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create Business Profile</DialogTitle>
+            </DialogHeader>
+            <BusinessForm onSuccess={() => {
+              setShowCreateBusiness(false)
+              window.location.reload()
+            }} />
+          </DialogContent>
+        </Dialog>
+      </DashboardLayout>
+    )
+  }
 
   return (
     <DashboardLayout>
@@ -113,7 +166,7 @@ export default function Dashboard() {
           <StoreGrid 
             storefronts={storefronts || []} 
             business={business}
-            onStoreSelect={handleStoreSelect}
+            onStoreSelect={(storeId) => navigate(`/store/${storeId}`)}
           />
           {business && (
             <BusinessUserManagement 
