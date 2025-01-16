@@ -46,7 +46,7 @@ const Users = () => {
             id,
             user_id,
             role,
-            user:user_id (
+            profiles:profiles (
               email
             )
           )
@@ -58,19 +58,8 @@ const Users = () => {
         throw storefrontsError;
       }
 
-      // Transform the data to match our expected types
-      const transformedData = storefrontsData.map(storefront => ({
-        ...storefront,
-        storefront_users: storefront.storefront_users.map(user => ({
-          ...user,
-          profiles: {
-            email: user.user.email
-          }
-        }))
-      }));
-
-      console.log("Fetched storefronts with users:", transformedData);
-      return transformedData as Storefront[];
+      console.log("Fetched storefronts with users:", storefrontsData);
+      return storefrontsData as Storefront[];
     },
     enabled: !!business?.id,
   });
