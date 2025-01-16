@@ -5,43 +5,76 @@
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Curately</title>
-    <script>
-      window.addEventListener('load', () => {
-        const slug = new URLSearchParams(window.location.search).get('slug');
-        if (slug) {
-          console.log('Setting up manifest for slug:', slug);
-          const manifestUrl = `https://bplsogdsyabqfftwclka.supabase.co/storage/v1/object/public/storefront-assets/pwa/${slug}/manifest.json`;
-          console.log('Using manifest URL:', manifestUrl);
-          
-          // Remove any existing manifest link
-          const existingManifest = document.querySelector('link[rel="manifest"]');
-          if (existingManifest) {
-            existingManifest.remove();
-          }
-          
-          const manifestLink = document.createElement('link');
-          manifestLink.rel = 'manifest';
-          manifestLink.href = manifestUrl;
-          manifestLink.crossOrigin = 'use-credentials';
-          document.head.appendChild(manifestLink);
-          
-          // Trigger manifest update
-          if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.ready.then(registration => {
-              registration.update();
-            });
-          }
-        }
-      });
-    </script>
   </head>
   <body>
     <div id="root"></div>
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
     <script>
+      window.addEventListener('load', async () => {
+        console.log('Window loaded, checking for URL parameters');
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('slug');
+        const pathSegments = window.location.pathname.split('/');
+        const storeId = pathSegments[pathSegments.indexOf('store') + 1];
+        
+        console.log('URL parameters:', { slug, storeId });
+        
+        let storefrontId = null;
+        
+        try {
+          if (slug) {
+            console.log('Looking up storefront by slug:', slug);
+            const { data: storefront } = await fetch(
+              `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/storefronts?slug=eq.${slug}&select=id`,
+              {
+                headers: {
+                  'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5OTg0ODEsImV4cCI6MjA1MTU3NDQ4MX0.bQo5CgIk3t0BGth_XjP-4Qx1M1PMCu6ZIzrUnMKfddE'
+                }
+              }
+            ).then(r => r.json());
+            
+            if (storefront && storefront[0]) {
+              storefrontId = storefront[0].id;
+              console.log('Found storefront ID from slug:', storefrontId);
+            }
+          } else if (storeId) {
+            console.log('Using store ID directly:', storeId);
+            storefrontId = storeId;
+          }
+
+          if (storefrontId) {
+            console.log('Fetching PWA settings for storefront:', storefrontId);
+            const { data: pwaSettings } = await fetch(
+              `https://bplsogdsyabqfftwclka.supabase.co/rest/v1/pwa_settings?storefront_id=eq.${storefrontId}&select=manifest_url`,
+              {
+                headers: {
+                  'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwbHNvZ2RzeWFicWZmdHdjbGthIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU5OTg0ODEsImV4cCI6MjA1MTU3NDQ4MX0.bQo5CgIk3t0BGth_XjP-4Qx1M1PMCu6ZIzrUnMKfddE'
+                }
+              }
+            ).then(r => r.json());
+
+            if (pwaSettings && pwaSettings[0] && pwaSettings[0].manifest_url) {
+              console.log('Found manifest URL:', pwaSettings[0].manifest_url);
+              const manifestLink = document.createElement('link');
+              manifestLink.rel = 'manifest';
+              manifestLink.href = pwaSettings[0].manifest_url;
+              document.head.appendChild(manifestLink);
+              console.log('Added manifest link to head');
+            } else {
+              console.log('No manifest URL found in PWA settings');
+            }
+          } else {
+            console.log('No valid storefront identifier found');
+          }
+        } catch (error) {
+          console.error('Error setting up manifest:', error);
+        }
+      });
+
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          console.log('Registering service worker...');
           navigator.serviceWorker.register('/sw.js')
             .then(registration => {
               console.log('ServiceWorker registration successful:', registration);
