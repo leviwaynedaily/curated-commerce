@@ -35,6 +35,19 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     try {
       setIsAddingUser(true)
       console.log("Adding user to business:", business.id)
+
+      // First verify the current user has permission to add users to this business
+      const { data: businessCheck, error: businessCheckError } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("id", business.id)
+        .single()
+
+      if (businessCheckError || !businessCheck) {
+        console.error("Error checking business permissions:", businessCheckError)
+        toast.error("You don't have permission to add users to this business")
+        return
+      }
       
       const tempPassword = generateTemporaryPassword()
       
