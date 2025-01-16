@@ -35,52 +35,43 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     try {
       setIsAddingUser(true)
       console.log("Adding user to business:", business.id)
-      console.log("Searching for user with email:", newUserEmail)
-
-      // First check if user exists in auth.users (via getUser)
-      const { data: { users }, error: getUserError } = await supabase.auth.admin.listUsers({
-        filters: {
-          email: newUserEmail
-        }
+      
+      const tempPassword = generateTemporaryPassword()
+      
+      // Try to create the user - if they exist, we'll get an error with their ID
+      const { data: newUser, error: signUpError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: tempPassword,
       })
 
-      if (getUserError) {
-        console.error("Error checking auth user:", getUserError)
-        toast.error("An error occurred while checking user")
-        return
-      }
+      console.log("Sign up response:", { newUser, signUpError })
 
       let userId: string | undefined
 
-      // If user doesn't exist in auth.users, create them
-      if (!users || users.length === 0) {
-        console.log("No user found with email:", newUserEmail)
-        console.log("Creating new user account")
-        
-        const tempPassword = generateTemporaryPassword()
-        
-        const { data: newUser, error: signUpError } = await supabase.auth.signUp({
-          email: newUserEmail,
-          password: tempPassword,
-        })
-
-        if (signUpError) {
+      if (signUpError) {
+        if (signUpError.message.includes("already registered")) {
+          // User exists, get their ID from profiles table
+          const { data: existingProfile } = await supabase
+            .from("profiles")
+            .select("id")
+            .eq("email", newUserEmail)
+            .single()
+          
+          userId = existingProfile?.id
+          console.log("Found existing user:", userId)
+        } else {
           console.error("Error creating user:", signUpError)
           toast.error("Failed to create user account")
           return
         }
-
+      } else {
         userId = newUser.user?.id
-        
         // Store the credentials for display
         setLastCreatedUserCredentials({
           email: newUserEmail,
           password: tempPassword
         })
-        
         toast.success("New user account created successfully")
-      } else {
-        userId = users[0].id
       }
 
       if (!userId) {
