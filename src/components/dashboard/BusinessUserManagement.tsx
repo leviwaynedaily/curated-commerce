@@ -27,6 +27,7 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
   const [isAddingUser, setIsAddingUser] = useState(false)
   const [lastCreatedUserCredentials, setLastCreatedUserCredentials] = useState<{email: string, password: string} | null>(null)
   const [userToDelete, setUserToDelete] = useState<{ id: string, email: string } | null>(null)
+  const [resetRequests, setResetRequests] = useState<Record<string, number>>({})
 
   const generateTemporaryPassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -161,7 +162,25 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
     }
   }
 
+  const isResetDisabled = (email: string) => {
+    const lastRequest = resetRequests[email]
+    if (!lastRequest) return false
+    const timeSinceLastRequest = Date.now() - lastRequest
+    return timeSinceLastRequest < 60000 // 60 seconds cooldown
+  }
+
+  const getResetButtonTooltip = (email: string) => {
+    if (!isResetDisabled(email)) return "Send password reset email"
+    const timeLeft = Math.ceil((60000 - (Date.now() - resetRequests[email])) / 1000)
+    return `Please wait ${timeLeft} seconds before requesting another reset`
+  }
+
   const handleResetPassword = async (email: string) => {
+    if (isResetDisabled(email)) {
+      toast.error("Please wait before requesting another password reset")
+      return
+    }
+
     try {
       console.log("Resetting password for user:", email)
       
@@ -169,8 +188,19 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
         redirectTo: `${window.location.origin}/reset-password`,
       })
 
-      if (error) throw error
+      if (error) {
+        if (error.message.includes('rate_limit')) {
+          toast.error("Please wait before requesting another password reset")
+        } else {
+          throw error
+        }
+        return
+      }
 
+      setResetRequests(prev => ({
+        ...prev,
+        [email]: Date.now()
+      }))
       toast.success("Password reset email sent successfully")
     } catch (error) {
       console.error("Error resetting password:", error)
@@ -232,6 +262,8 @@ export function BusinessUserManagement({ business, businessUsers, onRefetch }: B
                     variant="ghost"
                     size="sm"
                     onClick={() => handleResetPassword(user.profiles.email)}
+                    disabled={isResetDisabled(user.profiles.email)}
+                    title={getResetButtonTooltip(user.profiles.email)}
                   >
                     <KeyRound className="h-4 w-4" />
                   </Button>
