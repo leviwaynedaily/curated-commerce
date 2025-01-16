@@ -214,7 +214,7 @@ export function ProductTable({
               </TableHeader>
               <ProductTableHeader
                 field="name"
-                label="Product"
+                label="Name"
                 className="min-w-[300px]"
                 currentSort={sortConfig}
                 onSort={handleSort}
